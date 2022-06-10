@@ -47,6 +47,6 @@ jobs:
       - name: build check
         run: |
           find semi-eco-reiwa/ -maxdepth 1 -name "*.pdf" -type f
-          if [ $? ]; then
+          if [ $? -ne 0 ]; then
             exit 1
           fi
