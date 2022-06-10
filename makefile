@@ -18,9 +18,9 @@ ifneq ($(shell docker ps -a | grep ${NAME}),) #起動済みのコンテナを停
 	docker container stop ${NAME}
 endif
 	make pre-exec_ --no-print-directory
-	-docker container exec -i ${NAME} /bin/bash -c "cd ${TEX_DIR} && make all"
-	-docker container exec -i ${NAME} /bin/bash -c "cd ${TEX_DIR} && make all"
-	-docker container exec -i ${NAME} /bin/bash -c "cd ${TEX_DIR} && latexindent -w -s ${TEXFILE} && rm *.bak*"
+	-docker container exec ${NAME} /bin/bash -c "cd ${TEX_DIR} && make all"
+	-docker container exec ${NAME} /bin/bash -c "cd ${TEX_DIR} && make all"
+	-docker container exec ${NAME} /bin/bash -c "cd ${TEX_DIR} && latexindent -w -s ${TEXFILE} && rm *.bak*"
 	make post-exec_ --no-print-directory
 
 lint:
@@ -28,7 +28,7 @@ ifneq ($(shell docker ps -a | grep ${NAME}),) #起動済みのコンテナを停
 	docker container stop ${NAME}
 endif
 	make pre-exec_ --no-print-directory
-	-docker container exec -i ${NAME} /bin/bash -c "./node_modules/.bin/textlint ${TEX_DIR}/${TEXFILE}"
+	-docker container exec ${NAME} /bin/bash -c "./node_modules/.bin/textlint ${TEX_DIR}/${TEXFILE}"
 	make post-exec_ --no-print-directory
 
 build:
