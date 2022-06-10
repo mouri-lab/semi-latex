@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
+      - name: checkout code
+        uses: actions/checkout@v2
       - name: Setup node
         uses: actions/setup-node@v2
         with:
