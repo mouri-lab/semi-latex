@@ -1,0 +1,23 @@
+plugins:
+- latex2e
+rules:
+  preset-ja-spacing: true
+  preset-ja-technical-writing:
+    # 助詞の重複をチェック(no-doubled-joshi)
+    no-doubled-joshi: true
+    # 文末の句点の有無をチェックしない (ja-no-mixed-period)
+    ja-no-mixed-period: false
+    max-kanji-continuous-len: false
+    sentence-length: false
+  preset-ja-engineering-paper:
+    # prh: false
+    prh:
+     rulePaths:
+     - node_modules/prh/prh-rules/media/WEB+DB_PRESS.yml
+     - node_modules/prh/prh-rules/media/semi-rule.yml
+
+    # 句読点「，」「．」のチェック
+    unify-kuten-and-touten: true
+filters:
+  enablingComment: textlint-enable
+  disablingComment: textlint-disable

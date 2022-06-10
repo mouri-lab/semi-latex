@@ -1,0 +1,30 @@
+#研究室ルール
+#研究室wikiより
+#リンク：https://frigg.asl.cs.ritsumei.ac.jp/~mouri/local/pukiwiki/?%E3%82%BC%E3%83%9F%E8%B3%87%E6%96%99%E3%81%AE%E6%9B%B8%E3%81%8D%E6%96%B9
+version: 1
+
+rules:
+  - expected: "書き込む"
+    pattern:  書き出す
+  - expected: "読み出す"
+    pattern:  読み込む
+  - expected: "記す"
+    pattern:  略す
+  - expected: "以下に示す"
+    pattern:  以下で示す
+  - expected: "以下で述べる"
+    pattern:  以下に述べる
+  - expected: "以下，本論文では"
+    pattern:   以下本論文では
+  - expected: "現在，我々は"
+    pattern:   現在我々は
+  - expected: "のとき"
+    pattern:   の時
+  - expected: "できる"
+    pattern:   出来る
+  - expected: "すべて"
+    pattern:   全て
+  - expected: "ふるまい"
+    pattern:  振舞い
+  - expected: "ない"
+    pattern:  無い

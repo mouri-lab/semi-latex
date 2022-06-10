@@ -1,0 +1,101 @@
+{
+	// latex-workshop.latex.autoBuild.run: .tex ファイルの保存時に自動的にビルドを行うかどうか
+	// LaTeX ファイルは .tex ファイルを変更後にビルドしないと、PDF ファイル上に変更結果が反映されないため、
+	// .tex ファイルの保存と同時に自動的にビルドを実行する設定があるが、文書が大きくなるに連れてビルドにも
+	// 時間がかかってしまい、ビルドプログラムの負荷がエディタに影響するため、無効化しておく。
+	"latex-workshop.latex.autoBuild.run": "onSave",
+	"latex-workshop.latex.autoBuild.interval": 3000,
+	"latex-workshop.latex.recipes": [
+		{
+			"name": "latexmk (lab)",
+			"tools": [
+				"make",
+			]
+		},
+		{
+			"name": "pbibtex",
+			"tools": [
+				"pbibtex",
+			]
+		},
+	],
+	// latex-workshop.latex.clean.fileTypes: クリーンアップ時に削除されるファイルの拡張子
+	// LaTeX 文書はビルド時に一時ファイルとしていくつかのファイルを生成するが、最終的に必要となるのは
+	// PDF ファイルのみである場合などが多い。また、LaTeX のビルド時に失敗した場合、失敗時に生成された
+	// 一時ファイルの影響で、修正後のビルドに失敗してしまう事がよくある。そのため、一時的なファイルを
+	// 削除する機能 (クリーンアップ) が LaTeX Workshop には備わっている。
+	"latex-workshop.latex.tools": [
+		{
+			"name": "make",
+			"command": "make",
+			"args": [
+				"run",
+				"-C",
+				"../",
+			]
+		},
+		{
+			"name": "lint",
+			"command": "make",
+			"args": [
+				"lint",
+				"-C",
+				"../",
+			]
+		},
+	],
+	// "latex-workshop.view.pdf.viewer": "external",
+	"editor.suggestSelection": "recentlyUsed",
+	"editor.formatOnSave": true,
+	"vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+	"workbench.startupEditor": "newUntitledFile",
+	"files.trimTrailingWhitespace": true,
+	"extensions.ignoreRecommendations": false,
+	"latex-workshop.synctex.afterBuild.enabled": true,
+	"latex-workshop.synctex.synctexjs.enabled": true,
+	"latex-workshop.view.pdf.viewer": "tab",
+	// latex-workshop.latex.autoClean.run: ビルド失敗時に一時ファイルのクリーンアップを行うかどうか
+	// 上記説明にもあったように、ビルド失敗時に生成された一時ファイルが悪影響を及ぼす事があるため、自動で
+	// クリーンアップがかかるようにしておく
+	"latex-workshop.latex.autoClean.run": "onFailed",
+	"latex-workshop.view.pdf.zoom": "page-width",
+	"latex-workshop.latexindent.path": "",
+	// スニペットを優先
+	"editor.snippetSuggestions": "top",
+	"[json]": {
+		"editor.quickSuggestions": {
+			"strings": true
+		},
+		"editor.suggest.insertMode": "replace"
+	},
+	"json.schemas": [],
+	"sync.gist": "e68e5c5d99f92026a7a01a8a95a70486",
+	"[latex]": {
+		"editor.formatOnPaste": false,
+		"editor.suggestSelection": "recentlyUsedByPrefix",
+		"editor.quickSuggestions": {
+			"comments": "off",
+			"strings": "off",
+			"other": "off"
+		}
+	},
+	"cSpell.ignoreWords": [],
+	"security.workspace.trust.untrustedFiles": "open",
+	"files.exclude": {
+		"**/.classpath": true,
+		"**/.project": true,
+		"**/.settings": true,
+		"**/.factorypath": true
+	},
+	"explorer.confirmDelete": false,
+	"editor.insertSpaces": false,
+	"editor.wordWrap": "on",
+	"cSpell.userWords": [
+		"assert",
+		"streq"
+	],
+	"workbench.editorAssociations": {
+		"*.pdf": "latex-workshop-pdf-hook"
+	},
+	"redhat.telemetry.enabled": false
+}
