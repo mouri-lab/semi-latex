@@ -43,7 +43,7 @@ jobs:
           rm -f semi-eco-reiwa/*.tex
       - name: build
         run: |
-          make -C run
+          make run
       - name: build check
         run: |
           find semi-eco-reiwa -name "*.tex" -type f
