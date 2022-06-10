@@ -20,11 +20,11 @@ make build
 ```
 
 ## コンパイル
-* コマンド
+* コマンド上で実行
 ```
 make run
 ```
-* VSCode上
+* VSCode上で実行
   * texファイル保存時にコンパイルされる
 
 ## textlint
