@@ -11,11 +11,11 @@ RUN apt-get update
 # デフォルトのサーバは遠いので通信速度が遅い
 RUN apt-get install -y apt-utils
 RUN apt-get install -y perl --no-install-recommends \
-	&& perl -p -i.bak -e 's%(deb(?:-src|)\s+)https?://(?!archive\.canonical\.com|security\.ubuntu\.com)[^\s]+%$1http://ftp.riken.jp/Linux/ubuntu/%' /etc/apt/sources.list
+    && perl -p -i.bak -e 's%(deb(?:-src|)\s+)https?://(?!archive\.canonical\.com|security\.ubuntu\.com)[^\s]+%$1http://ftp.riken.jp/Linux/ubuntu/%' /etc/apt/sources.list
 
 # ターミナルで日本語の出力を可能にするための設定
 RUN apt-get update \
-&&  apt-get install -y \
+    &&  apt-get install -y \
     language-pack-ja-base \
     language-pack-ja \
     fonts-noto-cjk \
@@ -37,12 +37,13 @@ RUN apt-get install -y \
     imagemagick \
     texlive-fonts-extra \
     texlive-latex-extra \
+    texlive-extra-utils \
     texlive-fonts-recommended \
     texlive-lang-cjk \
     texlive-lang-japanese \
     inkscape \
     librsvg2-bin \
-&&  apt-get clean
+    &&  apt-get clean
 
 
 ENV DIRPATH home/${DOCKER_USER_}
@@ -64,10 +65,10 @@ RUN apt-get install -y nodejs \
     wget
 
 RUN npm install n -g -y \
-&& n lts
+    && n lts
 
 RUN npm init --yes \
-&& npm install textlint \
+    && npm install textlint \
     textlint-rule-preset-ja-technical-writing \
     textlint-rule-preset-ja-spacing \
     textlint-rule-preset-jtf-style \
@@ -76,7 +77,7 @@ RUN npm init --yes \
 
 # ”はじめに”と”おわりに”を漢字変換しないよう，ルールを変更
 RUN sed -i "1084,1085d" node_modules/prh/prh-rules/media/WEB+DB_PRESS.yml \
-&& sed -i "s;おわ[^0-9][^0-9]らりるれろ;おわ\([らるれろ;g" node_modules/prh/prh-rules/media/WEB+DB_PRESS.yml
+    && sed -i "s;おわ[^0-9][^0-9]らりるれろ;おわ\([らるれろ;g" node_modules/prh/prh-rules/media/WEB+DB_PRESS.yml
 
 ENV GTK_IM_MODULE=xim \
     QT_IM_MODULE=fcitx \

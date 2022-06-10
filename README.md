@@ -1,13 +1,21 @@
 # ゼミ用LaTeX環境
+* LaTeX環境をローカルにインストールしたくないので作りました
 
 ## 動作環境
-* docker&makeが動作する環境
-* latex-workshopがインストールされたVScode
+* 以下が動作する環境
+  * Docker
+  * make
+* LaTeX-WorkshopがインストールされたVScode
 
 ## INSTALL
+* Dockerのインストール
+  * インストール後に再起動が必要
 ```
-sudo apt install docker.io make
-#workspace内
+make install-docker
+```
+* Dockerのビルド
+  * インストールした後にDockerFileをビルドする必要があります
+```
 make build
 ```
 
@@ -32,3 +40,5 @@ make lint
 	make remote
 	```
   * リモートエクスプローラにlatex-containerが表示されるのでAttach to Container
+ * 研のlintルール
+   * 場所：media/semi-rule.yml

@@ -72,6 +72,7 @@
 	"sync.gist": "e68e5c5d99f92026a7a01a8a95a70486",
 	"[latex]": {
 		"editor.formatOnPaste": false,
+		"editor.formatOnSave": false,
 		"editor.suggestSelection": "recentlyUsedByPrefix",
 		"editor.quickSuggestions": {
 			"comments": "off",

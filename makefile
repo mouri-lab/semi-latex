@@ -20,6 +20,7 @@ endif
 	make pre-exec_ --no-print-directory
 	-docker container exec -i ${NAME} /bin/bash -c "cd ${TEX_DIR} && make all"
 	-docker container exec -i ${NAME} /bin/bash -c "cd ${TEX_DIR} && make all"
+	-docker container exec -i ${NAME} /bin/bash -c "cd ${TEX_DIR} && latexindent -w -s ${TEXFILE} && rm *.bak*"
 	make post-exec_ --no-print-directory
 
 lint:
@@ -82,19 +83,9 @@ rebuild:
 connect:
 	docker exec -u root -it ${NAME} /bin/bash
 
-install:
+install-docker:
 	sudo apt update
-	sudo apt install -y apt-transport-https \
-    ca-certificates \
-    curl \
-    gnupg-agent \
-    software-properties-common \
-	texlive-extra-utils
-	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-	sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
-	sudo apt update
-	apt-cache policy docker-ce
-	sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+	sudo apt install -y docker.io
 ifneq ($(shell getent group docker| cut -f 4 --delim=":"),$(shell whoami))
 	sudo gpasswd -a $(shell whoami) docker
 endif
