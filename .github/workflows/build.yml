@@ -36,7 +36,7 @@ jobs:
       - name: docker build
         run: |
           pwd
-          sed -i "s/@docker container run/faketty docker container run/g" docker/makefile
+          sed -i "s/@docker container run/faketty docker container run/g" makefile
           make build
           rm -f semi-eco-reiwa/*.tex
       - name: build
