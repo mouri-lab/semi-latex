@@ -46,7 +46,7 @@ jobs:
           make run
       - name: build check
         run: |
-          find semi-eco-reiwa -name "*.tex" -type f
+          find semi-eco-reiwa/ -maxdepth 1 -name "*.pdf" -type f
           if [ $? ]; then
             exit 1
           fi
