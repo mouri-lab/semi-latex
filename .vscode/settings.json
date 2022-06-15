@@ -46,7 +46,6 @@
 	],
 	// "latex-workshop.view.pdf.viewer": "external",
 	"editor.suggestSelection": "recentlyUsed",
-	"editor.formatOnSave": true,
 	"vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
 	"workbench.startupEditor": "newUntitledFile",
 	"files.trimTrailingWhitespace": true,
