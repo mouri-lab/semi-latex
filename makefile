@@ -20,8 +20,7 @@ endif
 	make pre-exec_ --no-print-directory
 	-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && make all"
 	-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && make all"
-	# texファイルの整形
-	-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && latexindent -w -s ${TEXFILE} && rm *.bak*"
+	@-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && latexindent -w -s ${TEXFILE} && rm *.bak*" # texファイルの整形
 	make post-exec_ --no-print-directory
 
 lint:
