@@ -28,9 +28,12 @@ lint:
 ifneq ($(shell docker ps -a | grep ${NAME}),) #起動済みのコンテナを停止
 	docker container stop ${NAME}
 endif
-	make pre-exec_ --no-print-directory
-	-docker container exec ${NAME} /bin/bash -c "./node_modules/.bin/textlint ${TEX_DIR}/${TEXFILE}"
-	make post-exec_ --no-print-directory
+	@make pre-exec_ --no-print-directory
+	-@docker container exec ${NAME} /bin/bash -c "./node_modules/.bin/textlint ${TEX_DIR}/${TEXFILE}"
+	@make post-exec_ --no-print-directory
+
+github_actions_lint_:
+	make lint > lint.log
 
 build:
 	DOCKER_BUILDKIT=1 docker image build -t ${NAME} \
