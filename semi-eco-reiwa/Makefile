@@ -193,7 +193,7 @@ $(MAIN).dvi: $(DVISRC)
 	fi
 
 $(MAIN).pdf: dvi
-	dvipdfmx $(MAIN).dvi
+	dvipdfmx -q $(MAIN).dvi
 
 
 ## Figure conversion algorithms

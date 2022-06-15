@@ -1,5 +1,5 @@
 # FROM nobodyxu/apt-fast:latest-ubuntu-bionic AS base
-FROM ubuntu:20.04 AS latex
+FROM amd64/ubuntu:20.04 AS latex
 
 ENV DEBIAN_FRONTEND noninteractive
 # ユーザーを作成
