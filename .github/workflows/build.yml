@@ -1,0 +1,52 @@
+name: build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+      - name: Setup faketty
+        uses: Yuri6037/Action-FakeTTY@v1.1
+      - name: update
+        run: |
+          sudo apt update
+          sudo apt upgrade -y
+      - name: install
+        run: |
+          sudo apt install -y apt-transport-https \
+             ca-certificates \
+             curl \
+             gnupg-agent \
+             software-properties-common
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+          sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+          sudo apt update
+          apt-cache policy docker-ce
+          sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+          sudo systemctl restart docker
+      - name: docker build
+        run: |
+          pwd
+          sed -i "s/@docker container run/faketty docker container run/g" makefile
+          make build
+          rm -f semi-eco-reiwa/*.tex
+      - name: build
+        run: |
+          make run
+      - name: build check
+        run: |
+          find semi-eco-reiwa/ -maxdepth 1 -name "*.pdf" -type f
+          if [ $? -ne 0 ]; then
+            exit 1
+          fi
