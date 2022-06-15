@@ -4,13 +4,13 @@ DOCKER_USER_NAME := guest
 DOCKER_HOME_DIR := /home/${DOCKER_USER_NAME}
 CURRENT_PATH := $(shell pwd)
 TEX_DIR := semi-eco-reiwa
-TEXFILE := $(shell find . -name "*.tex" -type f -printf '%f\n')
+TEXFILE := $(shell find . -name "*.tex" -type f | cut -d '/' -f 3)
+IS_LINUX := $(shell uname)
 
 .PHONY: run
 .PHONY: lint
 .PHONY: build
 .PHONY: remote
-
 
 # コンテナ実行
 run:
@@ -18,9 +18,10 @@ ifneq ($(shell docker ps -a | grep ${NAME}),) #起動済みのコンテナを停
 	docker container stop ${NAME}
 endif
 	make pre-exec_ --no-print-directory
-	-docker container exec ${NAME} /bin/bash -c "cd ${TEX_DIR} && make all"
-	-docker container exec ${NAME} /bin/bash -c "cd ${TEX_DIR} && make all"
-	-docker container exec ${NAME} /bin/bash -c "cd ${TEX_DIR} && latexindent -w -s ${TEXFILE} && rm *.bak*"
+	-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && make all"
+	-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && make all"
+	# texファイルの整形
+	-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && latexindent -w -s ${TEXFILE} && rm *.bak*"
 	make post-exec_ --no-print-directory
 
 lint:
@@ -59,9 +60,11 @@ pre-exec_:
 	--name ${NAME} \
 	${NAME}:latest
 	@-docker container cp ${TEX_DIR} ${NAME}:${DOCKER_HOME_DIR}
-	@-docker cp ~/.bashrc ${NAME}:${DOCKER_HOME_DIR}/.bashrc
 	@-docker cp .textlintrc ${NAME}:${DOCKER_HOME_DIR}/
 	@-docker cp media/semi-rule.yml ${NAME}:${DOCKER_HOME_DIR}/node_modules/prh/prh-rules/media/
+ifeq (${IS_LINUX},Linux)
+	@-docker cp ~/.bashrc ${NAME}:${DOCKER_HOME_DIR}/.bashrc
+endif
 
 post-exec_:
 	@-docker container cp ${NAME}:${DOCKER_HOME_DIR}/${TEX_DIR} .
@@ -84,6 +87,11 @@ connect:
 	docker exec -u root -it ${NAME} /bin/bash
 
 install-docker:
+ifneq (${IS_LINUX},Linux)
+	echo "このコマンドはLinuxでのみ使用できます"
+	echo "その他のOSを使っている場合は別途Docker環境を用意してください"
+	exit 1
+endif
 	sudo apt update
 	sudo apt install -y docker.io
 ifneq ($(shell getent group docker| cut -f 4 --delim=":"),$(shell whoami))
@@ -100,4 +108,5 @@ png2eps: ${PNG:%.png=%.eps}
 	convert $^ eps2:$@
 
 test:
-	$(shell basename $(find . -name "*.tex" -type f) ".tex")
+	echo $(shell find . -name "*.tex" -type f -printf '%f\n')
+	echo $(shell find . -name "*.tex" -type f | cut -d '/' -f 3)
