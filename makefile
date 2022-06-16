@@ -1,8 +1,8 @@
 NAME := latex-container
-TS := `date +%Y%m%d%H%M%S`
 DOCKER_USER_NAME := guest
 DOCKER_HOME_DIR := /home/${DOCKER_USER_NAME}
 CURRENT_PATH := $(shell pwd)
+# texファイルのディレクトリ
 TEX_DIR := semi-eco-reiwa
 TEXFILE := $(shell find . -name "*.tex" -type f | cut -d '/' -f 3)
 IS_LINUX := $(shell uname)
@@ -12,7 +12,7 @@ IS_LINUX := $(shell uname)
 .PHONY: build
 .PHONY: remote
 
-# コンテナ実行
+# LaTeXのコンパイル
 run:
 ifneq ($(shell docker ps -a | grep ${NAME}),) #起動済みのコンテナを停止
 	docker container stop ${NAME}
@@ -23,14 +23,20 @@ endif
 	@-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && latexindent -w -s ${TEXFILE} && rm *.bak*" # texファイルの整形
 	make post-exec_ --no-print-directory
 
+# TextLint
 lint:
 ifneq ($(shell docker ps -a | grep ${NAME}),) #起動済みのコンテナを停止
 	docker container stop ${NAME}
 endif
-	make pre-exec_ --no-print-directory
-	-docker container exec ${NAME} /bin/bash -c "./node_modules/.bin/textlint ${TEX_DIR}/${TEXFILE}"
-	make post-exec_ --no-print-directory
+	@make pre-exec_ --no-print-directory
+	-@docker container exec ${NAME} /bin/bash -c "./node_modules/.bin/textlint ${TEX_DIR}/${TEXFILE}"
+	@make post-exec_ --no-print-directory
 
+# GitHub Actions上でのTextLintのテスト用
+github_actions_lint_:
+	make lint > lint.log
+
+# コンテナのビルド
 build:
 	DOCKER_BUILDKIT=1 docker image build -t ${NAME} \
 	--build-arg DOCKER_USER_=${DOCKER_USER_NAME} \
@@ -39,6 +45,8 @@ ifneq ($(shell docker images -f 'dangling=true' -q),)
 	-docker rmi $(shell docker images -f 'dangling=true' -q)
 endif
 
+# VScodeからTextLint環境にリモート接続する際に使用
+# コンテナを開きっぱなしにする
 remote:
 	make pre-exec_ --no-print-directory
 	-docker cp remote/.devcontainer ${NAME}:${DOCKER_HOME_DIR}/
@@ -46,11 +54,15 @@ remote:
 	-docker container exec -it ${NAME} bash
 	make post-exec_ --no-print-directory
 
+# デバッグ用
+# コンテナ内に入って作業する
 bash:
 	make pre-exec_ --no-print-directory
 	-docker container exec -it ${NAME} bash
 	make post-exec_ --no-print-directory
 
+# コンテナ実行する際の前処理
+# 起動，ファイルのコピーを行う
 pre-exec_:
 	@docker container run \
 	-it \
@@ -65,6 +77,8 @@ ifeq (${IS_LINUX},Linux)
 	@-docker cp ~/.bashrc ${NAME}:${DOCKER_HOME_DIR}/.bashrc
 endif
 
+# コンテナ終了時の後処理
+# コンテナ内のファイルをローカルへコピー，コンテナの削除を行う
 post-exec_:
 	@-docker container cp ${NAME}:${DOCKER_HOME_DIR}/${TEX_DIR} .
 	@docker container stop ${NAME}
@@ -82,9 +96,12 @@ rebuild:
 	--no-cache=true .
 
 # root権限で起動中のコンテナに接続
+# aptパッケージのインストールをテストする際に使用
+# コンテナは起動しておく必要がある
 connect:
 	docker exec -u root -it ${NAME} /bin/bash
 
+# UbuntuにコンテナをインストールしsudoなしでDockerコマンドを実行する設定を行う
 install-docker:
 ifneq (${IS_LINUX},Linux)
 	echo "このコマンドはLinuxでのみ使用できます"
@@ -100,6 +117,7 @@ endif
 	sudo systemctl restart docker
 	@echo "環境構築を完了するために再起動してください"
 
+# PNG画像をEPSへ変換する
 PNG := $(shell find semi-eco-reiwa/fig -name "*.png" -type f)
 png2eps: ${PNG:%.png=%.eps}
 
