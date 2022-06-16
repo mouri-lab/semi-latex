@@ -86,12 +86,13 @@ jobs:
           sed -i "s/@docker container run/faketty docker container run/g" makefile
           make build
           rm -f semi-eco-reiwa/*.pdf
-      - name: build
+      - name: lint
         run: |
           make github_actions_lint_
+          ls
       - name: lint check
         run: |
-          lint_cnt=cat lint.log | grep -c "26:8   ✓ error  を無く => をなく"
+          lint_cnt=cat lint.log | grep -c "error"
           if [ ${lint_cnt} -lt 1 ]; then
             exit 1
           fi
