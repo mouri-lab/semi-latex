@@ -72,7 +72,7 @@
 	"[latex]": {
 		"editor.formatOnPaste": false,
 		"editor.formatOnSave": false,
-		"editor.suggestSelection": "recentlyUsedByPrefix",
+		"editor.suggestSelection": "recentlyUsed",
 		"editor.quickSuggestions": {
 			"comments": "off",
 			"strings": "off",
