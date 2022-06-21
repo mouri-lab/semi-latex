@@ -85,11 +85,11 @@ SRC-PNG := $(wildcard $(addsuffix /*.png,$(SRC-FIGURE-DIRS))) # Some pictures
 SRC-PDF := $(wildcard $(addsuffix /*.pdf,$(SRC-FIGURE-DIRS))) # Power Point, Visio, and so on
 
 # Will generate files (They will be removed by clean-full)
-DST-FIG := $(SRC-SVG:%.svg=%.eps)            # svg -> eps
-DST-FIG += $(SRC-PNG:%.png=%.bb)             # png -> bb
+DST-FIG := $(SRC-SVG:%.svg=%.pdf)            # svg -> pdf
+# DST-FIG += $(SRC-PNG:%.png=%.bb)             # png -> bb
 DST-FIG += $(SRC-PNG:%.png=%.eps)            # png -> eps
 DST-FIG += $(SRC-OBJ:%.obj=%.eps)            # obj -> eps
-DST-FIG += $(SRC-PDF:%.pdf=%.bb)			 # pdf -> bb
+# DST-FIG += $(SRC-PDF:%.pdf=%.bb)			 # pdf -> bb
 ifeq ("$(CONV-PDF-TO-EPS)","yes")
 	DST-FIG += $(SRC-PDF:%.pdf=%.eps)		 # pdf -> eps
 endif
@@ -207,6 +207,9 @@ $(MAIN).pdf: dvi
 # Inkscape: svg -> eps
 %.eps: %.svg
 	$(INKSCAPE) $< --export-eps=$@ --export-text-to-path --export-area-drawing
+
+%.pdf: %.svg
+	rsvg-convert -f pdf -o $@ $<
 
 # Tgif: obj -> eps
 %.eps: %.obj
