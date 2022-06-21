@@ -5,3 +5,5 @@
 *.dvi
 *.log
 *.pdf
+*.tex
+!semi.tex
