@@ -74,7 +74,7 @@ make bash
 ```
 exit
 ```
-![latex](https://user-images.githubusercontent.com/71243805/175035945-0b5701c0-b7cf-4804-b47a-a0acbff3f340.gif)
+![latex-3](https://user-images.githubusercontent.com/71243805/175042384-17a4563b-654e-4d83-a79c-0070f718913a.gif)
 
 
 ### 研のlintルール
