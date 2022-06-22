@@ -46,17 +46,7 @@ ifneq ($(shell docker images -f 'dangling=true' -q),)
 	-docker rmi $(shell docker images -f 'dangling=true' -q)
 endif
 
-# VScodeからTextLint環境にリモート接続する際に使用
 # コンテナを開きっぱなしにする
-remote:
-	make pre-exec_ --no-print-directory
-	-docker cp remote/.devcontainer ${NAME}:${DOCKER_HOME_DIR}/
-	-docker cp remote/settings.json ${NAME}:${DOCKER_HOME_DIR}/
-	-docker container exec -it ${NAME} bash
-	make post-exec_ --no-print-directory
-
-# デバッグ用
-# コンテナ内に入って作業する
 bash:
 	make pre-exec_ --no-print-directory
 	-docker container exec -it ${NAME} bash
