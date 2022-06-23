@@ -89,8 +89,10 @@ rebuild:
 # root権限で起動中のコンテナに接続
 # aptパッケージのインストールをテストする際に使用
 # コンテナは起動しておく必要がある
-connect:
-	docker exec -u root -it ${NAME} /bin/bash
+root:
+	make pre-exec_ --no-print-directory
+	-docker container exec -it --user root ${NAME} bash
+	make post-exec_ --no-print-directory
 
 # UbuntuにコンテナをインストールしsudoなしでDockerコマンドを実行する設定を行う
 install-docker:
