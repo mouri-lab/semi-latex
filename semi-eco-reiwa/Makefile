@@ -193,7 +193,7 @@ $(MAIN).dvi: $(DVISRC)
 	fi
 
 $(MAIN).pdf: dvi
-	dvipdfmx -q $(MAIN).dvi
+	dvipdfmx -f texfonts.map -q $(MAIN).dvi
 
 
 ## Figure conversion algorithms

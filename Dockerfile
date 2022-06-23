@@ -43,7 +43,8 @@ RUN apt-get install -y \
     texlive-lang-japanese \
     inkscape \
     librsvg2-bin \
-    &&  apt-get clean
+    &&  apt-get clean \
+    &&  kanji-config-updmap-sys auto
 
 
 ENV DIRPATH home/${DOCKER_USER_}
