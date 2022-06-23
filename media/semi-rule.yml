@@ -31,7 +31,47 @@ rules:
   - expected: "ふるまい"
     pattern: 振舞い
   - expected: "ない"
-    pattern: 無い
+    pattern:  無い
+  - expected: "アーキテクチャ"
+    pattern:  アーキテクチャー
+  - expected: "インタフェース"
+    pattern:  インターフェース
+  - expected: "オーバヘッド"
+    pattern:  オーバーヘッド
+  - expected: "呼出し"
+    pattern:  呼び出し
+  - expected: "受付け"
+    pattern:  受け付け
+  - expected: "組込み"
+    pattern:  組み込み
+  - expected: "1つ"
+    pattern:  一つ
+  - expected: "2つ"
+    pattern:  二つ
+  - expected: "3つ"
+    pattern:  三つ
+  - expected: "4つ"
+    pattern:  四つ
+  - expected: "5つ"
+    pattern:  五つ
+  - expected: "6つ"
+    pattern:  六つ
+  - expected: "7つ"
+    pattern:  七つ
+  - expected: "8つ"
+    pattern:  八つ
+  - expected: "9つ"
+    pattern:  九つ
+  - expected: "禁句です"
+    pattern:  だから
+  - expected: "禁句です"
+    pattern:  つまり
+  - expected: "禁句です"
+    pattern:  そして
+  - expected: "禁句です"
+    pattern:  だが
+  - expected: "禁句です"
+    pattern:  たら
   - expected: 解析
     pattern: /解析(をする|によって)解析
   - expected: デバッグ
