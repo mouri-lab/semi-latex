@@ -45,17 +45,7 @@ ifneq ($(shell docker images -f 'dangling=true' -q),)
 	-docker rmi $(shell docker images -f 'dangling=true' -q)
 endif
 
-# VScodeからTextLint環境にリモート接続する際に使用
 # コンテナを開きっぱなしにする
-remote:
-	make pre-exec_ --no-print-directory
-	-docker cp remote/.devcontainer ${NAME}:${DOCKER_HOME_DIR}/
-	-docker cp remote/settings.json ${NAME}:${DOCKER_HOME_DIR}/
-	-docker container exec -it ${NAME} bash
-	make post-exec_ --no-print-directory
-
-# デバッグ用
-# コンテナ内に入って作業する
 bash:
 	make pre-exec_ --no-print-directory
 	-docker container exec -it ${NAME} bash
@@ -98,8 +88,10 @@ rebuild:
 # root権限で起動中のコンテナに接続
 # aptパッケージのインストールをテストする際に使用
 # コンテナは起動しておく必要がある
-connect:
-	docker exec -u root -it ${NAME} /bin/bash
+root:
+	make pre-exec_ --no-print-directory
+	-docker container exec -it --user root ${NAME} bash
+	make post-exec_ --no-print-directory
 
 # UbuntuにコンテナをインストールしsudoなしでDockerコマンドを実行する設定を行う
 install-docker:

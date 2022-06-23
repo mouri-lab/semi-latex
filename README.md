@@ -5,6 +5,9 @@
   - [INSTALL](#install)
   - [コンパイル](#コンパイル)
   - [textlint](#textlint)
+    - [ターミナルで実行](#ターミナルで実行)
+    - [VScode上でlintを表示させる場合](#vscode上でlintを表示させる場合)
+    - [研のlintルール](#研のlintルール)
   - [画像の貼り方](#画像の貼り方)
     - [png](#png)
     - [svg](#svg)
@@ -33,7 +36,7 @@
 * Dockerのインストール
   * (注)このコマンドはUbuntuのみで実行可能
     * Mac OS, Windowsは個別にDockerとmakeの実行環境を作ってください
-  * インストール後に再起動が必要- [ゼミ用LaTeX環境](#ゼミ用latex環境)
+  * インストール後に再起動が必要
 ```
 make install-docker
 ```
@@ -53,19 +56,28 @@ make run
   * texファイル保存時にコンパイルされる
 
 ## textlint
-* コマンド
+### ターミナルで実行
 ```
 make lint
 ```
 
-* VScode上でlintを表示させる場合
-  * VScodeにRemote Developmentをインストール
-  * コンテナを起動する
-	```
-	make remote
-	```
-  * リモートエクスプローラにlatex-containerが表示されるのでAttach to Container
- * 研のlintルール
+### VScode上でlintを表示させる場合
+* VScodeにRemote Developmentのインストールが必要
+1. コンテナを起動する
+```
+make bash
+```
+2. リモートエクスプローラにlatex-containerが表示されるのでAttach to Container
+
+1. 編集後にコンテナを終了させる
+  * コンテナ内の変更はこのときにローカルにコピーされる
+```
+exit
+```
+![latex-3](https://user-images.githubusercontent.com/71243805/175042384-17a4563b-654e-4d83-a79c-0070f718913a.gif)
+
+
+### 研のlintルール
    * 場所：media/semi-rule.yml
 
 ## 画像の貼り方
