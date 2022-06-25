@@ -7,3 +7,5 @@
 *.pdf
 *.tex
 !semi.tex
+
+workspace/*

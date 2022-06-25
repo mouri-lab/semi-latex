@@ -3,8 +3,15 @@ DOCKER_USER_NAME := guest
 DOCKER_HOME_DIR := /home/${DOCKER_USER_NAME}
 CURRENT_PATH := $(shell pwd)
 # texファイルのディレクトリ
-TEX_DIR := semi-eco-reiwa
-TEXFILE := $(shell find . -name "*.tex" -type f | cut -d '/' -f 3)
+ifneq ($(shell find workspace -name "*.tex" -type f),)
+TEX_DIR := $(shell find workspace -name "*.tex" -type f | cut -d '/' -f 1)
+else
+TEX_DIR := sample
+endif
+TEX_FILE := $(shell find . -name "*.tex" -type f | cut -d '/' -f 3)
+SETTING_DIR := latex-setting
+SETTING_FILES := $(shell ls ${SETTING_DIR})
+
 IS_LINUX := $(shell uname)
 
 .PHONY: run
@@ -20,7 +27,7 @@ endif
 	make pre-exec_ --no-print-directory
 	-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && make all"
 	-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && make all"
-	@-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && latexindent -w -s ${TEXFILE} && rm *.bak*" # texファイルの整形
+	@-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && latexindent -w -s ${TEX_FILE} && rm *.bak*" # texファイルの整形
 	make post-exec_ --no-print-directory
 
 # TextLint
@@ -29,12 +36,15 @@ ifneq ($(shell docker ps -a | grep ${NAME}),) #起動済みのコンテナを停
 	docker container stop ${NAME}
 endif
 	@make pre-exec_ --no-print-directory
-	-@docker container exec ${NAME} /bin/bash -c "./node_modules/.bin/textlint ${TEX_DIR}/${TEXFILE}"
+	-@docker container exec ${NAME} /bin/bash -c "./node_modules/.bin/textlint ${TEX_DIR}/${TEX_FILE}"
 	@make post-exec_ --no-print-directory
 
 # GitHub Actions上でのTextLintのテスト用
 github_actions_lint_:
 	make lint > lint.log
+
+runOnVscode:
+
 
 # コンテナのビルド
 build:
@@ -61,6 +71,9 @@ pre-exec_:
 	--name ${NAME} \
 	${NAME}:latest
 	@-docker container cp ${TEX_DIR} ${NAME}:${DOCKER_HOME_DIR}
+	@-docker container cp ${SETTING_DIR} ${NAME}:${DOCKER_HOME_DIR}
+	@-docker container exec --user root ${NAME}  bash -c "cp -a ${DOCKER_HOME_DIR}/${SETTING_DIR}/* ${DOCKER_HOME_DIR}/${TEX_DIR}"
+	@-docker container exec --user root ${NAME}  bash -c "cd ${DOCKER_HOME_DIR}/${TEX_DIR}"
 	@-docker cp .textlintrc ${NAME}:${DOCKER_HOME_DIR}/
 	@-docker cp media/semi-rule.yml ${NAME}:${DOCKER_HOME_DIR}/node_modules/prh/prh-rules/media/
 ifeq (${IS_LINUX},Linux)
@@ -70,6 +83,7 @@ endif
 # コンテナ終了時の後処理
 # コンテナ内のファイルをローカルへコピー，コンテナの削除を行う
 post-exec_:
+	-docker container exec ${NAME}  bash -c "cd ${DOCKER_HOME_DIR}/${TEX_DIR} && rm ${SETTING_FILES} "
 	@-docker container cp ${NAME}:${DOCKER_HOME_DIR}/${TEX_DIR} .
 	@docker container stop ${NAME}
 
@@ -109,13 +123,7 @@ endif
 	sudo systemctl restart docker
 	@echo "環境構築を完了するために再起動してください"
 
-# PNG画像をEPSへ変換する
-PNG := $(shell find semi-eco-reiwa/fig -name "*.png" -type f)
-png2eps: ${PNG:%.png=%.eps}
-
-%.eps: %.png
-	convert $^ eps2:$@
-
 test:
-	echo $(shell find . -name "*.tex" -type f -printf '%f\n')
-	echo $(shell find . -name "*.tex" -type f | cut -d '/' -f 3)
+	echo ${TEX_DIR}
+	echo ${SETTING_FILES}
+	echo $(1)
