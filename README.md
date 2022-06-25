@@ -3,6 +3,7 @@
   - [動作環境](#動作環境)
 - [使い方](#使い方)
   - [INSTALL](#install)
+  - [作業場所](#作業場所)
   - [コンパイル](#コンパイル)
   - [textlint](#textlint)
     - [ターミナルで実行](#ターミナルで実行)
@@ -13,6 +14,7 @@
     - [svg](#svg)
 - [コマンド一覧](#コマンド一覧)
   - [LaTexのコンパイル](#latexのコンパイル)
+  - [サンプルのコンパイル](#サンプルのコンパイル)
   - [TextLint](#textlint-1)
   - [dockerのリソースを開放](#dockerのリソースを開放)
   - [コンテナのパッケージ更新](#コンテナのパッケージ更新)
@@ -24,6 +26,9 @@
 * 実行環境
   * Docker
   * make
+  * VScode
+    * あると便利
+    * 無くてもターミナルから実行可能
 * VScodeの拡張機能
   * LaTeX-Workshop
     * LaTeXの補完
@@ -34,26 +39,34 @@
 # 使い方
 ## INSTALL
 * Dockerのインストール
-  * (注)このコマンドはUbuntuのみで実行可能
+  * **このコマンドはUbuntuのみで実行可能**
     * Mac OS, Windowsは個別にDockerとmakeの実行環境を作ってください
   * インストール後に再起動が必要
-```
-make install-docker
-```
+  ```
+  make install-docker
+  ```
 
 * Dockerのビルド
-  * インストールした後にDockerFileをビルドする必要があります
-```
-make build
-```
+  * インストールした後にDockerFileをビルドすることが必要
+  * 所要時間：5~10分（ネットワークの速度依存）
+  * 5GBのイメージを作るので時間がかかる
+  ```
+  make build
+  ```
+
+## 作業場所
+* **workspace**内で.texファイルを作成
+  * workspace内のファイルはGitの追跡対象外
+  * サンプルコードは**sample**内のsemi.tex
 
 ## コンパイル
 * コマンドから実行
-```
-make run
-```
+  ```
+  make run
+  ```
 * VSCode上で実行
   * texファイル保存時にコンパイルされる
+  * **LaTeX-Workshopが必要**
 
 ## textlint
 ### ターミナルで実行
@@ -70,7 +83,7 @@ make bash
 2. リモートエクスプローラにlatex-containerが表示されるのでAttach to Container
 
 1. 編集後にコンテナを終了させる
-  * コンテナ内の変更はこのときにローカルにコピーされる
+     * コンテナ内の変更はこのときにローカルにコピーされる
 ```
 exit
 ```
@@ -109,9 +122,16 @@ exit
 # コマンド一覧
 
 ## LaTexのコンパイル
+* コンパイルされるのはworkspace内のtexファイル
 ```
 make run
 ```
+
+## サンプルのコンパイル
+```
+make sample
+```
+
 ## TextLint
 ```
 make lint
@@ -124,7 +144,7 @@ make clean
 ```
 
 ## コンテナのパッケージ更新
-* make buildパッケージは更新されない
+* make buildではパッケージは更新されない
   * 過去のキャッシュが使われる
 ```
 make rebuild
