@@ -41,11 +41,11 @@ lint:
 
 # sampleをビルド
 sample:
-	make pre-exec_ --no-print-directory
+	make pre-exec_ TEX_DIR=sample --no-print-directory
 	-docker container exec --user root ${NAME} /bin/bash -c "cd sample && make all"
 	-docker container exec --user root ${NAME} /bin/bash -c "cd sample && make all"
 	@-docker container exec --user root ${NAME} /bin/bash -c "cd sample && latexindent -w -s semi.tex && rm *.bak*"
-	make post-exec_ --no-print-directory
+	make post-exec_ TEX_DIR=sample --no-print-directory
 
 
 # GitHub Actions上でのTextLintのテスト用
