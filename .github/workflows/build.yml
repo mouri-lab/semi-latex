@@ -46,8 +46,7 @@ jobs:
           make run
       - name: build check
         run: |
-          find sample/ -maxdepth 1 -name "*.pdf" -type f
-          if [ $? -ne 0 ]; then
+          if [ $(ls sample/ | grep -c .pdf) -eq 0 ]; then
             exit 1
           fi
 
