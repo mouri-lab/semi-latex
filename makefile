@@ -83,7 +83,7 @@ endif
 # コンテナ終了時の後処理
 # コンテナ内のファイルをローカルへコピー，コンテナの削除を行う
 post-exec_:
-	-docker container exec ${NAME}  bash -c "cd ${DOCKER_HOME_DIR}/${TEX_DIR} && rm ${SETTING_FILES} "
+	@-docker container exec --user root ${NAME}  bash -c "cd ${DOCKER_HOME_DIR}/${TEX_DIR} && rm ${SETTING_FILES} "
 	@-docker container cp ${NAME}:${DOCKER_HOME_DIR}/${TEX_DIR} .
 	@docker container stop ${NAME}
 
