@@ -38,12 +38,13 @@
 
 # 使い方
 ## INSTALL
-* Dockerのインストール
-  * **このコマンドはUbuntuのみで実行可能**
+* workspaceディレクトリの作成
+* 環境をインストール
+  * **Ubuntuのみ**Docker環境をインストールできる
     * Mac OS, Windowsは個別にDockerとmakeの実行環境を作ってください
-  * インストール後に再起動が必要
+    * インストール後に再起動が必要
   ```
-  make install-docker
+  make install
   ```
 
 * Dockerのビルド

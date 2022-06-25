@@ -118,11 +118,21 @@ root:
 	-docker container exec -it --user root ${NAME} bash
 	make post-exec_ --no-print-directory
 
+install:
+ifeq ($(ls | grep -c workspace),0)
+	mkdir workspace
+endif
+ifeq ($(shell docker --version),)
+	ifeq (${IS_LINUX},Linux)
+		-make install-docker
+	endif
+endif
+
+
+
 # UbuntuにコンテナをインストールしsudoなしでDockerコマンドを実行する設定を行う
 install-docker:
-ifneq (${IS_LINUX},Linux)
-	echo "このコマンドはLinuxでのみ使用できます"
-	echo "その他のOSを使っている場合は別途Docker環境を用意してください"
+ifneq ($(shell docker --version),)
 	exit 1
 endif
 	sudo apt update
@@ -136,7 +146,8 @@ endif
 
 
 test:
-	echo ${TEX_DIR}
-	echo ${TEX_FILE}
-	echo ${SETTING_FILES}
-	echo $(1)
+ifneq ($(shell docker --version),)
+	exit find
+else
+	echo not find
+endif
