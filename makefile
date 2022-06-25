@@ -6,10 +6,10 @@ DOCKER_HOME_DIR := /home/${DOCKER_USER_NAME}
 CURRENT_PATH := $(shell pwd)
 
 # texファイルのディレクトリ
-ifneq ($(shell find workspace -name "*.tex" -type f),)
-TEX_DIR := $(shell find workspace -name "*.tex" -type f | cut -d '/' -f 1)
-else
+ifeq ($(shell find workspace -name "*.tex" -type f),)
 TEX_DIR := sample
+else
+TEX_DIR := $(shell find workspace -name "*.tex" -type f | cut -d '/' -f 1)
 endif
 
 
