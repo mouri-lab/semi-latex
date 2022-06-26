@@ -43,7 +43,7 @@ jobs:
           rm -f sample/*.pdf
       - name: build
         run: |
-          make run
+          make sample
       - name: build check
         run: |
           if [ $(ls sample/ | grep -c .pdf) -eq 0 ]; then
