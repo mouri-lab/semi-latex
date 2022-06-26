@@ -119,8 +119,13 @@ root:
 	make post-exec_ --no-print-directory
 
 install:
-ifeq ($(ls | grep -c workspace),0)
+ifeq ($(shell ls | grep -c workspace),0)
 	mkdir workspace
+endif
+ifeq ($(shell ls workspace/ | grep -c ".tex"),0)
+	cp sample/*.tex workspace/
+	touch workspace/references.bib
+	bash sample-clean.sh
 endif
 ifeq ($(shell docker --version),)
 	ifeq (${IS_LINUX},Linux)
@@ -146,8 +151,4 @@ endif
 
 
 test:
-ifneq ($(shell docker --version),)
-	exit find
-else
-	echo not find
-endif
+	sed "$(shell $(expr $(grep -n "section{はじめに}" workspace/semi.tex | cut -d ":" -f 1) + 1))/171d" workspace/semi.tex
