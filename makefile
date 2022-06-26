@@ -1,40 +1,57 @@
+# コンテナ名
 NAME := latex-container
+
 DOCKER_USER_NAME := guest
 DOCKER_HOME_DIR := /home/${DOCKER_USER_NAME}
 CURRENT_PATH := $(shell pwd)
+
 # texファイルのディレクトリ
-TEX_DIR := semi-eco-reiwa
-TEXFILE := $(shell find . -name "*.tex" -type f | cut -d '/' -f 3)
+ifeq ($(shell find workspace -name "*.tex" -type f),)
+TEX_DIR := sample
+else
+TEX_DIR := $(shell find workspace -name "*.tex" -type f | cut -d '/' -f 1)
+endif
+
+
+TEX_FILE := $(shell find ./${TEX_DIR} -name "*.tex" -type f | cut -d '/' -f 3)
+SETTING_DIR := latex-setting
+SETTING_FILES := $(shell ls ${SETTING_DIR})
+
 IS_LINUX := $(shell uname)
 
 .PHONY: run
 .PHONY: lint
+.PHONY: sample
 .PHONY: build
-.PHONY: remote
+.PHONY: bash
 
 # LaTeXのコンパイル
 run:
-ifneq ($(shell docker ps -a | grep ${NAME}),) #起動済みのコンテナを停止
-	docker container stop ${NAME}
-endif
 	make pre-exec_ --no-print-directory
 	-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && make all"
 	-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && make all"
-	@-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && latexindent -w -s ${TEXFILE} && rm *.bak*" # texファイルの整形
+	@-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && latexindent -w -s ${TEX_FILE} && rm *.bak*" # texファイルの整形
 	make post-exec_ --no-print-directory
 
 # TextLint
 lint:
-ifneq ($(shell docker ps -a | grep ${NAME}),) #起動済みのコンテナを停止
-	docker container stop ${NAME}
-endif
 	@make pre-exec_ --no-print-directory
-	-@docker container exec ${NAME} /bin/bash -c "./node_modules/.bin/textlint ${TEX_DIR}/${TEXFILE}"
+	-@docker container exec ${NAME} /bin/bash -c "./node_modules/.bin/textlint ${TEX_DIR}/${TEX_FILE}"
 	@make post-exec_ --no-print-directory
+
+# sampleをビルド
+sample:
+	make pre-exec_ TEX_DIR=sample --no-print-directory
+	-docker container exec --user root ${NAME} /bin/bash -c "cd sample && make all"
+	-docker container exec --user root ${NAME} /bin/bash -c "cd sample && make all"
+	@-docker container exec --user root ${NAME} /bin/bash -c "cd sample && latexindent -w -s semi.tex && rm *.bak*"
+	make post-exec_ TEX_DIR=sample --no-print-directory
+
 
 # GitHub Actions上でのTextLintのテスト用
 github_actions_lint_:
 	make lint > lint.log
+
 
 # コンテナのビルド
 build:
@@ -45,15 +62,21 @@ ifneq ($(shell docker images -f 'dangling=true' -q),)
 	-docker rmi $(shell docker images -f 'dangling=true' -q)
 endif
 
+
 # コンテナを開きっぱなしにする
+# リモートアクセス用
 bash:
 	make pre-exec_ --no-print-directory
 	-docker container exec -it ${NAME} bash
 	make post-exec_ --no-print-directory
 
+
 # コンテナ実行する際の前処理
 # 起動，ファイルのコピーを行う
 pre-exec_:
+ifneq ($(shell docker ps -a | grep ${NAME}),) #起動済みのコンテナを停止
+	docker container stop ${NAME}
+endif
 	@docker container run \
 	-it \
 	--rm \
@@ -61,6 +84,8 @@ pre-exec_:
 	--name ${NAME} \
 	${NAME}:latest
 	@-docker container cp ${TEX_DIR} ${NAME}:${DOCKER_HOME_DIR}
+	@-docker container cp ${SETTING_DIR} ${NAME}:${DOCKER_HOME_DIR}
+	@-docker container exec --user root ${NAME}  bash -c "cp -a ${DOCKER_HOME_DIR}/${SETTING_DIR}/* ${DOCKER_HOME_DIR}/${TEX_DIR}"
 	@-docker cp .textlintrc ${NAME}:${DOCKER_HOME_DIR}/
 	@-docker cp media/semi-rule.yml ${NAME}:${DOCKER_HOME_DIR}/node_modules/prh/prh-rules/media/
 ifeq (${IS_LINUX},Linux)
@@ -70,6 +95,7 @@ endif
 # コンテナ終了時の後処理
 # コンテナ内のファイルをローカルへコピー，コンテナの削除を行う
 post-exec_:
+	@-docker container exec --user root ${NAME}  bash -c "cd ${DOCKER_HOME_DIR}/${TEX_DIR} && rm ${SETTING_FILES} "
 	@-docker container cp ${NAME}:${DOCKER_HOME_DIR}/${TEX_DIR} .
 	@docker container stop ${NAME}
 
@@ -87,17 +113,31 @@ rebuild:
 
 # root権限で起動中のコンテナに接続
 # aptパッケージのインストールをテストする際に使用
-# コンテナは起動しておく必要がある
 root:
 	make pre-exec_ --no-print-directory
 	-docker container exec -it --user root ${NAME} bash
 	make post-exec_ --no-print-directory
 
+install:
+ifeq ($(shell ls | grep -c workspace),0)
+	mkdir workspace
+endif
+ifeq ($(shell ls workspace/ | grep -c ".tex"),0)
+	cp sample/*.tex workspace/
+	touch workspace/references.bib
+	bash sample-clean.sh
+endif
+ifeq ($(shell docker --version),)
+	ifeq (${IS_LINUX},Linux)
+		-make install-docker
+	endif
+endif
+
+
+
 # UbuntuにコンテナをインストールしsudoなしでDockerコマンドを実行する設定を行う
 install-docker:
-ifneq (${IS_LINUX},Linux)
-	echo "このコマンドはLinuxでのみ使用できます"
-	echo "その他のOSを使っている場合は別途Docker環境を用意してください"
+ifneq ($(shell docker --version),)
 	exit 1
 endif
 	sudo apt update
@@ -109,13 +149,6 @@ endif
 	sudo systemctl restart docker
 	@echo "環境構築を完了するために再起動してください"
 
-# PNG画像をEPSへ変換する
-PNG := $(shell find semi-eco-reiwa/fig -name "*.png" -type f)
-png2eps: ${PNG:%.png=%.eps}
-
-%.eps: %.png
-	convert $^ eps2:$@
 
 test:
-	echo $(shell find . -name "*.tex" -type f -printf '%f\n')
-	echo $(shell find . -name "*.tex" -type f | cut -d '/' -f 3)
+	sed "$(shell $(expr $(grep -n "section{はじめに}" workspace/semi.tex | cut -d ":" -f 1) + 1))/171d" workspace/semi.tex

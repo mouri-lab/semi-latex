@@ -3,16 +3,18 @@
   - [動作環境](#動作環境)
 - [使い方](#使い方)
   - [INSTALL](#install)
+  - [作業場所](#作業場所)
   - [コンパイル](#コンパイル)
   - [textlint](#textlint)
     - [ターミナルで実行](#ターミナルで実行)
-    - [VScode上でlintを表示させる場合](#vscode上でlintを表示させる場合)
+    - [VScode上でlint結果を表示](#vscode上でlint結果を表示)
     - [研のlintルール](#研のlintルール)
   - [画像の貼り方](#画像の貼り方)
     - [png](#png)
     - [svg](#svg)
 - [コマンド一覧](#コマンド一覧)
   - [LaTexのコンパイル](#latexのコンパイル)
+  - [サンプルのコンパイル](#サンプルのコンパイル)
   - [TextLint](#textlint-1)
   - [dockerのリソースを開放](#dockerのリソースを開放)
   - [コンテナのパッケージ更新](#コンテナのパッケージ更新)
@@ -21,39 +23,48 @@
 # 概要
 * LaTeX環境をローカルにインストールしたくないので作りました
 ## 動作環境
-* 実行環境
+* 必要環境
   * Docker
   * make
-* VScodeの拡張機能
-  * LaTeX-Workshop
-    * LaTeXの補完
-    * 保存時に自動コンパイル
-  * Remote Development
-    * VScode上にTextLintのエラーを表示させる
+* 推奨環境
+  * VScode
+  * VScodeの拡張機能
+    * LaTeX-Workshop
+      * LaTeXの補完
+      * 保存時に自動コンパイル
+    * Remote Development
+      * VScode上にTextLintのエラーを表示させる
 
 # 使い方
 ## INSTALL
-* Dockerのインストール
-  * (注)このコマンドはUbuntuのみで実行可能
+1. 環境をインストール
+   * **Ubuntuのみ**Docker環境を自動インストール
     * Mac OS, Windowsは個別にDockerとmakeの実行環境を作ってください
-  * インストール後に再起動が必要
-```
-make install-docker
-```
+    ```
+    make install
+    ```
+2. 再起動
+3. Dockerのビルド
+  * インストールした後にDockerFileをビルドすることが必要
+  * 所要時間：5~10分（ネットワークの速度依存）
+  * 5GBのイメージを作るので時間がかかる
+    ```
+    make build
+    ```
 
-* Dockerのビルド
-  * インストールした後にDockerFileをビルドする必要があります
-```
-make build
-```
+## 作業場所
+* **workspace**
+  * workspace内のファイルはGitの追跡対象外
+  * make install時にフォルダとファイルが作成される
 
 ## コンパイル
 * コマンドから実行
-```
-make run
-```
+  ```
+  make run
+  ```
 * VSCode上で実行
   * texファイル保存時にコンパイルされる
+  * **LaTeX-Workshopが必要**
 
 ## textlint
 ### ターミナルで実行
@@ -61,19 +72,19 @@ make run
 make lint
 ```
 
-### VScode上でlintを表示させる場合
+### VScode上でlint結果を表示
 * VScodeにRemote Developmentのインストールが必要
 1. コンテナを起動する
-```
-make bash
-```
+    ```
+    make bash
+    ```
 2. リモートエクスプローラにlatex-containerが表示されるのでAttach to Container
 
 1. 編集後にコンテナを終了させる
-  * コンテナ内の変更はこのときにローカルにコピーされる
-```
-exit
-```
+     * コンテナ内の変更はこのときにローカルにコピーされる
+    ```
+    exit
+    ```
 ![latex-3](https://user-images.githubusercontent.com/71243805/175042384-17a4563b-654e-4d83-a79c-0070f718913a.gif)
 
 
@@ -109,9 +120,16 @@ exit
 # コマンド一覧
 
 ## LaTexのコンパイル
+* コンパイルされるのはworkspace内のtexファイル
 ```
 make run
 ```
+
+## サンプルのコンパイル
+```
+make sample
+```
+
 ## TextLint
 ```
 make lint
@@ -124,7 +142,7 @@ make clean
 ```
 
 ## コンテナのパッケージ更新
-* make buildパッケージは更新されない
+* make buildではパッケージは更新されない
   * 過去のキャッシュが使われる
 ```
 make rebuild

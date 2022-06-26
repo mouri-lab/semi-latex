@@ -40,14 +40,13 @@ jobs:
           pwd
           sed -i "s/@docker container run/faketty docker container run/g" makefile
           make build
-          rm -f semi-eco-reiwa/*.pdf
+          rm -f sample/*.pdf
       - name: build
         run: |
-          make run
+          make sample
       - name: build check
         run: |
-          find semi-eco-reiwa/ -maxdepth 1 -name "*.pdf" -type f
-          if [ $? -ne 0 ]; then
+          if [ $(ls sample/ | grep -c .pdf) -eq 0 ]; then
             exit 1
           fi
 
@@ -85,7 +84,6 @@ jobs:
           pwd
           sed -i "s/@docker container run/faketty docker container run/g" makefile
           make build
-          rm -f semi-eco-reiwa/*.pdf
       - name: lint
         run: |
           make github_actions_lint_
