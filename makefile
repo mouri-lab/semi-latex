@@ -6,10 +6,10 @@ DOCKER_HOME_DIR := /home/${DOCKER_USER_NAME}
 CURRENT_PATH := $(shell pwd)
 
 # texファイルのディレクトリ
-ifeq ($(shell find workspace -name "*.tex" -type f),)
+ifeq ($(shell find workspace -name "*.tex" -type f 2>/dev/null),)
 TEX_DIR := sample
 else
-TEX_DIR := $(shell find workspace -name "*.tex" -type f | cut -d '/' -f 1)
+TEX_DIR := $(shell find workspace -name "*.tex" -type f 2>/dev/null | cut -d '/' -f 1)
 endif
 
 
@@ -74,15 +74,17 @@ bash:
 # コンテナ実行する際の前処理
 # 起動，ファイルのコピーを行う
 pre-exec_:
-ifneq ($(shell docker ps -a | grep ${NAME}),) #起動済みのコンテナを停止
-	docker container stop ${NAME}
-endif
+ifeq ($(shell docker ps -a | grep -c ${NAME}),0)
 	@docker container run \
 	-it \
 	--rm \
+	--network none \
 	-d \
 	--name ${NAME} \
 	${NAME}:latest
+else
+	@-docker container exec --user root ${NAME}  bash -c "cd ${DOCKER_HOME_DIR} && rm -rf ${TEX_DIR} "
+endif
 	@-docker container cp ${TEX_DIR} ${NAME}:${DOCKER_HOME_DIR}
 	@-docker container cp ${SETTING_DIR} ${NAME}:${DOCKER_HOME_DIR}
 	@-docker container exec --user root ${NAME}  bash -c "cp -a ${DOCKER_HOME_DIR}/${SETTING_DIR}/* ${DOCKER_HOME_DIR}/${TEX_DIR}"
@@ -97,7 +99,6 @@ endif
 post-exec_:
 	@-docker container exec --user root ${NAME}  bash -c "cd ${DOCKER_HOME_DIR}/${TEX_DIR} && rm ${SETTING_FILES} "
 	@-docker container cp ${NAME}:${DOCKER_HOME_DIR}/${TEX_DIR} .
-	@docker container stop ${NAME}
 
 # dockerのリソースを開放
 clean:
@@ -118,11 +119,15 @@ root:
 	-docker container exec -it --user root ${NAME} bash
 	make post-exec_ --no-print-directory
 
+stop:
+	@docker container stop ${NAME}
+
+
 install:
 ifeq ($(shell ls | grep -c workspace),0)
 	mkdir workspace
 endif
-ifeq ($(shell ls workspace/ | grep -c ".tex"),0)
+ifeq ($(shell ls workspace/ 2>/dev/null | grep -c ".tex"),0)
 	cp sample/*.tex workspace/
 	touch workspace/references.bib
 	bash sample-clean.sh
