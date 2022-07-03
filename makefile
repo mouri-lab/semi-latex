@@ -5,11 +5,12 @@ DOCKER_USER_NAME := guest
 DOCKER_HOME_DIR := /home/${DOCKER_USER_NAME}
 CURRENT_PATH := $(shell pwd)
 
-# texファイルのディレクトリ
-ifeq ($(shell find workspace -name "*.tex" -type f 2>/dev/null),)
+# コンパイルするtexファイルのディレクトリ
+# 指定したディレクトリにtexファイルは1つであることが必要
+TEX_DIR := workspace
+ifeq ($(shell find ${TEX_DIR} -name "*.tex" -type f 2>/dev/null),)
+# 指定したディレクトリ内にtexファイルが無い場合はsampleが使用される
 TEX_DIR := sample
-else
-TEX_DIR := $(shell find workspace -name "*.tex" -type f 2>/dev/null | cut -d '/' -f 1)
 endif
 
 
@@ -36,7 +37,7 @@ run:
 # TextLint
 lint:
 	@make pre-exec_ --no-print-directory
-	-@docker container exec ${NAME} /bin/bash -c "./node_modules/.bin/textlint ${TEX_DIR}/${TEX_FILE}"
+	@- docker container exec ${NAME} /bin/bash -c "./node_modules/.bin/textlint ${TEX_DIR}/${TEX_FILE}"
 	@make post-exec_ --no-print-directory
 
 # sampleをビルド
@@ -120,7 +121,11 @@ root:
 	make post-exec_ --no-print-directory
 
 stop:
+ifneq ($(shell docker container ls -a | grep -c "${NAME}"),0)
 	@docker container stop ${NAME}
+	@echo "コンテナを停止"
+endif
+	@docker container ls -a
 
 
 install:
@@ -132,17 +137,17 @@ ifeq ($(shell ls workspace/ 2>/dev/null | grep -c ".tex"),0)
 	touch workspace/references.bib
 	bash sample-clean.sh
 endif
-ifeq ($(shell docker --version),)
-	ifeq (${IS_LINUX},Linux)
-		-make install-docker
-	endif
+ifeq ($(shell docker --version 2>/dev/null),)
+ifeq (${IS_LINUX},Linux)
+	-make install-docker
+endif
 endif
 
 
 
-# UbuntuにコンテナをインストールしsudoなしでDockerコマンドを実行する設定を行う
+# UbuntuにDockerをインストールし，sudoなしでDockerコマンドを実行する設定を行う
 install-docker:
-ifneq ($(shell docker --version),)
+ifneq ($(shell docker --version 2>/dev/null),)
 	exit 1
 endif
 	sudo apt update
@@ -154,6 +159,6 @@ endif
 	sudo systemctl restart docker
 	@echo "環境構築を完了するために再起動してください"
 
-
+# コマンドのテスト用
 test:
 	sed "$(shell $(expr $(grep -n "section{はじめに}" workspace/semi.tex | cut -d ":" -f 1) + 1))/171d" workspace/semi.tex
