@@ -5,11 +5,12 @@ DOCKER_USER_NAME := guest
 DOCKER_HOME_DIR := /home/${DOCKER_USER_NAME}
 CURRENT_PATH := $(shell pwd)
 
-# texファイルのディレクトリ
-ifeq ($(shell find workspace -name "*.tex" -type f),)
+# コンパイルするtexファイルのディレクトリ
+# 指定したディレクトリにtexファイルは1つであることが必要
+TEX_DIR := workspace
+ifeq ($(shell find ${TEX_DIR} -name "*.tex" -type f 2>/dev/null),)
+# 指定したディレクトリ内にtexファイルが無い場合はsampleが使用される
 TEX_DIR := sample
-else
-TEX_DIR := $(shell find workspace -name "*.tex" -type f | cut -d '/' -f 1)
 endif
 
 
@@ -36,7 +37,7 @@ run:
 # TextLint
 lint:
 	@make pre-exec_ --no-print-directory
-	-@docker container exec ${NAME} /bin/bash -c "./node_modules/.bin/textlint ${TEX_DIR}/${TEX_FILE}"
+	@- docker container exec ${NAME} /bin/bash -c "./node_modules/.bin/textlint ${TEX_DIR}/${TEX_FILE}"
 	@make post-exec_ --no-print-directory
 
 # sampleをビルド
@@ -74,15 +75,17 @@ bash:
 # コンテナ実行する際の前処理
 # 起動，ファイルのコピーを行う
 pre-exec_:
-ifneq ($(shell docker ps -a | grep ${NAME}),) #起動済みのコンテナを停止
-	docker container stop ${NAME}
-endif
+ifeq ($(shell docker ps -a | grep -c ${NAME}),0)
 	@docker container run \
 	-it \
 	--rm \
+	--network none \
 	-d \
 	--name ${NAME} \
 	${NAME}:latest
+else
+	@-docker container exec --user root ${NAME}  bash -c "cd ${DOCKER_HOME_DIR} && rm -rf ${TEX_DIR} "
+endif
 	@-docker container cp ${TEX_DIR} ${NAME}:${DOCKER_HOME_DIR}
 	@-docker container cp ${SETTING_DIR} ${NAME}:${DOCKER_HOME_DIR}
 	@-docker container exec --user root ${NAME}  bash -c "cp -a ${DOCKER_HOME_DIR}/${SETTING_DIR}/* ${DOCKER_HOME_DIR}/${TEX_DIR}"
@@ -97,7 +100,6 @@ endif
 post-exec_:
 	@-docker container exec --user root ${NAME}  bash -c "cd ${DOCKER_HOME_DIR}/${TEX_DIR} && rm ${SETTING_FILES} "
 	@-docker container cp ${NAME}:${DOCKER_HOME_DIR}/${TEX_DIR} .
-	@docker container stop ${NAME}
 
 # dockerのリソースを開放
 clean:
@@ -118,26 +120,34 @@ root:
 	-docker container exec -it --user root ${NAME} bash
 	make post-exec_ --no-print-directory
 
+stop:
+ifneq ($(shell docker container ls -a | grep -c "${NAME}"),0)
+	@docker container stop ${NAME}
+	@echo "コンテナを停止"
+endif
+	@docker container ls -a
+
+
 install:
 ifeq ($(shell ls | grep -c workspace),0)
 	mkdir workspace
 endif
-ifeq ($(shell ls workspace/ | grep -c ".tex"),0)
+ifeq ($(shell ls workspace/ 2>/dev/null | grep -c ".tex"),0)
 	cp sample/*.tex workspace/
 	touch workspace/references.bib
 	bash sample-clean.sh
 endif
-ifeq ($(shell docker --version),)
-	ifeq (${IS_LINUX},Linux)
-		-make install-docker
-	endif
+ifeq ($(shell docker --version 2>/dev/null),)
+ifeq (${IS_LINUX},Linux)
+	-make install-docker
+endif
 endif
 
 
 
-# UbuntuにコンテナをインストールしsudoなしでDockerコマンドを実行する設定を行う
+# UbuntuにDockerをインストールし，sudoなしでDockerコマンドを実行する設定を行う
 install-docker:
-ifneq ($(shell docker --version),)
+ifneq ($(shell docker --version 2>/dev/null),)
 	exit 1
 endif
 	sudo apt update
@@ -149,6 +159,6 @@ endif
 	sudo systemctl restart docker
 	@echo "環境構築を完了するために再起動してください"
 
-
+# コマンドのテスト用
 test:
 	sed "$(shell $(expr $(grep -n "section{はじめに}" workspace/semi.tex | cut -d ":" -f 1) + 1))/171d" workspace/semi.tex

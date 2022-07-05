@@ -1,12 +1,15 @@
-*.aux
-*.bbl
-*.blg
-*.gz
-*.dvi
-*.log
-*.pdf
-*.tex
+*
+!/.devcontainer/
+!/.github/
+!/.vscode/
+!/latex-setting/
+!/media/
+!/sample/
 
-!sample/fig/ex2.pdf
-
-workspace/*
+!.dockerignore
+!.gitignore
+!.textlintrc
+!Dockerfile
+!makefile
+!README.md
+!sample-clean.sh
