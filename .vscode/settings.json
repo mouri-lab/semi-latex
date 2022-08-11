@@ -59,6 +59,7 @@
 	"latex-workshop.latex.autoClean.run": "onFailed",
 	"latex-workshop.view.pdf.zoom": "page-width",
 	"latex-workshop.latexindent.path": "",
+	"latex-workshop.intellisense.package.enabled": true,
 	// スニペットを優先
 	"editor.snippetSuggestions": "top",
 	"[json]": {
@@ -72,6 +73,7 @@
 	"[latex]": {
 		"editor.formatOnPaste": false,
 		"editor.formatOnSave": false,
+		"editor.wordWrap": "on",
 		"editor.suggestSelection": "recentlyUsed",
 		"editor.quickSuggestions": {
 			"comments": "off",
@@ -79,8 +81,6 @@
 			"other": "off"
 		}
 	},
-	"cSpell.ignoreWords": [],
-	"security.workspace.trust.untrustedFiles": "open",
 	"files.exclude": {
 		"**/.classpath": true,
 		"**/.project": true,
