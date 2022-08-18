@@ -5,6 +5,8 @@ DOCKER_USER_NAME := guest
 DOCKER_HOME_DIR := /home/${DOCKER_USER_NAME}
 CURRENT_PATH := $(shell pwd)
 
+DOCKER_REPOSITORY := taka0628/semi-latex
+
 # コンパイルするtexファイルのディレクトリ
 # 指定したディレクトリにtexファイルは1つであることが必要
 TEX_DIR := workspace
@@ -14,7 +16,7 @@ TEX_DIR := sample
 endif
 
 
-TEX_FILE := $(shell find ./${TEX_DIR} -name "*.tex" -type f | cut -d '/' -f 3)
+TEX_FILE := $(shell find ./${TEX_DIR} -name "*.tex" -type f | rev | cut -d '/' -f 1 | rev)
 SETTING_DIR := latex-setting
 SETTING_FILES := $(shell ls ${SETTING_DIR})
 
@@ -142,6 +144,8 @@ ifeq (${IS_LINUX},Linux)
 	-make install-docker
 endif
 endif
+	LATEX_CONTAINER_MAKE_PATH=$(shell pwd)
+
 
 
 
@@ -159,6 +163,17 @@ endif
 	sudo systemctl restart docker
 	@echo "環境構築を完了するために再起動してください"
 
+push-image:
+	docker tag ${NAME}:latest ${DOCKER_REPOSITORY}
+	docker push ${DOCKER_REPOSITORY}
+	docker image rm ${DOCKER_REPOSITORY}
+
+get-image:
+	docker pull ${DOCKER_REPOSITORY}:latest
+	docker tag ${DOCKER_REPOSITORY}:latest ${NAME}
+	docker image rm ${DOCKER_REPOSITORY}
+
 # コマンドのテスト用
 test:
 	sed "$(shell $(expr $(grep -n "section{はじめに}" workspace/semi.tex | cut -d ":" -f 1) + 1))/171d" workspace/semi.tex
+

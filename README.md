@@ -47,15 +47,21 @@
     make install
     ```
 2. 再起動
-3. Dockerのビルド
-     * 所要時間：5~10分（ネットワークの速度依存）
-     * 5GBのイメージを作るので時間がかかる
-    ```
-    make build
-    ```
+3. Docker Imageの作成
+   *  Docker Hubからイメージを取得
+      * 基本的にはこちらを推奨
+       ```
+       make get-image
+       ```
+   * Dockerのビルド
+     * Docker Hubから取得出来なかった場合
+     * こちらの方が時間がかかる
+      ```
+      make build
+      ```
 
 ## 作業場所
-* **workspace**
+* **workspace**内にtexファイルが作成されることを想定
   * workspace内のファイルはGitの追跡対象外
   * make install時にフォルダとファイルが作成される
 
