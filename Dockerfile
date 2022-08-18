@@ -5,13 +5,7 @@ ENV DEBIAN_FRONTEND noninteractive
 # ユーザーを作成
 ARG DOCKER_USER_=null
 
-RUN apt-get update
-
-# パッケージインストールで参照するサーバを日本サーバに変更
-# デフォルトのサーバは遠いので通信速度が遅い
-RUN apt-get install -y apt-utils
-RUN apt-get install -y perl --no-install-recommends \
-    && perl -p -i.bak -e 's%(deb(?:-src|)\s+)https?://(?!archive\.canonical\.com|security\.ubuntu\.com)[^\s]+%$1http://ftp.riken.jp/Linux/ubuntu/%' /etc/apt/sources.list
+COPY --chown=root:root latex-setting/sources.list /etc/apt/sources.list
 
 # ターミナルで日本語の出力を可能にするための設定
 RUN apt-get update \
@@ -49,12 +43,12 @@ RUN apt-get install -y \
 
 ENV DIRPATH home/${DOCKER_USER_}
 WORKDIR $DIRPATH
+
 # ユーザ設定
 RUN useradd ${DOCKER_USER_}
 RUN chown -R ${DOCKER_USER_} /${DIRPATH}
 
 USER ${DOCKER_USER_}
-
 
 FROM latex AS textlint
 
