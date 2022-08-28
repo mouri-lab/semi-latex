@@ -28,7 +28,7 @@ jobs:
           if [ $(ls sample/ | grep -c .pdf) -eq 0 ]; then
             ls -l
             exit 1
-          elif [ $(ll sample | grep semi.pdf | cut -d " " -f 6) -eq 0 ]; then
+          elif [ $(ls -l sample | grep semi.pdf | cut -d " " -f 5) -eq 0 ]; then
             ls -l
             exit 1
           fi
