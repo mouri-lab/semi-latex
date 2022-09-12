@@ -5,7 +5,8 @@ ENV DEBIAN_FRONTEND noninteractive
 # ユーザーを作成
 ARG DOCKER_USER_=null
 
-COPY --chown=root:root latex-setting/sources.list /etc/apt/sources.list
+COPY latex-setting/net.sh /net.sh
+RUN sh /net.sh
 
 # ターミナルで日本語の出力を可能にするための設定
 RUN apt-get update \
