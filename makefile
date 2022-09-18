@@ -1,11 +1,15 @@
 # コンテナ名
 NAME := latex-container
 
-DOCKER_USER_NAME := guest
+# DockerHubのリポジトリ名
+DOCKER_REPOSITORY := taka0628/semi-latex
+
+
+DOCKER_USER_NAME := $(shell cat Dockerfile | grep "ARG DOCKER_USER_" | cut -d "=" -f 2)
 DOCKER_HOME_DIR := /home/${DOCKER_USER_NAME}
 CURRENT_PATH := $(shell pwd)
+TS := $(shell date +%Y%m%d%H%M%S)
 
-DOCKER_REPOSITORY := taka0628/semi-latex
 
 # コンパイルするtexファイルのディレクトリ
 # 指定したディレクトリにtexファイルは1つであることが必要
@@ -21,34 +25,35 @@ SETTING_DIR := latex-setting
 SETTING_FILES := $(shell ls ${SETTING_DIR})
 
 IS_LINUX := $(shell uname)
+SHELL := /bin/bash
 
 .PHONY: run
 .PHONY: lint
-.PHONY: sample
-.PHONY: build
 .PHONY: bash
 
 # LaTeXのコンパイル
 run:
-	make pre-exec_ --no-print-directory
+	make _preExec -s
 	-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && make all"
 	-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && make all"
-	@-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && latexindent -w -s ${TEX_FILE} && rm *.bak*" # texファイルの整形
-	make post-exec_ --no-print-directory
+# texファイルの整形
+	@-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && latexindent -w -s ${TEX_FILE} && rm *.bak*"
+	make _postExec -s
 
 # TextLint
 lint:
-	@make pre-exec_ --no-print-directory
+	@make _preExec -s
 	@- docker container exec ${NAME} /bin/bash -c "./node_modules/.bin/textlint ${TEX_DIR}/${TEX_FILE}"
-	@make post-exec_ --no-print-directory
+	@make _postExec -s
 
 # sampleをビルド
-sample:
-	make pre-exec_ TEX_DIR=sample --no-print-directory
+run-sample:
+	make _preExec TEX_DIR=sample -s
 	-docker container exec --user root ${NAME} /bin/bash -c "cd sample && make all"
 	-docker container exec --user root ${NAME} /bin/bash -c "cd sample && make all"
 	@-docker container exec --user root ${NAME} /bin/bash -c "cd sample && latexindent -w -s semi.tex && rm *.bak*"
-	make post-exec_ TEX_DIR=sample --no-print-directory
+	make _postExec TEX_DIR=sample -s
+
 
 
 # GitHub Actions上でのTextLintのテスト用
@@ -57,28 +62,55 @@ github_actions_lint_:
 
 
 # コンテナのビルド
-build:
+docker-build:
+	make docker-stop -s
 	DOCKER_BUILDKIT=1 docker image build -t ${NAME} \
-	--build-arg DOCKER_USER_=${DOCKER_USER_NAME} \
+	--build-arg TS=${TS} \
 	--force-rm=true .
-ifneq ($(shell docker images -f 'dangling=true' -q),)
-	-docker rmi $(shell docker images -f 'dangling=true' -q)
-endif
+	make _postBuild -s
 
+
+# キャッシュを使わずにビルド
+docker-rebuild:
+	make docker-stop -s
+	DOCKER_BUILDKIT=1 docker image build -t ${NAME} \
+	--pull \
+	--force-rm=true \
+	--no-cache=true .
+	make _postBuild -s
+
+
+# dockerのリソースを開放
+docker-clean:
+	yes | docker system prune
+
+docker-stop:
+ifneq ($(shell docker container ls -a | grep -c "${NAME}"),0)
+	@docker container stop ${NAME}
+	@echo "コンテナを停止"
+	sync
+endif
+	@docker container ls -a
 
 # コンテナを開きっぱなしにする
 # リモートアクセス用
 bash:
-	make pre-exec_ --no-print-directory
+	make _preExec -s
 	-docker container exec -it ${NAME} bash
-	make post-exec_ --no-print-directory
+	make _postExec -s
 
+# root権限で起動中のコンテナに接続
+# aptパッケージのインストールをテストする際に使用
+root:
+	make _preExec -s
+	-docker container exec -it --user root ${NAME} bash
+	make _postExec -s
 
 # コンテナ実行する際の前処理
 # 起動，ファイルのコピーを行う
-pre-exec_:
+_preExec:
 ifeq ($(shell docker ps -a | grep -c ${NAME}),0)
-	@docker container run \
+	docker container run \
 	-it \
 	--rm \
 	--network none \
@@ -86,48 +118,26 @@ ifeq ($(shell docker ps -a | grep -c ${NAME}),0)
 	--name ${NAME} \
 	${NAME}:latest
 else
-	@-docker container exec --user root ${NAME}  bash -c "cd ${DOCKER_HOME_DIR} && rm -rf ${TEX_DIR} "
+	-docker container exec --user root ${NAME}  /bin/bash -c "cd ${DOCKER_HOME_DIR} && rm -rf ${TEX_DIR} "
 endif
-	@-docker container cp ${TEX_DIR} ${NAME}:${DOCKER_HOME_DIR}
-	@-docker container cp ${SETTING_DIR} ${NAME}:${DOCKER_HOME_DIR}
-	@-docker container exec --user root ${NAME}  bash -c "cp -a ${DOCKER_HOME_DIR}/${SETTING_DIR}/* ${DOCKER_HOME_DIR}/${TEX_DIR}"
-	@-docker cp .textlintrc ${NAME}:${DOCKER_HOME_DIR}/
-	@-docker cp media/semi-rule.yml ${NAME}:${DOCKER_HOME_DIR}/node_modules/prh/prh-rules/media/
+	-docker container cp ${TEX_DIR}/ ${NAME}:${DOCKER_HOME_DIR}/
+	-docker container cp ${SETTING_DIR} ${NAME}:${DOCKER_HOME_DIR}
+	-docker container exec --user root ${NAME}  /bin/bash -c "cp -a ${DOCKER_HOME_DIR}/${SETTING_DIR}/* ${DOCKER_HOME_DIR}/${TEX_DIR}"
 ifeq (${IS_LINUX},Linux)
-	@-docker cp ~/.bashrc ${NAME}:${DOCKER_HOME_DIR}/.bashrc
+	-docker cp ~/.bashrc ${NAME}:${DOCKER_HOME_DIR}/.bashrc
 endif
 
 # コンテナ終了時の後処理
 # コンテナ内のファイルをローカルへコピー，コンテナの削除を行う
-post-exec_:
+_postExec:
 	@-docker container exec --user root ${NAME}  bash -c "cd ${DOCKER_HOME_DIR}/${TEX_DIR} && rm ${SETTING_FILES} "
 	@-docker container cp ${NAME}:${DOCKER_HOME_DIR}/${TEX_DIR} .
 
-# dockerのリソースを開放
-clean:
-	docker system prune
-
-# キャッシュを使わずにビルド
-rebuild:
-	DOCKER_BUILDKIT=1 docker image build -t ${NAME} \
-	--build-arg DOCKER_USER_=${DOCKER_USER_NAME} \
-	--pull \
-	--force-rm=true \
-	--no-cache=true .
-
-# root権限で起動中のコンテナに接続
-# aptパッケージのインストールをテストする際に使用
-root:
-	make pre-exec_ --no-print-directory
-	-docker container exec -it --user root ${NAME} bash
-	make post-exec_ --no-print-directory
-
-stop:
-ifneq ($(shell docker container ls -a | grep -c "${NAME}"),0)
-	@docker container stop ${NAME}
-	@echo "コンテナを停止"
-endif
-	@docker container ls -a
+# 不要になったビルドイメージを削除
+_postBuild:
+	if [[ $$(docker images | grep -c ${NAME}) -ne 0 ]]; then\
+		 docker image rm $$(docker images -f 'dangling=true' -q);\
+	fi
 
 
 install:
@@ -147,8 +157,6 @@ endif
 	LATEX_CONTAINER_MAKE_PATH=$(shell pwd)
 
 
-
-
 # UbuntuにDockerをインストールし，sudoなしでDockerコマンドを実行する設定を行う
 install-docker:
 ifneq ($(shell docker --version 2>/dev/null),)
@@ -156,9 +164,9 @@ ifneq ($(shell docker --version 2>/dev/null),)
 endif
 	sudo apt update
 	sudo apt install -y docker.io
-ifneq ($(shell getent group docker| cut -f 4 --delim=":"),$(shell whoami))
-	sudo gpasswd -a $(shell whoami) docker
-endif
+	if [[ $$(getent group docker | cut -f 4 --delim=":") != $$(whoami) ]]; then\
+		sudo gpasswd -a $$(whoami) docker;\
+	fi
 	sudo chgrp docker /var/run/docker.sock
 	sudo systemctl restart docker
 	@echo "環境構築を完了するために再起動してください"
@@ -170,8 +178,9 @@ push-image:
 
 get-image:
 	docker pull ${DOCKER_REPOSITORY}:latest
-	docker tag ${DOCKER_REPOSITORY}:latest ${NAME}
+	docker tag ${DOCKER_REPOSITORY}:latest ${NAME}:latest
 	docker image rm ${DOCKER_REPOSITORY}
+
 
 # コマンドのテスト用
 test:

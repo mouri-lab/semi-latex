@@ -57,7 +57,7 @@
      * Docker Hubから取得出来なかった場合
      * こちらの方が時間がかかる
       ```
-      make build
+      make docker-build
       ```
 
 ## 作業場所
@@ -137,7 +137,7 @@ make run
 
 ## サンプルのコンパイル
 ```
-make sample
+make run-sample
 ```
 
 ## TextLint
@@ -164,13 +164,13 @@ make lint
   * メモリは数MB消費
 * それでも停止したい人向け
 ```
-make stop
+make docker-stop
 ```
 
 ## dockerのリソースを開放
 * トラブルが起きたときはとりあえず実行
 ```
-make clean
+make docker-clean
 ```
 
 ## コンテナのパッケージ更新

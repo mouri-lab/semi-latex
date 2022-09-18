@@ -3,10 +3,10 @@ FROM amd64/ubuntu:20.04 AS latex
 
 ENV DEBIAN_FRONTEND noninteractive
 # ユーザーを作成
-ARG DOCKER_USER_=null
+ARG DOCKER_USER_=guest
 
-COPY latex-setting/net.sh /net.sh
-RUN sh /net.sh
+ARG APT_LINK=http://ftp.riken.jp/Linux/ubuntu/
+RUN sed -i "s-$(cat /etc/apt/sources.list | grep -v "#" | cut -d " " -f 2 | grep -v "security" | sed "/^$/d" | sed -n 1p)-${APT_LINK}-g" /etc/apt/sources.list
 
 # ターミナルで日本語の出力を可能にするための設定
 RUN apt-get update \
@@ -42,12 +42,12 @@ RUN apt-get install -y \
     &&  kanji-config-updmap-sys auto
 
 
-ENV DIRPATH home/${DOCKER_USER_}
+ENV DIRPATH /home/${DOCKER_USER_}
 WORKDIR $DIRPATH
 
 # ユーザ設定
 RUN useradd ${DOCKER_USER_}
-RUN chown -R ${DOCKER_USER_} /${DIRPATH}
+RUN chown -R ${DOCKER_USER_} ${DIRPATH}
 
 USER ${DOCKER_USER_}
 
@@ -71,13 +71,18 @@ RUN npm init --yes \
     textlint-rule-preset-ja-engineering-paper \
     textlint-plugin-latex2e
 
-# ”はじめに”と”おわりに”を漢字変換しないよう，ルールを変更
-RUN sed -i "1084,1085d" node_modules/prh/prh-rules/media/WEB+DB_PRESS.yml \
-    && sed -i "s;おわ[^0-9][^0-9]らりるれろ;おわ\([らるれろ;g" node_modules/prh/prh-rules/media/WEB+DB_PRESS.yml
-
 ENV GTK_IM_MODULE=xim \
     QT_IM_MODULE=fcitx \
     XMODIFIERS=@im=fcitx \
     DefalutIMModule=fcitx
+
+# 研究室用のカスタムルールをコピー
+COPY media/semi-rule.yml ${DIRPATH}/node_modules/prh/prh-rules/media/
+COPY media/WEB+DB_PRESS.yml ${DIRPATH}/node_modules/prh/prh-rules/media/
+COPY .textlintrc ${DIRPATH}/
+
+ARG TS
+RUN apt-get update &&\
+    apt-get upgrade -y
 
 USER ${DOCKER_USER_}
