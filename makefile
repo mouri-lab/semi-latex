@@ -154,7 +154,6 @@ ifeq (${IS_LINUX},Linux)
 	-make install-docker
 endif
 endif
-	LATEX_CONTAINER_MAKE_PATH=$(shell pwd)
 
 
 # UbuntuにDockerをインストールし，sudoなしでDockerコマンドを実行する設定を行う
