@@ -6,7 +6,6 @@ on:
   workflow_dispatch:
 
 env:
-  # Docker イメージの tar アーカイブ出力先のパス
   TAG: latex-container
 
 jobs:

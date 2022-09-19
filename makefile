@@ -13,12 +13,12 @@ TS := $(shell date +%Y%m%d%H%M%S)
 
 # コンパイルするtexファイルのディレクトリ
 # 指定したディレクトリにtexファイルは1つであることが必要
-TEX_DIR := workspace
+TEX_FILE_PATH := $(shell bash latex-setting/build-manager.sh)
+TEX_DIR = $(shell echo ${TEX_FILE_PATH} | rev | cut -d "/" -f 2 | rev)
 ifeq ($(shell find ${TEX_DIR} -name "*.tex" -type f 2>/dev/null),)
 # 指定したディレクトリ内にtexファイルが無い場合はsampleが使用される
 TEX_DIR := sample
 endif
-
 
 TEX_FILE := $(shell find ./${TEX_DIR} -name "*.tex" -type f | rev | cut -d '/' -f 1 | rev)
 SETTING_DIR := latex-setting
@@ -43,7 +43,9 @@ run:
 # TextLint
 lint:
 	@make _preExec -s
-	@- docker container exec ${NAME} /bin/bash -c "./node_modules/.bin/textlint ${TEX_DIR}/${TEX_FILE}"
+	@- docker container exec --user root ${NAME} /bin/bash -c "./node_modules/textlint/bin/textlint.js ${TEX_DIR}/${TEX_FILE} > ${TEX_DIR}/lint.txt"
+	@- docker container exec -t --env TEX_PATH="$(shell readlink -f ${TEX_DIR})" ${NAME} /bin/bash -c "cd ${TEX_DIR} && bash lint-formatter.sh"
+	@- docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && rm -f lint.txt"
 	@make _postExec -s
 
 # sampleをビルド
@@ -120,7 +122,7 @@ ifeq ($(shell docker ps -a | grep -c ${NAME}),0)
 else
 	-docker container exec --user root ${NAME}  /bin/bash -c "cd ${DOCKER_HOME_DIR} && rm -rf ${TEX_DIR} "
 endif
-	-docker container cp ${TEX_DIR}/ ${NAME}:${DOCKER_HOME_DIR}/
+	-docker container cp $(dir ${TEX_FILE_PATH})/ ${NAME}:${DOCKER_HOME_DIR}/
 	-docker container cp ${SETTING_DIR} ${NAME}:${DOCKER_HOME_DIR}
 	-docker container exec --user root ${NAME}  /bin/bash -c "cp -a ${DOCKER_HOME_DIR}/${SETTING_DIR}/* ${DOCKER_HOME_DIR}/${TEX_DIR}"
 ifeq (${IS_LINUX},Linux)
@@ -131,7 +133,7 @@ endif
 # コンテナ内のファイルをローカルへコピー，コンテナの削除を行う
 _postExec:
 	@-docker container exec --user root ${NAME}  bash -c "cd ${DOCKER_HOME_DIR}/${TEX_DIR} && rm ${SETTING_FILES} "
-	@-docker container cp ${NAME}:${DOCKER_HOME_DIR}/${TEX_DIR} .
+	@-docker container cp ${NAME}:${DOCKER_HOME_DIR}/${TEX_DIR} $(dir ${TEX_FILE_PATH})../
 
 # 不要になったビルドイメージを削除
 _postBuild:
@@ -183,5 +185,6 @@ get-image:
 
 # コマンドのテスト用
 test:
-	sed "$(shell $(expr $(grep -n "section{はじめに}" workspace/semi.tex | cut -d ":" -f 1) + 1))/171d" workspace/semi.tex
+	echo ${DEFAULT_DIR}
+
 
