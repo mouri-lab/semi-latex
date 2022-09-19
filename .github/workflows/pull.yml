@@ -2,7 +2,6 @@ name: Scheduled workflow
 
 on:
   push:
-  pull_request:
   workflow_dispatch:
   schedule:
     - cron: "0 0 * * 1"
@@ -36,7 +35,6 @@ jobs:
   DockerCacheSave:
     runs-on: ubuntu-22.04
     steps:
-      # リポジトリの読み込み（fetch-depth=1）
       - name: Check out repo under workspace
         uses: actions/checkout@v2
       - name: setup docker

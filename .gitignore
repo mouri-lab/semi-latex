@@ -1,20 +1,17 @@
-# *
-# !/.devcontainer/
-# !/.github/
-# !/.vscode/
-# !/latex-setting/
-# !/media/
-# !/sample/
+*
+!*/
 
-# !.dockerignore
-# !.gitignore
-# !.textlintrc
-# !Dockerfile
-# !makefile
-# !README.md
-# !sample-clean.sh
-# !pull.yml
-workspace/
-sample/
-*.tar
-.git/
+!/.github/*
+!/.vscode/*
+!/.devcontainer/*
+!/sample/*.tex
+!/sample/*.bib
+!/latex-setting/*
+!/media/*
+
+!.dockerignore
+!.textlintrc
+!Dockerfile
+!makefile
+!README.md
+!sample-clean.sh
