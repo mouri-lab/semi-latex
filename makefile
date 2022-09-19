@@ -43,7 +43,8 @@ run:
 # TextLint
 lint:
 	@make _preExec -s
-	@- docker container exec ${NAME} /bin/bash -c "./node_modules/.bin/textlint ${TEX_DIR}/${TEX_FILE}"
+	- docker container exec ${NAME} /bin/bash -c "./node_modules/.bin/textlint ${TEX_DIR}/${TEX_FILE} > ${TEX_DIR}/lint.txt"
+	- docker container exec -t --env TEX_PATH="$(shell readlink -f ${TEX_DIR})" ${NAME} /bin/bash -c "cd ${TEX_DIR} && bash lint-formatter.sh"
 	@make _postExec -s
 
 # sampleをビルド
