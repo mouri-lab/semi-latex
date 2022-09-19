@@ -3,11 +3,10 @@
   - [動作環境](#動作環境)
 - [使い方](#使い方)
   - [INSTALL](#install)
-  - [作業場所](#作業場所)
   - [コンパイル](#コンパイル)
   - [textlint](#textlint)
     - [ターミナルで実行](#ターミナルで実行)
-    - [VScode上でlint結果を表示](#vscode上でlint結果を表示)
+    - [VSCode上でlint結果を表示](#vscode上でlint結果を表示)
     - [研のlintルール](#研のlintルール)
   - [画像の貼り方](#画像の貼り方)
     - [png](#png)
@@ -27,6 +26,7 @@
 * LaTeX環境をローカルにインストールしたくないので作りました
 ## 動作環境
 * 必要環境
+  * Linux
   * Docker
   * make
 * 推奨環境
@@ -36,7 +36,7 @@
       * LaTeXの補完
       * 保存時に自動コンパイル
     * Remote Development
-      * VScode上にTextLintのエラーを表示させる
+      * VScode上にTextLintのエラーを表示させる場合に使用
 
 # 使い方
 ## INSTALL
@@ -49,24 +49,25 @@
 2. 再起動
 3. Docker Imageの作成
    *  Docker Hubからイメージを取得
-      * 基本的にはこちらを推奨
+      * 推奨
        ```
        make get-image
        ```
    * Dockerのビルド
-     * Docker Hubから取得出来なかった場合
-     * こちらの方が時間がかかる
+     * Docker Hubから取得出来なかった場合などに使用
+     * 時間がかかるので非推奨
+       * 約10分
       ```
       make docker-build
       ```
 
-## 作業場所
-* **workspace**内にtexファイルが作成されることを想定
-  * workspace内のファイルはGitの追跡対象外
-  * make install時にフォルダとファイルが作成される
-
 ## コンパイル
+* 作業ディレクトリ
+  * このディレクトリ(semi-latex)内であれば任意のディレクトリを使用できます
+  * make run実行時に自動的に最新のtexファイルを探索し、コンパイルします
+
 * コマンドから実行
+  * semi-latexディレクトリ内で変更されたtexをコンパイル
   ```
   make run
   ```
@@ -76,11 +77,12 @@
 
 ## textlint
 ### ターミナルで実行
+* VSCode上のターミナルを使うとファイルパスのCtrl+クリックで該当箇所にジャンプできます
 ```
 make lint
 ```
 
-### VScode上でlint結果を表示
+### VSCode上でlint結果を表示
 * VScodeにRemote Developmentのインストールが必要
 1. コンテナに接続
     ```
@@ -174,11 +176,15 @@ make docker-clean
 ```
 
 ## コンテナのパッケージ更新
-* make buildではパッケージが更新されない
-  * キャッシュが使われるため
-```
-make rebuild
-```
+* aptパッケージの更新
+  ```
+  make docker-build
+  ```
+* コンテナの再構築
+  * 10分ほどかかります
+  ```
+  make docker-rebuild
+  ```
 
 ## インストール
 * workspaceディレクトリの作成とtexファイル, bibtexファイルを作成する
