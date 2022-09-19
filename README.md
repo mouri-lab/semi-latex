@@ -107,15 +107,14 @@ make lint
   * eps
   * pdf
   * png
-    * epsへの変換が必要
+    * epsへ自動変換
   * svg
-    * pdfへの変換が必要
+    * pdfへ自動変換
 ### png
-* 拡張子に.pngを使わない
-  * .epsで指定
-  * コンテナ内で自動的にpngからepsを生成
+* 拡張子は.pngではなく.epsを指定
+  * コンテナ内で自動的にpngからepsを生成するため
 * 例：ローカルにfig/hoge.pngがある場合
-  * hoge.epsはなくても可
+  * .epsはなくてもOK
 ```
 \includegraphics[]{fig/hoge.eps}
 ```
@@ -123,6 +122,8 @@ make lint
 ### svg
 * 拡張子は指定しない
   * コンテナ内で自動的にsvgからpdfを生成
+  * pdbはベクタ形式で生成
+    * ベクタ形式なのでズームしても画像が荒くなりません
 * 例：ローカルにfig/huga.svgがある場合
 ```
 \includegraphics[]{fig/huga}

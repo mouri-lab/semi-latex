@@ -34,6 +34,7 @@ jobs:
 
   DockerCacheSave:
     runs-on: ubuntu-22.04
+    timeout-minutes: 20
     steps:
       - name: Check out repo under workspace
         uses: actions/checkout@v2
