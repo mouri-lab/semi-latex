@@ -25,13 +25,20 @@
 	// 一時ファイルの影響で、修正後のビルドに失敗してしまう事がよくある。そのため、一時的なファイルを
 	// 削除する機能 (クリーンアップ) が LaTeX Workshop には備わっている。
 	"latex-workshop.latex.tools": [
+		// {
+		// 	"name": "make",
+		// 	"command": "make",
+		// 	"args": [
+		// 		"%DIR%"
+		// 	]
+		// },
 		{
 			"name": "make",
 			"command": "make",
 			"args": [
-				"run",
 				"-C",
-				"../",
+				"%WORKSPACE_FOLDER%",
+				"-s",
 			]
 		},
 		{
@@ -46,7 +53,6 @@
 	],
 	// "latex-workshop.view.pdf.viewer": "external",
 	"editor.suggestSelection": "recentlyUsed",
-	"vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
 	"workbench.startupEditor": "newUntitledFile",
 	"files.trimTrailingWhitespace": true,
 	"extensions.ignoreRecommendations": false,
