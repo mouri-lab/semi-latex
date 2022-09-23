@@ -13,7 +13,7 @@ TS := $(shell date +%Y%m%d%H%M%S)
 
 # コンパイルするtexファイルのディレクトリ
 # 指定したディレクトリにtexファイルは1つであることが必要
-TEX_FILE_PATH := $(shell bash latex-setting/build-manager.sh)
+TEX_FILE_PATH := $(shell bash latex-setting/file-explorer.sh)
 TEX_FILE := $(shell echo ${TEX_FILE_PATH} | rev | cut -d '/' -f 1 | rev)
 
 TEX_DIR_PATH := $(shell echo ${TEX_FILE_PATH} | sed -e "s@${TEX_FILE}@@" -e "s@$(shell pwd)/@@")
@@ -37,8 +37,7 @@ SHELL := /bin/bash
 # LaTeXのコンパイル
 run:
 	make _preExec -s
-	-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && make all"
-	-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && make all"
+	-bash latex-setting/build.sh ${NAME} ${TEX_DIR} ${TEX_FILE}
 # texファイルの整形
 	@-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && latexindent -w -s ${TEX_FILE} && rm *.bak*"
 	make _postExec -s
@@ -54,8 +53,7 @@ lint:
 # sampleをビルド
 run-sample:
 	make _preExec TEX_DIR=sample -s
-	-docker container exec --user root ${NAME} /bin/bash -c "cd sample && make all"
-	-docker container exec --user root ${NAME} /bin/bash -c "cd sample && make all"
+	-bash latex-setting/build.sh ${NAME} ${TEX_DIR} ${TEX_FILE}
 	@-docker container exec --user root ${NAME} /bin/bash -c "cd sample && latexindent -w -s semi.tex && rm *.bak*"
 	make _postExec TEX_DIR=sample -s
 

@@ -36,8 +36,11 @@ RUN apt-get install -y \
     texlive-fonts-recommended \
     texlive-lang-cjk \
     texlive-lang-japanese \
+    # svg, epsの変換ツール
     inkscape \
     librsvg2-bin \
+    # pdbをtextに変換
+    poppler-utils \
     &&  apt-get clean \
     &&  kanji-config-updmap-sys auto
 
