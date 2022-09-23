@@ -35,13 +35,20 @@ jobs:
           no-cache: true
           cache-to: type=gha,mode=max
 
-      - name: latex build
+      - name: latex build sample
         run: |
           rm -f sample/*.pdf
           make run-sample
           make docker-stop
-      - name: build check
+          if [ $(ls sample/ | grep -c .pdf) -eq 0 ]; then
+            exit 1
+          fi
+
+      - name: latex build
         run: |
+          rm -f sample/*.pdf
+          make run
+          make docker-stop
           if [ $(ls sample/ | grep -c .pdf) -eq 0 ]; then
             exit 1
           fi
