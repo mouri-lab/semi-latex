@@ -12,12 +12,6 @@
 				"make",
 			]
 		},
-		{
-			"name": "pbibtex",
-			"tools": [
-				"pbibtex",
-			]
-		},
 	],
 	// latex-workshop.latex.clean.fileTypes: クリーンアップ時に削除されるファイルの拡張子
 	// LaTeX 文書はビルド時に一時ファイルとしていくつかのファイルを生成するが、最終的に必要となるのは
@@ -25,13 +19,6 @@
 	// 一時ファイルの影響で、修正後のビルドに失敗してしまう事がよくある。そのため、一時的なファイルを
 	// 削除する機能 (クリーンアップ) が LaTeX Workshop には備わっている。
 	"latex-workshop.latex.tools": [
-		// {
-		// 	"name": "make",
-		// 	"command": "make",
-		// 	"args": [
-		// 		"%DIR%"
-		// 	]
-		// },
 		{
 			"name": "make",
 			"command": "make",
@@ -47,11 +34,10 @@
 			"args": [
 				"lint",
 				"-C",
-				"../",
+				"%WORKSPACE_FOLDER%",
 			]
 		},
 	],
-	// "latex-workshop.view.pdf.viewer": "external",
 	"editor.suggestSelection": "recentlyUsed",
 	"workbench.startupEditor": "newUntitledFile",
 	"files.trimTrailingWhitespace": true,
@@ -68,14 +54,6 @@
 	"latex-workshop.intellisense.package.enabled": true,
 	// スニペットを優先
 	"editor.snippetSuggestions": "top",
-	"[json]": {
-		"editor.quickSuggestions": {
-			"strings": true
-		},
-		"editor.suggest.insertMode": "replace"
-	},
-	"json.schemas": [],
-	"sync.gist": "e68e5c5d99f92026a7a01a8a95a70486",
 	"[latex]": {
 		"editor.formatOnPaste": false,
 		"editor.formatOnSave": false,
