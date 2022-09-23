@@ -6,6 +6,12 @@ on:
   schedule:
     - cron: "0 0 * * 1"
 
+permissions:
+  contents: read
+
+env:
+  TAG: latex-container
+
 jobs:
   get-image:
     runs-on: ubuntu-latest
