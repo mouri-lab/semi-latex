@@ -61,6 +61,16 @@ jobs:
             exit 1
           fi
 
+      - name: deep path
+        run: |
+          mkdir -p deepdir/L1/L2/L3
+          cp -r sample/* deepdir/L1/L2/L3/
+          make run
+          make docker-stop
+          if [ $(ls deepdir/L1/L2/L3 | grep -c .pdf) -eq 0 ]; then
+            exit 1
+          fi
+
       - name: lint
         run: |
           make github_actions_lint_
