@@ -12,12 +12,6 @@
 				"make",
 			]
 		},
-		{
-			"name": "pbibtex",
-			"tools": [
-				"pbibtex",
-			]
-		},
 	],
 	// latex-workshop.latex.clean.fileTypes: クリーンアップ時に削除されるファイルの拡張子
 	// LaTeX 文書はビルド時に一時ファイルとしていくつかのファイルを生成するが、最終的に必要となるのは
@@ -29,9 +23,9 @@
 			"name": "make",
 			"command": "make",
 			"args": [
-				"run",
 				"-C",
-				"../",
+				"%WORKSPACE_FOLDER%",
+				"-s",
 			]
 		},
 		{
@@ -40,13 +34,11 @@
 			"args": [
 				"lint",
 				"-C",
-				"../",
+				"%WORKSPACE_FOLDER%",
 			]
 		},
 	],
-	// "latex-workshop.view.pdf.viewer": "external",
 	"editor.suggestSelection": "recentlyUsed",
-	"vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
 	"workbench.startupEditor": "newUntitledFile",
 	"files.trimTrailingWhitespace": true,
 	"extensions.ignoreRecommendations": false,
@@ -62,14 +54,6 @@
 	"latex-workshop.intellisense.package.enabled": true,
 	// スニペットを優先
 	"editor.snippetSuggestions": "top",
-	"[json]": {
-		"editor.quickSuggestions": {
-			"strings": true
-		},
-		"editor.suggest.insertMode": "replace"
-	},
-	"json.schemas": [],
-	"sync.gist": "e68e5c5d99f92026a7a01a8a95a70486",
 	"[latex]": {
 		"editor.formatOnPaste": false,
 		"editor.formatOnSave": false,

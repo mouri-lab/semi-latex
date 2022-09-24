@@ -13,14 +13,17 @@ TS := $(shell date +%Y%m%d%H%M%S)
 
 # コンパイルするtexファイルのディレクトリ
 # 指定したディレクトリにtexファイルは1つであることが必要
-TEX_FILE_PATH := $(shell bash latex-setting/build-manager.sh)
-TEX_DIR = $(shell echo ${TEX_FILE_PATH} | rev | cut -d "/" -f 2 | rev)
-ifeq ($(shell find ${TEX_DIR} -name "*.tex" -type f 2>/dev/null),)
-# 指定したディレクトリ内にtexファイルが無い場合はsampleが使用される
-TEX_DIR := sample
-endif
+TEX_FILE_PATH := $(shell bash latex-setting/file-explorer.sh)
+TEX_FILE := $(shell echo ${TEX_FILE_PATH} | rev | cut -d '/' -f 1 | rev)
 
-TEX_FILE := $(shell find ./${TEX_DIR} -name "*.tex" -type f | rev | cut -d '/' -f 1 | rev)
+TEX_DIR_PATH := $(shell echo ${TEX_FILE_PATH} | sed -e "s@${TEX_FILE}@@" -e "s@$(shell pwd)/@@")
+TEX_DIR := $(shell echo ${TEX_DIR_PATH} | rev | cut -d "/" -f 2 | rev)
+
+# ifeq ($(shell find ${TEX_DIR} -name "*.tex" -type f 2>/dev/null),)
+# # 指定したディレクトリ内にtexファイルが無い場合はsampleが使用される
+# # TEX_DIR := sample
+# endif
+
 SETTING_DIR := latex-setting
 SETTING_FILES := $(shell ls ${SETTING_DIR})
 
@@ -34,8 +37,7 @@ SHELL := /bin/bash
 # LaTeXのコンパイル
 run:
 	make _preExec -s
-	-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && make all"
-	-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && make all"
+	-bash latex-setting/build.sh ${NAME} ${TEX_DIR} ${TEX_FILE}
 # texファイルの整形
 	@-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && latexindent -w -s ${TEX_FILE} && rm *.bak*"
 	make _postExec -s
@@ -51,8 +53,7 @@ lint:
 # sampleをビルド
 run-sample:
 	make _preExec TEX_DIR=sample -s
-	-docker container exec --user root ${NAME} /bin/bash -c "cd sample && make all"
-	-docker container exec --user root ${NAME} /bin/bash -c "cd sample && make all"
+	-bash latex-setting/build.sh ${NAME} ${TEX_DIR} ${TEX_FILE}
 	@-docker container exec --user root ${NAME} /bin/bash -c "cd sample && latexindent -w -s semi.tex && rm *.bak*"
 	make _postExec TEX_DIR=sample -s
 
@@ -97,9 +98,9 @@ endif
 # コンテナを開きっぱなしにする
 # リモートアクセス用
 bash:
-	make _preExec -s
+	make _preExec
 	-docker container exec -it ${NAME} bash
-	make _postExec -s
+	make _postExec
 
 # root権限で起動中のコンテナに接続
 # aptパッケージのインストールをテストする際に使用
@@ -120,9 +121,8 @@ ifeq ($(shell docker ps -a | grep -c ${NAME}),0)
 	--name ${NAME} \
 	${NAME}:latest
 else
-	-docker container exec --user root ${NAME}  /bin/bash -c "cd ${DOCKER_HOME_DIR} && rm -rf ${TEX_DIR} "
 endif
-	-docker container cp $(dir ${TEX_FILE_PATH})/ ${NAME}:${DOCKER_HOME_DIR}/
+	-docker container cp ${TEX_DIR_PATH} ${NAME}:${DOCKER_HOME_DIR}/
 	-docker container cp ${SETTING_DIR} ${NAME}:${DOCKER_HOME_DIR}
 	-docker container exec --user root ${NAME}  /bin/bash -c "cp -a ${DOCKER_HOME_DIR}/${SETTING_DIR}/* ${DOCKER_HOME_DIR}/${TEX_DIR}"
 ifeq (${IS_LINUX},Linux)
@@ -132,8 +132,10 @@ endif
 # コンテナ終了時の後処理
 # コンテナ内のファイルをローカルへコピー，コンテナの削除を行う
 _postExec:
-	@-docker container exec --user root ${NAME}  bash -c "cd ${DOCKER_HOME_DIR}/${TEX_DIR} && rm ${SETTING_FILES} "
-	@-docker container cp ${NAME}:${DOCKER_HOME_DIR}/${TEX_DIR} $(dir ${TEX_FILE_PATH})../
+	-docker container exec --user root ${NAME}  bash -c "cd ${DOCKER_HOME_DIR}/${TEX_DIR} && rm ${SETTING_FILES} "
+	-docker container cp ${NAME}:${DOCKER_HOME_DIR}/${TEX_DIR} ${TEX_DIR_PATH}../
+	-docker container exec --user root ${NAME}  /bin/bash -c "cd ${DOCKER_HOME_DIR} && rm -rf ${TEX_DIR} "
+
 
 # 不要になったビルドイメージを削除
 _postBuild:
@@ -185,6 +187,9 @@ get-image:
 
 # コマンドのテスト用
 test:
-	echo ${DEFAULT_DIR}
+	@echo ${TEX_FILE_PATH}
+	@echo ${TEX_FILE}
+	@echo ${TEX_DIR_PATH}
+	@echo ${TEX_DIR}
 
 

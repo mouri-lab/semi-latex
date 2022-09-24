@@ -1,5 +1,5 @@
-# FROM nobodyxu/apt-fast:latest-ubuntu-bionic AS base
 FROM amd64/ubuntu:20.04 AS latex
+
 
 ENV DEBIAN_FRONTEND noninteractive
 # ユーザーを作成
@@ -8,9 +8,17 @@ ARG DOCKER_USER_=guest
 ARG APT_LINK=http://ftp.riken.jp/Linux/ubuntu/
 RUN sed -i "s-$(cat /etc/apt/sources.list | grep -v "#" | cut -d " " -f 2 | grep -v "security" | sed "/^$/d" | sed -n 1p)-${APT_LINK}-g" /etc/apt/sources.list
 
+RUN apt-get update &&\
+    apt-get install -y software-properties-common
+
+RUN add-apt-repository ppa:apt-fast/stable
+RUN apt-get update &&\
+    apt-get install -y apt-fast &&\
+    apt-get purge -y software-properties-common
+
 # ターミナルで日本語の出力を可能にするための設定
-RUN apt-get update \
-    &&  apt-get install -y \
+RUN apt-fast update \
+    &&  apt-fast install -y \
     language-pack-ja-base \
     language-pack-ja \
     fonts-noto-cjk \
@@ -25,7 +33,7 @@ RUN update-locale LANG=ja_JP.UTF-8
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezon
 
 # 実行のためのパッケージ
-RUN apt-get install -y \
+RUN apt-fast install -y \
     make \
     evince \
     xdvik-ja \
@@ -36,9 +44,12 @@ RUN apt-get install -y \
     texlive-fonts-recommended \
     texlive-lang-cjk \
     texlive-lang-japanese \
+    # svg, epsの変換ツール
     inkscape \
     librsvg2-bin \
-    &&  apt-get clean \
+    # pdbをtextに変換
+    poppler-utils \
+    &&  apt-fast clean \
     &&  kanji-config-updmap-sys auto
 
 
@@ -55,7 +66,7 @@ FROM latex AS textlint
 
 USER root
 
-RUN apt-get install -y nodejs \
+RUN apt-fast install -y nodejs \
     npm \
     curl \
     wget
@@ -82,7 +93,7 @@ COPY media/WEB+DB_PRESS.yml ${DIRPATH}/node_modules/prh/prh-rules/media/
 COPY .textlintrc ${DIRPATH}/
 
 ARG TS
-RUN apt-get update &&\
-    apt-get upgrade -y
+RUN apt-fast update &&\
+    apt-fast upgrade -y
 
 USER ${DOCKER_USER_}
