@@ -5,7 +5,7 @@ readonly tex_file=$(sed -n 2p lint.txt | rev | cut -d "/" -f 1 | rev)
 
 readonly host_tex_path=$1
 
-set -eux
+set -eu
 
 
 [[ -z $host_tex_path ]] && exit 1
