@@ -11,8 +11,8 @@ RUN sed -i "s-$(cat /etc/apt/sources.list | grep -v "#" | cut -d " " -f 2 | grep
 RUN apt-get update &&\
     apt-get install -y software-properties-common
 
-RUN add-apt-repository ppa:apt-fast/stable
-RUN apt-get update &&\
+RUN add-apt-repository ppa:apt-fast/stable &&\
+    apt-get update &&\
     apt-get install -y apt-fast &&\
     apt-get purge -y software-properties-common
 
@@ -29,8 +29,6 @@ ENV LANG ja_JP.UTF-8
 ENV LANGUAGE ja_JP:jp
 ENV LC_ALL ja_JP.UTF-8
 RUN update-locale LANG=ja_JP.UTF-8
-
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezon
 
 # 実行のためのパッケージ
 RUN apt-fast install -y \
