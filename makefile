@@ -139,7 +139,7 @@ _postExec:
 
 # 不要になったビルドイメージを削除
 _postBuild:
-	if [[ $$(docker images | grep -c ${NAME}) -ne 0 ]]; then\
+	if [[ -n $$(docker images -f 'dangling=true' -q) ]]; then\
 		 docker image rm $$(docker images -f 'dangling=true' -q);\
 	fi
 
