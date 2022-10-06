@@ -61,7 +61,7 @@ run-sample:
 
 # GitHub Actions上でのTextLintのテスト用
 github_actions_lint_:
-	make lint > lint.log
+	-make lint -s > lint.log
 
 
 # コンテナのビルド
