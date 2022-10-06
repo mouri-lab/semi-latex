@@ -75,8 +75,6 @@ jobs:
         run: |
           make github_actions_lint_
           ls
-      - name: lint check
-        run: |
           lint_cnt=$(cat lint.log | grep -c "error")
           if [ ${lint_cnt} -lt 1 ]; then
             exit 1
