@@ -85,7 +85,7 @@ docker-rebuild:
 
 # dockerのリソースを開放
 docker-clean:
-	yes | docker system prune
+	docker system prune -f
 
 docker-stop:
 ifneq ($(shell docker container ls -a | grep -c "${NAME}"),0)
