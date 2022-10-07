@@ -5,8 +5,8 @@ on:
   pull_request:
   workflow_dispatch:
 
-# permissions:
-#   contents: read
+permissions:
+  contents: read
 
 env:
   TAG: latex-container
