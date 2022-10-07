@@ -14,7 +14,7 @@ env:
 jobs:
   get-image:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - name: checkout code
         uses: actions/checkout@v2
@@ -39,7 +39,7 @@ jobs:
 
   DockerCacheSave:
     runs-on: ubuntu-22.04
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - name: Check out repo under workspace
         uses: actions/checkout@v2
