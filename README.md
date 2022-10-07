@@ -4,6 +4,7 @@
 - [使い方](#使い方)
   - [INSTALL](#install)
   - [コンパイル](#コンパイル)
+    - [B3用のテンプレート](#b3用のテンプレート)
   - [textlint](#textlint)
     - [ターミナルで実行](#ターミナルで実行)
     - [VSCode上でlint結果を表示](#vscode上でlint結果を表示)
@@ -75,6 +76,16 @@
   * texファイル保存時にコンパイルされる
   * **LaTeX-Workshopが必要**
 
+### B3用のテンプレート
+texファイルのdocumentclassでecoではなくb3-ecoを指定してください
+```
+\documentclass[submit,techreq,noauthor,dvipdfmx]{b3-eco}
+```
+ゼミ用テンプレートに戻すにはecoを指定
+```
+\documentclass[submit,techreq,noauthor,dvipdfmx]{b3-eco}
+```
+
 ## textlint
 ### ターミナルで実行
 * VSCode上のターミナルを使うとファイルパスのCtrl+クリックで該当箇所にジャンプできます
@@ -132,8 +143,7 @@ make lint
 # コマンド一覧
 
 ## LaTexのコンパイル
-* コンパイルされるのはworkspace内のtexファイル
-  * 他のディレクトリをコンパイルしたいときはmakefileを書き換えて
+* コンパイルされるのはsami-latex/内で最も最近更新されたtexファイルです
 ```
 make run
 ```
@@ -182,7 +192,7 @@ make docker-clean
   make docker-build
   ```
 * コンテナの再構築
-  * 10分ほどかかります
+  * 5分ほどかかります
   ```
   make docker-rebuild
   ```
