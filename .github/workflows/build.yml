@@ -5,8 +5,8 @@ on:
   pull_request:
   workflow_dispatch:
 
-permissions:
-  contents: read
+# permissions:
+#   contents: read
 
 env:
   TAG: latex-container
@@ -73,11 +73,10 @@ jobs:
 
       - name: lint
         run: |
-          make github_actions_lint_
-          ls
-          lint_cnt=$(cat lint.log | grep -c "error")
-          if [[ ${lint_cnt} -lt 1 ]]; then
-            echo ${lint_cnt}
-            cat lint.log
+          make lint > lint.txt
+          cat lint.txt
+          if [[ $(cat lint.txt | grep -c "error") -lt 1 ]]; then
+            cat lint.txt | grep -c "error"
+            cat lint.txt
             exit 1
           fi
