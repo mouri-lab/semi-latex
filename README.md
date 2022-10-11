@@ -198,7 +198,6 @@ make docker-clean
   ```
 
 ## インストール
-* workspaceディレクトリの作成とtexファイル, bibtexファイルを作成する
 * Dockerがインストールされていない場合はインストールする
   * Linux限定
 ```
