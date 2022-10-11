@@ -83,7 +83,7 @@ texファイルのdocumentclassでecoではなくb3-ecoを指定してくださ�
 ```
 ゼミ用テンプレートに戻すにはecoを指定
 ```
-\documentclass[submit,techreq,noauthor,dvipdfmx]{b3-eco}
+\documentclass[submit,techreq,noauthor,dvipdfmx]{eco}
 ```
 
 ## textlint

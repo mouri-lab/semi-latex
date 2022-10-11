@@ -1,10 +1,12 @@
-#!/bin/bash -eux
+#!/bin/bash
+
+# set -e
 
 # 最後に更新されたtexファイルを探索
-# vscodeからは編集中のtexファイルを取得できないため作成
 
 tex_files=()
-tex_files+=($(readlink -f $(find ../ -name "*.tex" -type f)))
+tex_files+=($(readlink -f $(find . -name "*.tex" -type f)))
+
 
 file_date=()
 file_date+=($(stat ${tex_files[@]} | grep Modify | cut -d " " -f 2,3 | sed -e "s@ @@g" -e "s@-@@g" -e "s@:@@g" -e "s@@@g"))

@@ -145,14 +145,6 @@ _postBuild:
 
 
 install:
-ifeq ($(shell ls | grep -c workspace),0)
-	mkdir workspace
-endif
-ifeq ($(shell ls workspace/ 2>/dev/null | grep -c ".tex"),0)
-	cp sample/*.tex workspace/
-	touch workspace/references.bib
-	bash sample-clean.sh
-endif
 ifeq ($(shell docker --version 2>/dev/null),)
 ifeq (${IS_LINUX},Linux)
 	-make install-docker
