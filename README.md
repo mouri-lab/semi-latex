@@ -44,6 +44,7 @@
 1. 環境をインストール
    * **Ubuntuのみ**Docker環境を自動インストール
     * Mac OS, Windowsは個別にDockerとmakeの実行環境を作ってください
+      * M1, M2では多分動作しません
     ```
     make install
     ```
@@ -121,6 +122,32 @@ make lint
     * epsへ自動変換
   * svg
     * pdfへ自動変換
+* 自動変換の注意
+  * 画像用のディレクトリを作成し，すべての画像を同じディレクトリに入れる
+    * ディレクトリ名は任意
+  * 作成したディレクトリ内でネストしない
+  * フォルダ階層の例
+    ```
+    sample.tex
+    fig/
+    |--hoge.png
+    |--huga.svg
+    ```
+  * NG
+    * ディレクトリがネスト
+    ```
+    sample.tex
+    fig/
+    |--fig/
+        |--hoge.png
+        |--huga.svg
+    ```
+    * ディレクトリに保存されていない
+    ```
+    sample.tex
+    hoge.png
+    huga.svg
+    ```
 ### png
 * 拡張子は.pngではなく.epsを指定
   * コンテナ内で自動的にpngからepsを生成するため
@@ -198,7 +225,6 @@ make docker-clean
   ```
 
 ## インストール
-* workspaceディレクトリの作成とtexファイル, bibtexファイルを作成する
 * Dockerがインストールされていない場合はインストールする
   * Linux限定
 ```

@@ -78,7 +78,7 @@ endif
 TIMESTAMP := $(shell date +%Y%m%d)
 
 ## Define dependent files to generate DVI file
-SRC-FIGURE-DIRS := fig
+SRC-FIGURE-DIRS := $(shell find . -name "*.png" -or -name "*.eps" -or -name "*.svg" | cut -d "/" -f 2 | head -n1)
 SRC-OBJ := $(wildcard $(addsuffix /*.obj,$(SRC-FIGURE-DIRS))) # Tgif files
 SRC-SVG := $(wildcard $(addsuffix /*.svg,$(SRC-FIGURE-DIRS))) # Inkscape files
 SRC-PNG := $(wildcard $(addsuffix /*.png,$(SRC-FIGURE-DIRS))) # Some pictures
