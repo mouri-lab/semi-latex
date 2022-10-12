@@ -5,5 +5,4 @@ updates:
     package-ecosystem: github-actions
     rebase-strategy: auto
     schedule:
-      timezone: "09:00 UTC"
-      interval: weekly
+      interval: daily
