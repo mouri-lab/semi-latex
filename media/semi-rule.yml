@@ -89,3 +89,7 @@ rules:
     pattern: リアルタム
   - expected: 調査
     pattern: 超うさ
+  - expected: Windows
+    pattern: windows
+  - expected: Linux
+    pattern: linux
