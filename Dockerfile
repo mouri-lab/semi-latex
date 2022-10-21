@@ -1,4 +1,4 @@
-FROM node:16.17.1 AS node
+FROM node:18.11.0-slim AS node
 FROM amd64/ubuntu:20.04 AS latex
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -37,7 +37,7 @@ RUN locale-gen ja_JP.UTF-8 && \
     update-locale LANG=ja_JP.UTF-8
 
 # 実行のためのパッケージ
-RUN apt-fast install -y --no-install-recommends \
+RUN apt-fast install -y  \
     make \
     evince \
     xdvik-ja \
@@ -48,7 +48,7 @@ RUN apt-fast install -y --no-install-recommends \
     texlive-lang-cjk \
     texlive-lang-japanese \
     # svg, epsの変換ツール
-    inkscape \
+    # inkscape \
     librsvg2-bin \
     # pdbをtextに変換
     poppler-utils \
@@ -60,7 +60,9 @@ RUN apt-fast install -y --no-install-recommends \
 
 # 推奨パッケージをインストール
 RUN apt-fast install -y \
-    texlive-extra-utils
+    texlive-extra-utils \
+    inkscape
+
 
 
 ENV DIRPATH /home/${DOCKER_USER_}
