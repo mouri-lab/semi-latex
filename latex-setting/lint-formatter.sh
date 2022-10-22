@@ -21,7 +21,9 @@ for ((i=0; i < $for_loop_max; i++)); do
 done
 unset for_loop_max
 
+sed -i 's/textlint --fix \[file\]/make lint-fix/' lint.txt
 sed -i "s@^ \+@ @" lint.txt
+
 cat lint.txt
 
 # sed -E s@"([0-9])+:([0-9])+"@"hoge/\1: \2"@ lint.txt
