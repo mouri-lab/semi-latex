@@ -48,7 +48,7 @@ RUN apt-fast install -y  \
     texlive-lang-cjk \
     texlive-lang-japanese \
     # svg, epsの変換ツール
-    # inkscape \
+    inkscape \
     librsvg2-bin \
     # pdbをtextに変換
     poppler-utils \
@@ -60,10 +60,7 @@ RUN apt-fast install -y  \
 
 # 推奨パッケージをインストール
 RUN apt-fast install -y \
-    texlive-extra-utils \
-    inkscape
-
-
+    texlive-extra-utils
 
 ENV DIRPATH /home/${DOCKER_USER_}
 WORKDIR $DIRPATH
