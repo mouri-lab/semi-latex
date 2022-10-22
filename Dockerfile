@@ -39,7 +39,7 @@ RUN locale-gen ja_JP.UTF-8 && \
 # 実行のためのパッケージ
 RUN apt-fast install -y --no-install-recommends \
     make \
-    evince \
+    # evince \
     xdvik-ja \
     imagemagick \
     texlive-fonts-extra \
@@ -50,7 +50,7 @@ RUN apt-fast install -y --no-install-recommends \
     # svg, epsの変換ツール
     inkscape \
     librsvg2-bin \
-    # pdbをtextに変換
+    # pdfをtextに変換
     poppler-utils \
     # textlint用のnpm
     npm \
