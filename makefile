@@ -184,9 +184,15 @@ get-image:
 
 # コマンドのテスト用
 test:
-	@echo ${TEX_FILE_PATH}
-	@echo ${TEX_FILE}
-	@echo ${TEX_DIR_PATH}
-	@echo ${TEX_DIR}
+	docker container run \
+	-it \
+	--rm \
+	--network none \
+	-d \
+	--name textlint-container \
+	textlint-container:latest
+	-docker container exec -it textlint-container bash
+	docker container stop textlint-container
+
 
 
