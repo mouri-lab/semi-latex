@@ -93,6 +93,11 @@ texファイルのdocumentclassでecoではなくb3-ecoを指定してくださ�
 ```
 make lint
 ```
+* 自動修正
+```
+make lint-fix
+```
+
 
 ### VSCode上でlint結果を表示
 * VScodeにRemote Developmentのインストールが必要

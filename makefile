@@ -50,6 +50,11 @@ lint:
 	@- docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && rm -f lint.txt"
 	@make _postExec -s
 
+lint-fix:
+	@make _preExec -s
+	@- docker container exec --user root -t ${NAME} /bin/bash -c "./node_modules/textlint/bin/textlint.js --fix ${TEX_DIR}/${TEX_FILE}"
+	@make _postExec -s
+
 # sampleをビルド
 run-sample:
 	make _preExec TEX_DIR=sample -s

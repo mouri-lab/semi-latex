@@ -1,4 +1,4 @@
-FROM node:16.17.1 AS node
+FROM node:18.11.0-slim AS node
 FROM amd64/ubuntu:20.04 AS latex
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -61,7 +61,6 @@ RUN apt-fast install -y --no-install-recommends \
 # 推奨パッケージをインストール
 RUN apt-fast install -y \
     texlive-extra-utils
-
 
 ENV DIRPATH /home/${DOCKER_USER_}
 WORKDIR $DIRPATH

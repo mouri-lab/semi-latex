@@ -1,11 +1,13 @@
 #!/bin/bash
 
-# set -e
+set -eu
 
 # 最後に更新されたtexファイルを探索
 
+readonly DIR=$(readlink -f $(dirname ${0}))
+
 tex_files=()
-tex_files+=($(readlink -f $(find . -name "*.tex" -type f)))
+tex_files+=($(readlink -f $(find ${DIR}/.. -name "*.tex" -type f)))
 
 
 file_date=()

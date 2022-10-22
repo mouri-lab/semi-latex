@@ -6,3 +6,4 @@ updates:
     rebase-strategy: auto
     schedule:
       interval: daily
+    target-branch: develop
