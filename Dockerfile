@@ -37,7 +37,7 @@ RUN locale-gen ja_JP.UTF-8 && \
     update-locale LANG=ja_JP.UTF-8
 
 # 実行のためのパッケージ
-RUN apt-fast install -y  \
+RUN apt-fast install -y --no-install-recommends \
     make \
     evince \
     xdvik-ja \
