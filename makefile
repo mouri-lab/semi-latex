@@ -45,14 +45,14 @@ run:
 # TextLint
 lint:
 	@make _preExec -s
-	@- docker container exec --user root ${NAME} /bin/bash -c "./node_modules/textlint/bin/textlint.js ${TEX_DIR}/${TEX_FILE} > ${TEX_DIR}/lint.txt"
+	@- docker container exec --user root ${NAME} /bin/bash -c "textlint.js ${TEX_DIR}/${TEX_FILE} > ${TEX_DIR}/lint.txt"
 	- docker container exec --user root -t --env TEX_PATH="$(shell readlink -f ${TEX_DIR})" ${NAME} /bin/bash -c "cd ${TEX_DIR} && bash lint-formatter.sh ${TEX_FILE_PATH}"
 	@- docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && rm -f lint.txt"
 	@make _postExec -s
 
 lint-fix:
 	@make _preExec -s
-	@- docker container exec --user root -t ${NAME} /bin/bash -c "./node_modules/textlint/bin/textlint.js --fix ${TEX_DIR}/${TEX_FILE}"
+	@- docker container exec --user root -t ${NAME} /bin/bash -c "textlint.js --fix ${TEX_DIR}/${TEX_FILE}"
 	@make _postExec -s
 
 # sampleをビルド
@@ -145,7 +145,7 @@ _postExec:
 # 不要になったビルドイメージを削除
 _postBuild:
 	if [[ -n $$(docker images -f 'dangling=true' -q) ]]; then\
-		 docker image rm $$(docker images -f 'dangling=true' -q);\
+		docker image rm $$(docker images -f 'dangling=true' -q);\
 	fi
 
 
@@ -160,13 +160,13 @@ endif
 # UbuntuにDockerをインストールし，sudoなしでDockerコマンドを実行する設定を行う
 install-docker:
 ifneq ($(shell docker --version 2>/dev/null),)
+	@echo "Docker is already installed"
+	docker --version
 	exit 1
 endif
 	sudo apt update
 	sudo apt install -y docker.io
-	if [[ $$(getent group docker | cut -f 4 --delim=":") != $$(whoami) ]]; then\
-		sudo gpasswd -a $$(whoami) docker;\
-	fi
+	[[ $$(getent group docker | cut -f 4 --delim=":") != $$(whoami) ]] && sudo gpasswd -a $$(whoami) docker
 	sudo chgrp docker /var/run/docker.sock
 	sudo systemctl restart docker
 	@echo "環境構築を完了するために再起動してください"
@@ -184,9 +184,15 @@ get-image:
 
 # コマンドのテスト用
 test:
-	@echo ${TEX_FILE_PATH}
-	@echo ${TEX_FILE}
-	@echo ${TEX_DIR_PATH}
-	@echo ${TEX_DIR}
+	docker container run \
+	-it \
+	--rm \
+	--network none \
+	-d \
+	--name textlint-container \
+	textlint-container:latest
+	-docker container exec -it textlint-container bash
+	docker container stop textlint-container
+
 
 
