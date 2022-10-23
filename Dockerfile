@@ -20,8 +20,11 @@ RUN useradd ${DOCKER_USER} \
 ARG APT_LINK=http://ftp.riken.jp/Linux/ubuntu/
 RUN sed -i "s-$(grep -v "#" /etc/apt/sources.list | cut -d " " -f 2 | grep -v "security" | sed "/^$/d" | sed -n 1p)-${APT_LINK}-g" /etc/apt/sources.list
 RUN apt-get update \
-    && apt-get install -y  \
-    npm
+    && apt-get install -y --no-install-recommends \
+    npm \
+    && apt-get -y clean \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
 
 
 RUN npm install textlint \
@@ -30,10 +33,7 @@ RUN npm install textlint \
     textlint-rule-preset-jtf-style \
     textlint-rule-preset-ja-engineering-paper \
     textlint-plugin-latex2e\
-    && apt-get purge -y npm \
-    && apt-get -y clean \
-    && apt-get autoremove -y \
-    && rm -rf /var/lib/apt/lists/*
+    && npm cache clean --force
 
 RUN rm $(find / -name "*.def" -type f)
 
@@ -51,13 +51,6 @@ ARG DOCKER_USER_=guest
 ARG APT_LINK=http://ftp.riken.jp/Linux/ubuntu/
 RUN sed -i "s-$(grep -v "#" /etc/apt/sources.list | cut -d " " -f 2 | grep -v "security" | sed "/^$/d" | sed -n 1p)-${APT_LINK}-g" /etc/apt/sources.list
 
-# RUN apt-get -q update &&\
-#     apt-get -q install -y --no-install-recommends software-properties-common \
-#     && add-apt-repository ppa:apt-fast/stable \
-#     && apt-get -q update \
-#     && apt-get -q install -y --no-install-recommends apt-fast \
-#     && apt-get purge -y software-properties-common \
-#     && apt-get clean
 
 # ターミナルで日本語の出力を可能にするための設定
 RUN apt-get update \
@@ -113,4 +106,5 @@ COPY media/semi-rule.yml ${DIRPATH}/node_modules/prh/prh-rules/media/
 COPY media/WEB+DB_PRESS.yml ${DIRPATH}/node_modules/prh/prh-rules/media/
 COPY .textlintrc ${DIRPATH}/
 
+ENV PATH $PATH:${DIRPATH}/node_modules/textlint/bin
 
