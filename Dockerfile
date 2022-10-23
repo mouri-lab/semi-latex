@@ -35,8 +35,7 @@ RUN npm install textlint \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
 
-RUN rm $(find / -name "*.def" -type f) \
-    && rm $(find / -name "*.gz" -type f)
+RUN rm $(find / -name "*.def" -type f)
 
 
 
@@ -101,6 +100,7 @@ RUN apt-get install -y \
 
 ENV DIRPATH /home/${DOCKER_USER_}
 WORKDIR $DIRPATH
+
 RUN useradd ${DOCKER_USER_} \
     && chown -R ${DOCKER_USER_} ${DIRPATH}
 
@@ -109,5 +109,8 @@ USER ${DOCKER_USER_}
 COPY --from=textlint $DIRPATH/ $DIRPATH/
 COPY --from=textlint /usr/local/bin/ /usr/local/bin/
 
+COPY media/semi-rule.yml ${DIRPATH}/node_modules/prh/prh-rules/media/
+COPY media/WEB+DB_PRESS.yml ${DIRPATH}/node_modules/prh/prh-rules/media/
+COPY .textlintrc ${DIRPATH}/
 
 
