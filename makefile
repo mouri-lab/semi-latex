@@ -145,7 +145,7 @@ _postExec:
 # 不要になったビルドイメージを削除
 _postBuild:
 	if [[ -n $$(docker images -f 'dangling=true' -q) ]]; then\
-		 docker image rm $$(docker images -f 'dangling=true' -q);\
+		docker image rm $$(docker images -f 'dangling=true' -q);\
 	fi
 
 
