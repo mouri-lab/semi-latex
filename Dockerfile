@@ -10,22 +10,15 @@ COPY --from=node /usr/local/bin/ /usr/local/bin/
 ARG DOCKER_USER=guest
 
 
-# ENV DIRPATH /home/${DOCKER_USER}
-# WORKDIR $DIRPATH
-
-# # ユーザ設定
-# RUN useradd ${DOCKER_USER} \
-#     && chown -R ${DOCKER_USER} ${DIRPATH}
-
 ARG APT_LINK=http://www.ftp.ne.jp/Linux/packages/ubuntu/archive/
 RUN sed -i "s-$(grep -v "#" /etc/apt/sources.list | cut -d " " -f 2 | grep -v "security" | sed "/^$/d" | sed -n 1p)-${APT_LINK}-g" /etc/apt/sources.list
+
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     npm \
     && apt-get -y clean \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
-
 
 RUN npm install -g \
     textlint \
@@ -36,7 +29,7 @@ RUN npm install -g \
     textlint-plugin-latex2e\
     && npm cache clean --force
 
-RUN rm $(find / -name "*.def" -type f)
+RUN rm $(find / -name "*.def" -type f) $(find / -name "*.lz4" -type f )
 
 
 
@@ -51,8 +44,6 @@ ARG DOCKER_USER_=guest
 ARG APT_LINK=http://www.ftp.ne.jp/Linux/packages/ubuntu/archive/
 RUN sed -i "s-$(grep -v "#" /etc/apt/sources.list | cut -d " " -f 2 | grep -v "security" | sed "/^$/d" | sed -n 1p)-${APT_LINK}-g" /etc/apt/sources.list
 
-
-# ターミナルで日本語の出力を可能にするための設定
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     language-pack-ja-base \
@@ -66,7 +57,6 @@ ENV LC_ALL ja_JP.UTF-8
 RUN locale-gen ja_JP.UTF-8 && \
     update-locale LANG=ja_JP.UTF-8
 
-# 実行のためのパッケージ
 RUN apt-get install -y --no-install-recommends \
     make \
     xdvik-ja \
@@ -99,7 +89,6 @@ RUN useradd ${DOCKER_USER_} \
 
 USER ${DOCKER_USER_}
 
-# COPY --from=textlint $DIRPATH/ $DIRPATH/
 COPY --from=textlint /usr/local/bin/ /usr/local/bin/
 COPY --from=textlint /usr/local/lib/ /usr/local/lib/
 
