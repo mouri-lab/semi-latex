@@ -61,16 +61,17 @@ RUN apt-get install -y --no-install-recommends \
     make \
     xdvik-ja \
     imagemagick \
-    texlive-fonts-extra \
-    texlive-latex-extra \
-    texlive-fonts-recommended \
-    texlive-lang-cjk \
-    texlive-lang-japanese \
     # svg, epsの変換ツール
     inkscape \
     librsvg2-bin \
     # pdfをtextに変換
     poppler-utils \
+    texlive \
+    texlive-fonts-extra \
+    texlive-latex-extra \
+    texlive-fonts-recommended \
+    texlive-lang-cjk \
+    texlive-lang-japanese \
     &&  kanji-config-updmap-sys auto
 
 # 推奨パッケージをインストール
