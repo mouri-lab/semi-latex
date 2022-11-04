@@ -86,8 +86,8 @@ SRC-PDF := $(wildcard $(addsuffix /*.pdf,$(SRC-FIGURE-DIRS))) # Power Point, Vis
 
 # Will generate files (They will be removed by clean-full)
 DST-FIG := $(SRC-SVG:%.svg=%.pdf)            # svg -> pdf
-# DST-FIG += $(SRC-PNG:%.png=%.bb)             # png -> bb
-DST-FIG += $(SRC-PNG:%.png=%.eps)            # png -> eps
+DST-FIG += $(SRC-PNG:%.png=%.xbb)             # png -> xbb
+# DST-FIG += $(SRC-PNG:%.png=%.eps)            # png -> eps
 DST-FIG += $(SRC-OBJ:%.obj=%.eps)            # obj -> eps
 # DST-FIG += $(SRC-PDF:%.pdf=%.bb)			 # pdf -> bb
 ifeq ("$(CONV-PDF-TO-EPS)","yes")
@@ -167,29 +167,12 @@ $(MAIN).dvi: $(DVISRC)
 	@if [ -f "references.bib" ] ; then   \
 		$(call strong,BIBTEX)           ;\
 		$(BIBTEX) $(MAIN) > jbibtex.log ;\
+		$(PLATEX) $(MAIN).tex			;\
 	fi
 	@if [ -f "$(MAIN).idx" ] ; then   \
 		$(call strong,MANDEX)        ;\
 		mendex $(MAIN).idx           ;\
-	fi
-	@$(call strong,PLATEX)
-	@$(PLATEX) $(MAIN).tex
-	@$(call strong,PLATEX)
-	@$(PLATEX) $(MAIN).tex
-	@if [ "$(JOIN-LOGS)" = "yes" ] ; then    \
-		$(call latex-join-log,$(@:.dvi=.log)) > platex.log ; \
-		if [ -f "references.bib" ] ; then  \
-			if grep Warning jbibtex.log > /dev/null ; then \
-				ruby -e 'puts "\n"+"="*80'; \
-				$(call strong,"WARNING (jbibtex):") ;\
-				nkf -u jbibtex.log | grep Warning | sed -e 's/<NL>/\n  /g' ;\
-			fi ;\
-		fi  ;\
-		if grep Warning platex.log > /dev/null; then \
-			ruby -e 'puts "\n"+"="*80'; \
-			$(call strong,"WARNING (platex):") ;\
-			nkf -u platex.log | grep Warning | sed -e 's/<NL>/\n  /g' ;\
-		fi  ;\
+		$(PLATEX) $(MAIN).tex		 ;\
 	fi
 
 $(MAIN).pdf: dvi
@@ -197,8 +180,8 @@ $(MAIN).pdf: dvi
 
 
 ## Figure conversion algorithms
-%.bb: %.png
-	cd $(shell dirname "$<") && ebb $(shell basename $<)
+%.xbb: %.png
+	cd $(shell dirname "$<") && extractbb  $(shell basename $<)
 %.bb: %.pdf
 	cd $(shell dirname "$<") && ebb $(shell basename $<)
 %.eps: %.png

@@ -4,6 +4,9 @@ NAME := latex-container
 # DockerHubのリポジトリ名
 DOCKER_REPOSITORY := taka0628/semi-latex
 
+# tex fileの自動整形をする
+# yes -> true, no -> true以外
+AUTO_FORMAT := true
 
 DOCKER_USER_NAME := $(shell cat Dockerfile | grep "ARG DOCKER_USER_" | cut -d "=" -f 2)
 DOCKER_HOME_DIR := /home/${DOCKER_USER_NAME}
@@ -33,33 +36,38 @@ SHELL := /bin/bash
 .PHONY: run
 .PHONY: lint
 .PHONY: bash
+.DEFAULT_GOAL := run
 
 # LaTeXのコンパイル
 run:
 	make _preExec -s
 	-bash latex-setting/build.sh ${NAME} ${TEX_DIR} ${TEX_FILE}
 # texファイルの整形
-	@-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && latexindent -w -s ${TEX_FILE} && rm *.bak*"
+ifeq (${AUTO_FORMAT},true)
+	-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && latexindent -w ${TEX_FILE} -s && rm -f *.bak*"
+endif
 	make _postExec -s
 
 # TextLint
 lint:
 	@make _preExec -s
-	@- docker container exec --user root ${NAME} /bin/bash -c "textlint.js ${TEX_DIR}/${TEX_FILE} > ${TEX_DIR}/lint.txt"
+	@- docker container exec --user root ${NAME} /bin/bash -c "textlint ${TEX_DIR}/${TEX_FILE} > ${TEX_DIR}/lint.txt"
 	- docker container exec --user root -t --env TEX_PATH="$(shell readlink -f ${TEX_DIR})" ${NAME} /bin/bash -c "cd ${TEX_DIR} && bash lint-formatter.sh ${TEX_FILE_PATH}"
 	@- docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && rm -f lint.txt"
 	@make _postExec -s
 
 lint-fix:
 	@make _preExec -s
-	@- docker container exec --user root -t ${NAME} /bin/bash -c "textlint.js --fix ${TEX_DIR}/${TEX_FILE}"
+	@- docker container exec --user root -t ${NAME} /bin/bash -c "textlint --fix ${TEX_DIR}/${TEX_FILE}"
 	@make _postExec -s
 
 # sampleをビルド
 run-sample:
 	make _preExec TEX_DIR=sample -s
 	-bash latex-setting/build.sh ${NAME} ${TEX_DIR} ${TEX_FILE}
-	@-docker container exec --user root ${NAME} /bin/bash -c "cd sample && latexindent -w -s semi.tex && rm *.bak*"
+ifeq (${AUTO_FORMAT},true)
+	docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && latexindent -w -s ${TEX_FILE} && rm *.bak*"
+endif
 	make _postExec TEX_DIR=sample -s
 
 
@@ -184,15 +192,7 @@ get-image:
 
 # コマンドのテスト用
 test:
-	docker container run \
-	-it \
-	--rm \
-	--network none \
-	-d \
-	--name textlint-container \
-	textlint-container:latest
-	-docker container exec -it textlint-container bash
-	docker container stop textlint-container
+	-docker container exec ${NAME} bash -c "echo $$(docker container exec ${NAME} bash -c "whoami")"
 
 
 

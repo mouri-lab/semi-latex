@@ -20,13 +20,16 @@ for ((i=0; i < ${for_loop_max}; i++)); do
 
 	docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && pdftotext ${TEX_FILE} ../pdf.txt"
 
-	if [[ $(docker container exec --user root ${NAME} /bin/bash -c "cat pdf.txt | grep -c '??'") -eq 0 ]]; then
+	if [[ $(docker container exec --user root ${NAME} /bin/bash -c "cat pdf.txt | grep -c '??'") > 0 ]]; then
 
-		exit 0
+		docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && make all"
 
 	else
 
-		docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && make all"
+		docker container exec --user root ${NAME} /bin/bash -c "rm -f \
+		$(docker container exec --user root ${NAME} /bin/bash -c  "find . -name "*.xbb" -type f")"
+
+		exit 0
 
 	fi
 

@@ -1,4 +1,4 @@
-\documentclass[submit,techreq,noauthor,dvipdfmx]{eco}	% ゼミ用テンプレート
+\documentclass[submit,techreq,noauthor]{eco}	% ゼミ用テンプレート
 % \documentclass[submit,techreq,noauthor,dvipdfmx]{b3-eco}	% b3用テンプレート
 % \documentclass[submit,techreq,noauthor,dvipdfmx]{mid-eco}	% b4中間発表テンプレート
 
@@ -7,9 +7,13 @@
 \usepackage{listings, jlisting} 		% for source code
 \usepackage{url}
 \usepackage{setspace}
-\usepackage{svg}
-\usepackage[shortlabels]{enumitem}
+\usepackage{enumitem}
 \usepackage{booktabs}
+
+% フォントの警告を無視
+\usepackage{silence}
+\WarningFilter{latexfont}{Some font shapes}
+\WarningFilter{latexfont}{Font shape}
 
 % listingsの設定
 \lstset{
@@ -149,7 +153,6 @@ TgifやOpenOfficeで作る場合は，epsで出力して，includegraphicsで挿
 	\label{fig:tgif-sample}
 \end{figure}
 
-
 \subsection{PowerPointで作る場合}
 複雑な図を作るときは，Microsoft PowerPointやVisioがおすすめ．
 図をPDFでエクスポートし，それをTeXで表示できます（例: 図\ref{fig:pdf-sample}）．
@@ -163,6 +166,7 @@ PDFを作成時にフォントが埋め込まれているかを確認する．
 	\label{fig:pdf-sample}
 \end{figure}
 
+
 \subsection{svgファイル}
 svgを貼るときはincludegraphicsに拡張子を指定しない．
 make実行時にpdfに変換されるため．
@@ -170,6 +174,8 @@ make実行時にpdfに変換されるため．
 	\centering\includegraphics[width=80mm, angle=0]{fig/svg-sample}
 	\caption{svgファイル}\label{fig:svg-sample}
 \end{figure}
+
+
 
 %%%%%%%%%%%%%%%%%%%%%ここまで消して下さい%%%%%%%%%%%%%%%%%%%%%
 

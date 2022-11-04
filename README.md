@@ -30,6 +30,7 @@
   * Linux
   * Docker
   * make
+  * Bash
 * 推奨環境
   * VScode
   * VScodeの拡張機能
@@ -38,13 +39,17 @@
       * 保存時に自動コンパイル
     * Remote Development
       * VScode上にTextLintのエラーを表示させる場合に使用
+* ホストOS
+  * Windows
+    * Virtual BoxやWSL2を使ってLinux環境を用意してください
+  * macOS
+    * Intel, M1, M2に関わらすDocker Desktopでの実行を確認できていません
+    * OverleafやCloud LaTeXなどの利用をおすすめします
 
 # 使い方
 ## INSTALL
-1. 環境をインストール
-   * **Ubuntuのみ**Docker環境を自動インストール
-    * Mac OS, Windowsは個別にDockerとmakeの実行環境を作ってください
-      * M1, M2では多分動作しません
+1. Docker環境をインストール
+     * Docker環境を構築済みの方は1と2をスキップしてください
     ```
     make install
     ```
@@ -58,7 +63,7 @@
    * Dockerのビルド
      * Docker Hubから取得出来なかった場合などに使用
      * 時間がかかるので非推奨
-       * 約10分
+       * 約5分
       ```
       make docker-build
       ```
@@ -71,10 +76,10 @@
 * コマンドから実行
   * semi-latexディレクトリ内で変更されたtexをコンパイル
   ```
-  make run
+  make
   ```
 * VSCode上で実行
-  * texファイル保存時にコンパイルされる
+  * texファイル保存時にコンパイル
   * **LaTeX-Workshopが必要**
 
 ### B3用のテンプレート
@@ -88,6 +93,7 @@ texファイルのdocumentclassでecoではなくb3-ecoを指定してくださ�
 ```
 
 ## textlint
+texファイルの表記ゆれや誤植を表示できます
 ### ターミナルで実行
 * VSCode上のターミナルを使うとファイルパスのCtrl+クリックで該当箇所にジャンプできます
 ```
@@ -124,7 +130,6 @@ make lint-fix
   * eps
   * pdf
   * png
-    * epsへ自動変換
   * svg
     * pdfへ自動変換
 * 自動変換の注意
@@ -154,12 +159,10 @@ make lint-fix
     huga.svg
     ```
 ### png
-* 拡張子は.pngではなく.epsを指定
-  * コンテナ内で自動的にpngからepsを生成するため
+* png形式に対応しました
 * 例：ローカルにfig/hoge.pngがある場合
-  * .epsはなくてもOK
 ```
-\includegraphics[]{fig/hoge.eps}
+\includegraphics[]{fig/hoge.png}
 ```
 
 ### svg
@@ -176,6 +179,10 @@ make lint-fix
 
 ## LaTexのコンパイル
 * コンパイルされるのはsami-latex/内で最も最近更新されたtexファイルです
+```
+make
+```
+または
 ```
 make run
 ```
