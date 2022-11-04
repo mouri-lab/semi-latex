@@ -26,10 +26,11 @@ RUN npm install -g \
     textlint-rule-preset-ja-spacing \
     textlint-rule-preset-jtf-style \
     textlint-rule-preset-ja-engineering-paper \
-    textlint-plugin-latex2e\
+    textlint-plugin-latex2e \
+    @textlint/ast-node-types \
     && npm cache clean --force
 
-RUN rm $(find / -name "*.def" -type f) $(find / -name "*.lz4" -type f )
+# RUN rm $(find / -name "*.def" -type f) $(find / -name "*.lz4" -type f )
 
 
 
