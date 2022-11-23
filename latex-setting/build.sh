@@ -27,7 +27,7 @@ for ((i=0; i < ${for_loop_max}; i++)); do
 	else
 
 		docker container exec --user root ${NAME} /bin/bash -c "rm -f \
-		$(docker container exec --user root ${NAME} /bin/bash -c  "find . -name "*.xbb" -type f")"
+		$(docker container exec --user root ${NAME} /bin/bash -c  "find . -name "*.xbb" -type f" | sed -z 's/\n/ /g' )"
 
 		exit 0
 
