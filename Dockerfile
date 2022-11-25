@@ -15,19 +15,19 @@ RUN sed -i "s-$(grep -v "#" /etc/apt/sources.list | cut -d " " -f 2 | grep -v "s
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-    npm \
+    npm=6.14.4+ds-1ubuntu2 \
     && apt-get -y clean \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
 
 RUN npm install -g \
-    textlint \
-    textlint-rule-preset-ja-technical-writing \
-    textlint-rule-preset-ja-spacing \
-    textlint-rule-preset-jtf-style \
-    textlint-rule-preset-ja-engineering-paper \
-    textlint-plugin-latex2e \
-    @textlint/ast-node-types \
+    textlint@v12.2.3 \
+    textlint-rule-preset-ja-technical-writing@7.0.0 \
+    textlint-rule-preset-ja-spacing@2.2.0 \
+    textlint-rule-preset-jtf-style@2.3.13 \
+    textlint-rule-preset-ja-engineering-paper@1.0.4 \
+    textlint-plugin-latex2e@1.2.0 \
+    @textlint/ast-node-types@12.2.2 \
     && npm cache clean --force
 
 # RUN rm $(find / -name "*.def" -type f) $(find / -name "*.lz4" -type f )
@@ -47,10 +47,10 @@ RUN sed -i "s-$(grep -v "#" /etc/apt/sources.list | cut -d " " -f 2 | grep -v "s
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-    language-pack-ja-base \
-    language-pack-ja \
-    fonts-noto-cjk \
-    fcitx-mozc
+    language-pack-ja-base=1:20.04+20220818 \
+    language-pack-ja=1:20.04+20220818 \
+    fonts-noto-cjk=1:20190410+repack1-2 \
+    fcitx-mozc=2.23.2815.102+dfsg-8ubuntu1
 
 ENV LANG ja_JP.UTF-8
 ENV LANGUAGE ja_JP:jp
@@ -67,17 +67,17 @@ RUN apt-get install -y --no-install-recommends \
     librsvg2-bin \
     # pdfをtextに変換
     poppler-utils \
-    texlive \
-    texlive-fonts-extra \
-    texlive-latex-extra \
-    texlive-fonts-recommended \
-    texlive-lang-cjk \
-    texlive-lang-japanese \
+    texlive=2019.20200218-1 \
+    texlive-fonts-extra=2019.202000218-1 \
+    texlive-latex-extra=2019.202000218-1 \
+    texlive-fonts-recommended=2019.20200218-1 \
+    texlive-lang-cjk=2019.20200218-1 \
+    texlive-lang-japanese=2019.20200218-1 \
     &&  kanji-config-updmap-sys auto
 
 # 推奨パッケージをインストール
 RUN apt-get install -y \
-    texlive-extra-utils \
+    texlive-extra-utils=2019.202000218-1 \
     && apt-get clean \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
