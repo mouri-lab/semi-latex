@@ -129,7 +129,6 @@ ifeq ($(shell docker ps -a | grep -c ${NAME}),0)
 	docker container run \
 	-it \
 	--rm \
-	--network none \
 	-d \
 	--name ${NAME} \
 	${NAME}:latest
