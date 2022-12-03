@@ -93,7 +93,7 @@ docker-clean:
 
 # dockerコンテナを停止
 docker-stop:
-	@if [[ $$(docker container ls -a | grep -c "${NAME}") -eq 0 ]]; then\
+	@if [[ $$(docker container ls -a | grep -c "${NAME}") -ne 0 ]]; then\
 		docker container stop ${NAME};\
 		echo "コンテナを停止";\
 		sync;\
