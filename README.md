@@ -4,12 +4,17 @@
 - [使い方](#使い方)
   - [INSTALL](#install)
   - [コンパイル](#コンパイル)
-    - [B3用のテンプレート](#b3用のテンプレート)
+    - [テンプレートについて](#テンプレートについて)
+      - [全体ゼミ](#全体ゼミ)
+      - [B3輪講](#b3輪講)
+      - [B4中間発表](#b4中間発表)
   - [textlint](#textlint)
     - [ターミナルで実行](#ターミナルで実行)
     - [VSCode上でlint結果を表示](#vscode上でlint結果を表示)
     - [研のlintルール](#研のlintルール)
   - [画像の貼り方](#画像の貼り方)
+    - [対応しているファイル形式](#対応しているファイル形式)
+    - [自動変換の注意](#自動変換の注意)
     - [png](#png)
     - [svg](#svg)
 - [コマンド一覧](#コマンド一覧)
@@ -19,7 +24,7 @@
   - [コンテナに入りコマンド実行](#コンテナに入りコマンド実行)
   - [コンテナを停止](#コンテナを停止)
   - [dockerのリソースを開放](#dockerのリソースを開放)
-  - [コンテナのパッケージ更新](#コンテナのパッケージ更新)
+  - [コンテナのビルド](#コンテナのビルド)
   - [インストール](#インストール)
   - [Dockerのインストール](#dockerのインストール)
 
@@ -50,20 +55,24 @@
 ## INSTALL
 1. Docker環境をインストール
      * Docker環境を構築済みの方は1と2をスキップしてください
+     * WSLではこのコマンドでインストールできない可能性があります
+       * aptのdocker.ioでDockerが入らないかも
+       * Docker公式ドキュメント記載の方法でインストールしてください
     ```
     make install
     ```
 2. 再起動
 3. Docker Imageの作成
-   *  Docker Hubからイメージを取得
-      * 推奨
+   * どちらか好きな方を実行してください
+   *  Docker Hubから構築済みイメージを取得
+      * Docker Imageのビルドが不要な分高速です
        ```
        make get-image
        ```
    * Dockerのビルド
-     * Docker Hubから取得出来なかった場合などに使用
-     * 時間がかかるので非推奨
-       * 約5分
+     * DockerfileからDocker Imageをビルド
+     * ほぼ確実にDocker Imageを取得できます
+       * make get-imageより信頼性は高いです
       ```
       make docker-build
       ```
@@ -82,18 +91,25 @@
   * texファイル保存時にコンパイル
   * **LaTeX-Workshopが必要**
 
-### B3用のテンプレート
-texファイルのdocumentclassでecoではなくb3-ecoを指定してください
-```
-\documentclass[submit,techreq,noauthor,dvipdfmx]{b3-eco}
-```
-ゼミ用テンプレートに戻すにはecoを指定
+### テンプレートについて
+texファイルのdocumentclassで使用するテンプレートを選択できます
+
+#### 全体ゼミ
 ```
 \documentclass[submit,techreq,noauthor,dvipdfmx]{eco}
 ```
+#### B3輪講
+```
+\documentclass[submit,techreq,noauthor,dvipdfmx]{b3-eco}
+```
+#### B4中間発表
+```
+\documentclass[submit,techreq,noauthor,dvipdfmx]{mid-eco}
+```
+
 
 ## textlint
-texファイルの表記ゆれや誤植を表示できます
+texファイルの表記ゆれや誤植を機械的に検出できます
 ### ターミナルで実行
 * VSCode上のターミナルを使うとファイルパスのCtrl+クリックで該当箇所にジャンプできます
 ```
@@ -126,25 +142,26 @@ make lint-fix
    * 場所：media/semi-rule.yml
 
 ## 画像の貼り方
-* 対応しているファイル形式
+### 対応しているファイル形式
   * eps
   * pdf
   * png
   * svg
     * pdfへ自動変換
-* 自動変換の注意
-  * 画像用のディレクトリを作成し，すべての画像を同じディレクトリに入れる
+### 自動変換の注意
+  * 画像用のディレクトリを作成し，すべての画像を同じディレクトリに入れることが必要
     * ディレクトリ名は任意
   * 作成したディレクトリ内でネストしない
-  * フォルダ階層の例
+  * 正しいフォルダ階層の例
     ```
     sample.tex
     fig/
     |--hoge.png
     |--huga.svg
     ```
-  * NG
+  * NG例
     * ディレクトリがネスト
+      * fig/内にfig/が存在
     ```
     sample.tex
     fig/
@@ -177,7 +194,9 @@ make lint-fix
 # コマンド一覧
 
 ## LaTexのコンパイル
-* コンパイルされるのはsemi-latex/内で最も最近更新されたtexファイルです
+コンパイルされるのはsemi-latex/内で最も最近更新されたtexファイルです
+
+makeとmake runは同じ処理
 ```
 make
 ```
@@ -187,6 +206,7 @@ make run
 ```
 
 ## サンプルのコンパイル
+sample/sample.texがコンパイルされます
 ```
 make run-sample
 ```
@@ -197,6 +217,7 @@ make lint
 ```
 
 ## コンテナに入りコマンド実行
+主にデバッグ用なので普段使う必要はないはず
 * root権限なし
     ```
     make bash
@@ -207,11 +228,8 @@ make lint
     ```
 
 ## コンテナを停止
-* 1度コンパイルすると再起動するまでコンテナは起動したままになる
-  * コンテナを毎回起動するとコンパルに時間がかかるため
-* アイドル状態のコンテナはリソースをほとんど消費しないので放置しても問題ない
-  * CPU使用率は0~0.1%
-  * メモリは数MB消費
+* 1度コンパイルすると再起動するまでコンテナは起動したままなので停止したい人向け
+  * コンテナを毎回起動するとコンパルに時間がかかるため起動したままにしています
 ```
 make docker-stop
 ```
@@ -222,13 +240,15 @@ make docker-stop
 make docker-clean
 ```
 
-## コンテナのパッケージ更新
-* aptパッケージの更新
+## コンテナのビルド
+* キャッシュを有効にしてDocker Imageをビルド
+  * キャッシュを利用するので2回目以降のビルドが高速です
+  * キャッシュが原因で失敗する場合があります
   ```
   make docker-build
   ```
-* コンテナの再構築
-  * 5分ほどかかります
+* コンテナをキャッシュ無しでビルド
+  * キャッシュを利用しないので信頼性は高いですがビルドに時間がかかります
   ```
   make docker-rebuild
   ```
@@ -242,7 +262,7 @@ make install
 
 ## Dockerのインストール
 * Dockerをインストールし，sudo権限なしで動作させる設定を行う
-  * 基本的にはmake installでOK
+  * make installから呼ばれます
 ```
 make install-docker
 ```
