@@ -1,0 +1,274 @@
+This is e-pTeX, Version 3.14159265-p3.8.2-190908-2.6 (utf8.euc) (TeX Live 2019/Debian) (preloaded format=platex 2022.12.3)  18 DEC 2022 05:11
+entering extended mode
+ restricted \write18 enabled.
+ file:line:error style messages enabled.
+ %&-line parsing enabled.
+**./semi.tex
+(./semi.tex
+pLaTeX2e <2020-02-02>+2 (based on LaTeX2e <2020-02-02> patch level 2)
+L3 programming layer <2020-02-14> (./eco.cls
+Document Class: eco 2013/06/09 v1.10 Mouri-semi eco Class
+\c@@paper=\count166
+\h=\dimen150
+\JQ=\dimen151
+\Q=\dimen152
+\@Q=\dimen153
+\ChtE=\skip47
+\CdpE=\skip48
+\CwdE=\skip49
+\CvsE=\skip50
+\normalbaselineskip=\skip51
+\author@count=\count167
+\label@count=\count168
+\email@count=\count169
+\affiliate@count=\count170
+\paffiliate@count=\count171
+\shubetutitlesep=\skip52
+\JEhonbunsep=\skip53
+\Etitleauthorsep=\skip54
+\Eauthorreceivesep=\skip55
+\Ereceiveabstsep=\skip56
+\Eabstkeywordsep=\skip57
+\Jtitlejauthorsep=\skip58
+\Jauthorjreceivesep=\skip59
+\Jreceivejabstsep=\skip60
+\Jabstsepjkeyword=\skip61
+\Jkeywordetitle=\skip62
+\Jetitleeauthor=\skip63
+\Jeauthorereceivesep=\skip64
+\Jereceiveeabstsep=\skip65
+\Jeabstekeywordsep=\skip66
+\@abstractbox=\box61
+\@eabstractbox=\box62
+\c@part=\count172
+\c@section=\count173
+\c@subsection=\count174
+\c@subsubsection=\count175
+\c@paragraph=\count176
+\c@subparagraph=\count177
+\@tempboxb=\box63
+\SECTwd=\box64
+\section@height=\skip67
+\@abovecapskip=\dimen154
+\@belowcapskip=\dimen155
+\c@figure=\count178
+\c@table=\count179
+\abovecaptionskip=\skip68
+\belowcaptionskip=\skip69
+\@tempboxb=\box65
+\capwidth=\dimen156
+\ecapwidth=\dimen157
+\bibindent=\dimen158
+\c@profile=\count180
+\mathindent=\dimen159
+\@dummyfigbox=\box66
+\twocolcapwidth=\dimen160
+\twocolecapwidth=\dimen161
+\@compare@result=\count181
+\semiyear=\toks15
+\semiseq=\toks16
+\dateyear=\toks17
+\datemonth=\toks18
+\dateday=\toks19
+\dateweek=\toks20
+) (/usr/share/texlive/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2019/11/30 v1.2a Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks21
+)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2019/11/30 v1.4a Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2016/01/03 v1.10 sin cos tan (DPC)
+)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: dvipdfmx.def on input line 105.
+
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-def/dvipdfmx.def
+File: dvipdfmx.def 2017/06/24 v5.0g Graphics/color driver for dvipdfmx
+))
+\Gin@req@height=\dimen162
+\Gin@req@width=\dimen163
+)
+(./mediabb.sty
+Package: mediabb 2006/10/26 v1.9 iNOUE Koich! <inoue@ma.ns.musashi-tech.ac.jp>
+) (/usr/share/texlive/texmf-dist/tex/latex/listings/listings.sty
+\lst@mode=\count182
+\lst@gtempboxa=\box67
+\lst@token=\toks22
+\lst@length=\count183
+\lst@currlwidth=\dimen164
+\lst@column=\count184
+\lst@pos=\count185
+\lst@lostspace=\dimen165
+\lst@width=\dimen166
+\lst@newlines=\count186
+\lst@lineno=\count187
+\lst@maxwidth=\dimen167
+
+(/usr/share/texlive/texmf-dist/tex/latex/listings/lstmisc.sty
+File: lstmisc.sty 2019/09/10 1.8c (Carsten Heinz)
+\c@lstnumber=\count188
+\lst@skipnumbers=\count189
+\lst@framebox=\box68
+)
+(/usr/share/texlive/texmf-dist/tex/latex/listings/listings.cfg
+File: listings.cfg 2019/09/10 1.8c listings configuration
+))
+Package: listings 2019/09/10 1.8c (Carsten Heinz)
+
+(./jlisting.sty
+Package: jlisting 2006/02/20 0.2 (Thor)
+\lst@nextchar=\count190
+\lst@inputfile=\read2
+) (/usr/share/texlive/texmf-dist/tex/latex/url/url.sty
+\Urlmuskip=\muskip16
+Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
+)
+(/usr/share/texlive/texmf-dist/tex/latex/setspace/setspace.sty
+Package: setspace 2011/12/19 v6.7a set line spacing
+)
+(/usr/share/texlive/texmf-dist/tex/latex/enumitem/enumitem.sty
+Package: enumitem 2019/06/20 v3.9 Customized lists
+\labelindent=\skip70
+\enit@outerparindent=\dimen168
+\enit@toks=\toks23
+\enit@inbox=\box69
+\enit@count@id=\count191
+\enitdp@description=\count192
+)
+(/usr/share/texlive/texmf-dist/tex/latex/booktabs/booktabs.sty
+Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
+\heavyrulewidth=\dimen169
+\lightrulewidth=\dimen170
+\cmidrulewidth=\dimen171
+\belowrulesep=\dimen172
+\belowbottomsep=\dimen173
+\aboverulesep=\dimen174
+\abovetopsep=\dimen175
+\cmidrulesep=\dimen176
+\cmidrulekern=\dimen177
+\defaultaddspace=\dimen178
+\@cmidla=\count193
+\@cmidlb=\count194
+\@aboverulesep=\dimen179
+\@belowrulesep=\dimen180
+\@thisruleclass=\count195
+\@lastruleclass=\count196
+\@thisrulewidth=\dimen181
+)
+(/usr/share/texlive/texmf-dist/tex/latex/silence/silence.sty
+Package: silence 2012/07/02 v1.5b Selective filtering of warnings and error mes
+sages
+\sl@Save=\count197
+\sl@StateNumber=\count198
+\sl@MessageCount=\count199
+\sl@Casualties=\count266
+\sl@Filter=\toks24
+\sl@Message=\toks25
+\sl@UnexpandedMessage=\toks26
+\sl@Mess@ge=\toks27
+\sl@WarningCount=\count267
+\sl@WarningNumber=\count268
+\sl@WarningCasualties=\count269
+\sl@TempBOW=\toks28
+\sl@BankOfWarnings=\toks29
+LaTeX Info: Redefining \GenericWarning on input line 433.
+\sl@ErrorCount=\count270
+\sl@ErrorNumber=\count271
+\sl@ErrorCasualties=\count272
+\sl@TempBOE=\toks30
+\sl@BankOfErrors=\toks31
+LaTeX Info: Redefining \GenericError on input line 601.
+)
+(/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-dvips.def
+File: l3backend-dvips.def 2020-02-03 L3 backend support: dvips
+\l__pdf_internal_box=\box70
+\g__pdf_backend_object_int=\count273
+\l__pdf_backend_content_box=\box71
+\l__pdf_backend_model_box=\box72
+\g__pdf_backend_annotation_int=\count274
+\g__pdf_backend_link_int=\count275
+\g__pdf_backend_link_sf_int=\count276
+)
+(./semi.aux)
+\openout1 = `semi.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for JY1/mc/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for JT1/mc/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+\c@lstlisting=\count277
+LaTeX Font Info:    Font shape `JT1/mc/b/n' in size <8.8711> not available
+(Font)              Font shape `JT1/mc/bx/n' tried instead on input line 57.
+LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <8.8711> not available
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 57.
+LaTeX Font Info:    Font shape `JY1/mc/b/n' in size <8.8711> not available
+(Font)              Font shape `JY1/mc/bx/n' tried instead on input line 57.
+LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <8.8711> not available
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 57.
+LaTeX Font Info:    Font shape `JY1/fgb/m/n' will be
+(Font)              scaled to size 12.78766pt on input line 64.
+LaTeX Font Info:    Font shape `JT1/gt/b/n' in size <19.2207> not available
+(Font)              Font shape `JT1/gt/bx/n' tried instead on input line 64.
+LaTeX Font Info:    Font shape `JT1/gt/bx/n' in size <19.2207> not available
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 64.
+LaTeX Font Info:    Font shape `JY1/gt/b/n' in size <19.2207> not available
+(Font)              Font shape `JY1/gt/bx/n' tried instead on input line 64.
+LaTeX Font Info:    Font shape `JY1/gt/bx/n' in size <19.2207> not available
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 64.
+LaTeX Font Info:    Font shape `JT1/gt/b/n' in size <12> not available
+(Font)              Font shape `JT1/gt/bx/n' tried instead on input line 64.
+LaTeX Font Info:    Font shape `JT1/gt/bx/n' in size <12> not available
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 64.
+LaTeX Font Info:    Font shape `JY1/gt/b/n' in size <12> not available
+(Font)              Font shape `JY1/gt/bx/n' tried instead on input line 64.
+LaTeX Font Info:    Font shape `JY1/gt/bx/n' in size <12> not available
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 64.
+LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
+(Font)              scaled to size 11.82806pt on input line 64.
+LaTeX Font Info:    Calculating math sizes for size <9.61035> on input line 64.
+
+LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
+(Font)              scaled to size 14.78487pt on input line 64.
+LaTeX Font Info:    Font shape `JT1/mc/b/n' in size <11.82813> not available
+(Font)              Font shape `JT1/mc/bx/n' tried instead on input line 67.
+LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <11.82813> not available
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 67.
+LaTeX Font Info:    Font shape `JY1/mc/b/n' in size <11.82813> not available
+(Font)              Font shape `JY1/mc/bx/n' tried instead on input line 67.
+LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <11.82813> not available
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 67.
+
+./semi.tex:139: Undefined control sequence.
+l.139 ^^I\capion
+                {BibTeXの記述例} 
+Here is how much of TeX's memory you used:
+ 3622 strings out of 483245
+ 50771 string characters out of 5968069
+ 407877 words of memory out of 5000000
+ 18935 multiletter control sequences out of 15000+600000
+ 546163 words of font info for 87 fonts, out of 8000000 for 9000
+ 14 hyphenation exceptions out of 8191
+ 30i,4n,36p,238b,1227s stack positions out of 5000i,500n,10000p,200000b,80000s
+
+No pages of output.
