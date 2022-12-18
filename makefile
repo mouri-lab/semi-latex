@@ -17,7 +17,12 @@ TS := $(shell date +%Y%m%d%H%M%S)
 
 # コンパイルするtexファイルのディレクトリ
 # 指定したディレクトリにtexファイルは1つであることが必要
+f :=
+TEX_FILE_PATH := ${f}
+ifeq (${TEX_FILE_PATH},)
 TEX_FILE_PATH := $(shell bash latex-setting/file-explorer.sh)
+endif
+
 TEX_FILE := $(shell echo ${TEX_FILE_PATH} | rev | cut -d '/' -f 1 | rev)
 
 TEX_DIR_PATH := $(shell echo ${TEX_FILE_PATH} | sed -e "s@${TEX_FILE}@@" -e "s@$(shell pwd)/@@")
@@ -61,12 +66,7 @@ lint-fix:
 
 # sampleをビルド
 run-sample:
-	make _preExec TEX_DIR=sample -s
-	-bash latex-setting/build.sh ${NAME} ${TEX_DIR} ${TEX_FILE}
-ifeq (${AUTO_FORMAT},true)
-	docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && latexindent -w -s ${TEX_FILE} && rm *.bak*"
-endif
-	make _postExec TEX_DIR=sample -s
+	make run f=sample/semi-sample/semi.tex -s
 
 # コンテナのビルド
 docker-build:
@@ -125,16 +125,16 @@ _preExec:
 		--name ${NAME} \
 		${NAME}:latest;\
 	fi
-	-docker container cp ${TEX_DIR_PATH} ${NAME}:${DOCKER_HOME_DIR}/
 	-docker container cp ${SETTING_DIR} ${NAME}:${DOCKER_HOME_DIR}
-	-docker container exec --user root ${NAME}  /bin/bash -c "cp -a ${DOCKER_HOME_DIR}/${SETTING_DIR}/* ${DOCKER_HOME_DIR}/${TEX_DIR}"
+	-docker container cp ${TEX_DIR_PATH} ${NAME}:${DOCKER_HOME_DIR}
+	-docker container exec --user root ${NAME}  /bin/bash -c "cp -n ${DOCKER_HOME_DIR}/${SETTING_DIR}/* ${DOCKER_HOME_DIR}/${TEX_DIR}"
 	-@[[ ${IS_LINUX} == "Linux" ]] && docker cp ~/.bashrc ${NAME}:${DOCKER_HOME_DIR}/.bashrc
 
 # コンテナ終了時の後処理
 # コンテナ内のファイルをローカルへコピー，コンテナの削除を行う
 _postExec:
 	-docker container exec --user root ${NAME}  bash -c "cd ${DOCKER_HOME_DIR}/${TEX_DIR} && rm ${SETTING_FILES} "
-	docker container exec --user root ${NAME} /bin/bash -c "rm -f \
+	-docker container exec --user root ${NAME} /bin/bash -c "rm -f \
 		$$(docker container exec --user root ${NAME} /bin/bash -c  "find . -name "*.xbb" -type f" | sed -z 's/\n/ /g' )"
 	-docker container cp ${NAME}:${DOCKER_HOME_DIR}/${TEX_DIR} ${TEX_DIR_PATH}../
 	-docker container exec --user root ${NAME}  /bin/bash -c "cd ${DOCKER_HOME_DIR} && rm -rf ${TEX_DIR} "
