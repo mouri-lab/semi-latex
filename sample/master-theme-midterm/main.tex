@@ -1,0 +1,44 @@
+﻿\documentclass[twocolumn,a4paper,9pt]{jsarticle}
+\usepackage{times,theme,j-caption,color,url}
+\usepackage[dvips]{graphicx}
+\usepackage{mediabb,comment,multirow}
+
+\pagestyle{empty}
+
+%--------------------------------------------------
+%    論文タイトル 著者
+%--------------------------------------------------
+\title{タイトル}
+\author{○○ ○○}
+\emailaddress{account@asl.cs.ritsumei.ac.jp}
+\studentno{0000000000-0}
+\univ{立命館大学大学院 情報理工学研究科}
+\lab{毛利研究室}
+
+%--------------------------------------------------
+%    文章フォントサイズとか
+%--------------------------------------------------
+% baselineskipの値は各自で適切に設定すること
+% 推奨値は 14pt -- 16.5pt の間
+% \maketitle ==> \papertitle になっている点に注意
+\begin{document}
+% \setlength{\baselineskip}{15.5pt}
+\setlength{\baselineskip}{14.2pt}
+\papertitle
+%\vspace*{-1\baselineskip}
+
+
+\section{はじめに}
+はじめに
+\cite{en}
+\cite{jp}
+
+\section{おわりに}
+おわりに\
+
+{\small
+\bibliographystyle{ipsjunsrt}
+\bibliography{references}
+}
+
+\end{document}

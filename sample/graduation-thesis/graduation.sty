@@ -1,0 +1,33 @@
+﻿
+% 目次に項目を追加する
+\newcommand{\AddTableOfContents}[1]{
+  \addtocontents{toc}{
+    \protect\contentsline{section}{\protect\numberline{}{#1}}{}}}
+
+% - [cnagashimaさんスタイル] ---------------------------------------------------
+  \setlength{\oddsidemargin}{0in}
+  \setlength{\topmargin}{-7.3mm}
+  \setlength{\textwidth}{162mm}
+  \setlength{\textheight}{232.5mm}
+  
+  % enumerate環境で番号に()をつける
+  \renewcommand\labelenumi{(\theenumi)}
+  
+  % ラベルの:を消す
+  \makeatletter
+  \long\def\@makecaption#1#2{%
+    \vskip\abovecaptionskip
+    \iftdir\sbox\@tempboxa{#1\hskip1zw#2}%
+      \else\sbox\@tempboxa{#1\hskip1zw#2}%
+    \fi
+    \ifdim \wd\@tempboxa >\hsize
+      \iftdir #1\hskip1zw#2\relax\par
+        \else #1\hskip1zw#2\relax\par
+      \fi
+    \else
+      \global \@minipagefalse
+      \hbox to\hsize{\hfil\box\@tempboxa\hfil}%
+    \fi
+    \vskip\belowcaptionskip}
+  \makeatother
+% ------------------------------------------------------------------------------

@@ -1,0 +1,28 @@
+\makeatletter
+\long\def\@makecaption#1#2{
+  \vskip\abovecaptionskip
+  \sbox\@tempboxa{#1\hskip1zw#2}
+  \ifdim \wd\@tempboxa >\hsize
+    #1::\hskip1zw::#2\relax\par
+  \else
+    \global \@minipagefalse
+    \hbox to\hsize{\hfil\box\@tempboxa\hfil}
+  \fi
+  \vskip\belowcaptionskip}
+\makeatother
+
+\renewcommand\labelenumi{(\theenumi)}
+
+\newcommand{\Gcenter}[2]{
+    \dimen0=\ht\strutbox%
+    \advance\dimen0\dp\strutbox%
+    \multiply\dimen0 by#1%
+    \divide\dimen0 by2%
+    \advance\dimen0 by-.5\normalbaselineskip
+    \raisebox{-\dimen0}[0pt][0pt]{#2}}%
+
+
+% 目次に項目を追加する
+\newcommand{\AddTableOfContents}[1]{
+  \addtocontents{toc}{
+    \protect\contentsline{section}{\protect\numberline{}{#1}}{}}}
