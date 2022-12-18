@@ -43,31 +43,44 @@ jobs:
           fi
           docker images
 
-      - name: latex build sample
+      - name: latex build semi-sample
         run: |
-          rm -f sample/*.pdf
+          rm -f sample/semi-sample/*.pdf
           make run-sample
           make docker-stop
-          if [ $(ls sample/ | grep -c .pdf) -eq 0 ]; then
+          if [ $(cat sample/semi-sample/semi.log | grep -c "No pages of output") -ne 0 ]; then
+            cat sample/semi-sample/semi.log
             exit 1
           fi
 
-      - name: latex build
+      - name: latex build master-theme-midterm
         run: |
-          rm -f sample/*.pdf
-          make run
+          rm -f sample/master-theme-midterm/*.pdf
+          make run f=sample/master-theme-midterm/main.tex
           make docker-stop
-          if [ $(ls sample/ | grep -c .pdf) -eq 0 ]; then
+          if [ $(cat sample/master-theme-midterm/main.log | grep -c "No pages of output") -ne 0 ]; then
+            cat sample/master-theme-midterm/main.log
             exit 1
           fi
 
-      - name: deep path
+      - name: latex build graduation-thesis
         run: |
-          mkdir -p deepdir/L1/L2/L3
-          cp -r sample/* deepdir/L1/L2/L3/
+          rm -f sample/graduation-thesis/*.pdf
+          make run f=sample/graduation-thesis/main.tex
+          make docker-stop
+          if [ $(cat sample/graduation-thesis/main.log | grep -c "No pages of output") -ne 0 ]; then
+            cat sample/graduation-thesis/main.log
+            exit 1
+          fi
+
+      - name: automatic selection of texfile
+        run: |
+          rm -f sample/semi-sample/*.pdf
+          cp -rf sample/semi-sample/ temp
           make run
           make docker-stop
-          if [ $(ls deepdir/L1/L2/L3 | grep -c .pdf) -eq 0 ]; then
+          if [ $(cat temp/semi.log | grep -c "No pages of output") -ne 0 ]; then
+            cat temp/semi.log
             exit 1
           fi
 
