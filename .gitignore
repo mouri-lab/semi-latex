@@ -1,17 +1,2 @@
 *
-# !*/
-
-!/.github/*
-!/.vscode/*
-!/.devcontainer/*
-!/sample/*.tex
-!/sample/*.bib
-!/latex-setting/*
-!/media/*
-
-!.dockerignore
-!.textlintrc
-!Dockerfile
-!makefile
-!README.md
-!sample-clean.sh
+*/
