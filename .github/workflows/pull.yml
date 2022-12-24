@@ -23,17 +23,33 @@ jobs:
       - name: docker pull
         run: |
           make get-image
-      - name: tex build
+      - name: latex build semi-sample
         run: |
-          rm -f sample/*.pdf
+          rm -f sample/semi-sample/*.pdf
           make run-sample
-      - name: build check
-        run: |
-          if [ $(ls sample/ | grep -c .pdf) -eq 0 ]; then
-            ls -l
+          make docker-stop
+          if [ $(cat sample/semi-sample/semi.log | grep -c "No pages of output") -ne 0 ]; then
+            cat sample/semi-sample/semi.log
             exit 1
-          elif [ $(ls -l sample | grep semi.pdf | cut -d " " -f 5) -eq 0 ]; then
-            ls -l
+          fi
+
+      - name: latex build master-theme-midterm
+        run: |
+          rm -f sample/master-theme-midterm/*.pdf
+          make run f=sample/master-theme-midterm/main.tex
+          make docker-stop
+          if [ $(cat sample/master-theme-midterm/main.log | grep -c "No pages of output") -ne 0 ]; then
+            cat sample/master-theme-midterm/main.log
+            exit 1
+          fi
+
+      - name: latex build graduation-thesis
+        run: |
+          rm -f sample/graduation-thesis/*.pdf
+          make run f=sample/graduation-thesis/main.tex
+          make docker-stop
+          if [ $(cat sample/graduation-thesis/main.log | grep -c "No pages of output") -ne 0 ]; then
+            cat sample/graduation-thesis/main.log
             exit 1
           fi
 
