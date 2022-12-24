@@ -1,3 +1,0 @@
-\contentsline {section}{\numberline {1}はじめに}{1}
-\contentsline {section}{\numberline {2}図の挿入方法}{2}
- \contentsline {section}{\numberline {}{参考文献}}{}
