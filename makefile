@@ -178,14 +178,45 @@ get-image:
 	docker image rm ${DOCKER_REPOSITORY}
 
 
-# コマンドのテスト用
+# サンプルのビルドテスト
 test:
-	if [[ $$(docker ps -a | grep -c ${NAME}) -eq 0 ]]; then\
-		docker container run \
-		-it \
-		--rm \
-		-d \
-		--name ${NAME} \
-		${NAME}:latest;\
+# セミ資料
+	@rm -f sample/semi-sample/*.pdf
+	@make run f=sample/semi-sample/semi.tex
+	@make docker-stop
+	@if [[ $$(cat sample/semi-sample/semi.log | grep -c "No pages of output") -ne 0 ]]; then\
+		cat sample/semi-sample/semi.log;\
+		echo "FAILED";\
+		exit 1;\
 	fi
-	echo "done!"
+# 全国大会
+	@rm -f sample/ipsj-report/*.pdf
+	@make run f=sample/ipsj-report/ipsj_report.tex
+	@make docker-stop
+	@if [[ $$(cat sample/ipsj-report/ipsj_report.log | grep -c "No pages of output") -ne 0 ]]; then\
+		cat sample/ipsj-report/ipsj_report.log;\
+		echo "FAILED";\
+		exit 1;\
+	fi
+# マスター中間発表
+	@rm -f sample/master-theme-midterm/*.pdf
+	@make run f=sample/master-theme-midterm/main.tex
+	@make docker-stop
+	@if [[ $$(cat sample/master-theme-midterm/main.log | grep -c "No pages of output") -ne 0 ]]; then\
+		cat sample/master-theme-midterm/main.log;\
+		echo "FAILED";\
+		exit 1;\
+	fi
+# 卒論
+	@rm -f sample/graduation-thesis/*.pdf
+	@make run f=sample/graduation-thesis/main.tex
+	@make docker-stop
+	@if [[ $$(cat sample/graduation-thesis/main.log | grep -c "No pages of output") -ne 0 ]]; then\
+		cat sample/graduation-thesis/main.log;\
+		echo "FAILED";\
+		exit 1;\
+	fi
+	@echo "SUCCESS!"
+
+sandbox:
+
