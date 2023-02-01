@@ -12,15 +12,18 @@ AUTO_FORMAT := true
 DOCKER_USER_NAME := $(shell cat Dockerfile | grep "ARG DOCKER_USER_" | cut -d "=" -f 2)
 DOCKER_HOME_DIR := /home/${DOCKER_USER_NAME}
 CURRENT_PATH := $(shell pwd)
-TS := $(shell date +%Y%m%d%H%M%S)
 
+STYLE_DIR := internal/style
+SCRIPTS_DIR := internal/scripts
+INTERAL_FILES := $(shell ls ${STYLE_DIR})
+INTERAL_FILES += $(shell ls ${SCRIPTS_DIR})
 
 # コンパイルするtexファイルのディレクトリ
 # 指定したディレクトリにtexファイルは1つであることが必要
 f :=
 TEX_FILE_PATH := ${f}
 ifeq (${TEX_FILE_PATH},)
-TEX_FILE_PATH := $(shell bash latex-setting/file-explorer.sh)
+TEX_FILE_PATH := $(shell bash ${SCRIPTS_DIR}/file-explorer.sh)
 endif
 
 TEX_FILE := $(shell echo ${TEX_FILE_PATH} | rev | cut -d '/' -f 1 | rev)
@@ -28,8 +31,7 @@ TEX_FILE := $(shell echo ${TEX_FILE_PATH} | rev | cut -d '/' -f 1 | rev)
 TEX_DIR_PATH := $(shell echo ${TEX_FILE_PATH} | sed -e "s@${TEX_FILE}@@" -e "s@$(shell pwd)/@@")
 TEX_DIR := $(shell echo ${TEX_DIR_PATH} | rev | cut -d "/" -f 2 | rev)
 
-SETTING_DIR := latex-setting
-SETTING_FILES := $(shell ls ${SETTING_DIR})
+
 
 IS_LINUX := $(shell uname)
 SHELL := /bin/bash
@@ -44,7 +46,7 @@ SHELL := /bin/bash
 # LaTeXのコンパイル
 run:
 	make _preExec -s
-	-bash latex-setting/build.sh ${NAME} ${TEX_DIR} ${TEX_FILE}
+	-bash ${SCRIPTS_DIR}/build.sh ${NAME} ${TEX_DIR} ${TEX_FILE}
 # texファイルの整形
 ifeq (${AUTO_FORMAT},true)
 	-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && latexindent -w ${TEX_FILE} -s && rm -f *.bak*"
@@ -71,9 +73,7 @@ run-sample:
 # コンテナのビルド
 docker-build:
 	make docker-stop -s
-	DOCKER_BUILDKIT=1 docker image build -t ${NAME} \
-	--build-arg TS=${TS} \
-	--force-rm=true .
+	DOCKER_BUILDKIT=1 docker image build -t ${NAME} .
 	make _postBuild -s
 
 
@@ -125,15 +125,17 @@ _preExec:
 		--name ${NAME} \
 		${NAME}:latest;\
 	fi
-	-docker container cp ${SETTING_DIR} ${NAME}:${DOCKER_HOME_DIR}
+	-docker container cp ${STYLE_DIR} ${NAME}:${DOCKER_HOME_DIR}
+	-docker container cp ${SCRIPTS_DIR} ${NAME}:${DOCKER_HOME_DIR}
 	-docker container cp ${TEX_DIR_PATH} ${NAME}:${DOCKER_HOME_DIR}
-	-docker container exec --user root ${NAME}  /bin/bash -c "cp -n ${DOCKER_HOME_DIR}/${SETTING_DIR}/* ${DOCKER_HOME_DIR}/${TEX_DIR}"
+	-docker container exec --user root ${NAME}  /bin/bash -c "cp -n ${DOCKER_HOME_DIR}/style/* ${DOCKER_HOME_DIR}/${TEX_DIR}"
+	-docker container exec --user root ${NAME}  /bin/bash -c "cp -n ${DOCKER_HOME_DIR}/scripts/* ${DOCKER_HOME_DIR}/${TEX_DIR}"
 	-@[[ ${IS_LINUX} == "Linux" ]] && docker cp ~/.bashrc ${NAME}:${DOCKER_HOME_DIR}/.bashrc
 
 # コンテナ終了時の後処理
 # コンテナ内のファイルをローカルへコピー，コンテナの削除を行う
 _postExec:
-	-docker container exec --user root ${NAME}  bash -c "cd ${DOCKER_HOME_DIR}/${TEX_DIR} && rm ${SETTING_FILES} "
+	-docker container exec --user root ${NAME}  bash -c "cd ${DOCKER_HOME_DIR}/${TEX_DIR} && rm ${INTERAL_FILES} "
 	-docker container exec --user root ${NAME} /bin/bash -c "rm -f \
 		$$(docker container exec --user root ${NAME} /bin/bash -c  "find . -name "*.xbb" -type f" | sed -z 's/\n/ /g' )"
 	-docker container cp ${NAME}:${DOCKER_HOME_DIR}/${TEX_DIR} ${TEX_DIR_PATH}../
@@ -186,7 +188,7 @@ test:
 	@make docker-stop
 	@if [[ $$(cat sample/semi-sample/semi.log | grep -c "No pages of output") -ne 0 ]]; then\
 		cat sample/semi-sample/semi.log;\
-		echo "FAILED";\
+		echo "semi-sample FAILED";\
 		exit 1;\
 	fi
 # 全国大会
@@ -195,7 +197,7 @@ test:
 	@make docker-stop
 	@if [[ $$(cat sample/ipsj-report/ipsj_report.log | grep -c "No pages of output") -ne 0 ]]; then\
 		cat sample/ipsj-report/ipsj_report.log;\
-		echo "FAILED";\
+		echo "ipsj-report FAILED";\
 		exit 1;\
 	fi
 # マスター中間発表
@@ -204,7 +206,7 @@ test:
 	@make docker-stop
 	@if [[ $$(cat sample/master-theme-midterm/main.log | grep -c "No pages of output") -ne 0 ]]; then\
 		cat sample/master-theme-midterm/main.log;\
-		echo "FAILED";\
+		echo "master-theme-midterm FAILED";\
 		exit 1;\
 	fi
 # 卒論
@@ -213,10 +215,10 @@ test:
 	@make docker-stop
 	@if [[ $$(cat sample/graduation-thesis/main.log | grep -c "No pages of output") -ne 0 ]]; then\
 		cat sample/graduation-thesis/main.log;\
-		echo "FAILED";\
+		echo "graduation FAILED";\
 		exit 1;\
 	fi
 	@echo "SUCCESS!"
 
 sandbox:
-
+	echo ${INTERAL_FILES}

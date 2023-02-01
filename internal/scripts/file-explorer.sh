@@ -7,7 +7,7 @@ set -eu
 readonly DIR=$(readlink -f $(dirname ${0}))
 
 tex_files=()
-tex_files+=($(readlink -f $(find ${DIR}/.. -name "*.tex" -type f)))
+tex_files+=($(readlink -f $(find ${DIR}/../.. -name "*.tex" -type f)))
 
 
 file_date=()
