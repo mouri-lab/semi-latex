@@ -1,8 +1,10 @@
 \documentclass[a4j,12pt]{jarticle}
-\usepackage[dvips]{graphicx}
 \usepackage{okumacro, cite, url}
 \usepackage{ascmac, comment, color, multirow, ifthen, mediabb}
-\usepackage{cover, graduation}
+\usepackage{bachelor_thesis, graduation}
+\usepackage{listings, jlisting} 		% for source code
+\usepackage{enumitem}
+\usepackage{svg}
 
 \newcounter{ChangedColor}
 % 1: 変更箇所に赤色を付ける
@@ -13,18 +15,18 @@
            {\newcommand{\Ca}[1]{#1}} %
            {\newcommand{\Ca}[1]{\textcolor{red}{#1}}} %
 
-\年度{2019}
+\年度{2022}
 \学期{秋}
-\クラス{○○}
-\卒研題目{○○○○○○○○○○○○○○ \\ ○○○○○○○○○○○○}
-\氏名{○○ ○○}
-\回生{4}
-\学籍番号{2600000000-0}
-\指導教員{毛利 公一 教授}
-\提出日{2023年1月31日}
+\題目{〇〇}
+\指導教員{〇〇 教授}
+\クラス{〇〇}
+\コース{〇〇}
+\学籍番号{〇〇}
+\氏名{〇〇}
 
 \begin{document}
-\makecoverpage
+\maketitle
+% \makecoverpage
 \clearpage
 
 \setlength{\baselineskip}{20pt}	% 行間の設定

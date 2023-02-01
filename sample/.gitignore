@@ -3,3 +3,6 @@
 *.dvi
 *.log
 *.aux
+*.lot
+*.lof
+*.toc

@@ -1,0 +1,162 @@
+\NeedsTeXFormat{pLaTeX2e}
+\ProvidesPackage{ipsj}
+  [2022/12/23 An Original Package for IPSJ Paper written by kanasiro]
+\typeout{%
+Special package: ipsj_utf8.sty 2022/12/23 params & macros for IPSJ Paper
+}
+
+%
+% 当然 \makeatletter する :-)
+%
+\makeatletter
+
+%
+% emptyページスタイルの再定義
+%   ==> これで本文中に `\thispagestyle{empty}' を記述せずに済む
+%
+\def\ps@empty{\let\ps@jpl@in\ps@empty%
+  \let\@mkboth\@gobbletwo\let\@oddhead\@empty\let\@oddfoot\@empty
+  \let\@evenhead\@empty\let\@evenfoot\@empty}
+
+%
+% パラメータの設定(余白など)
+%   ==> A4 上マージン30mm，下マージン 25mm，左マージン20mm，
+%       右マージン20mm，コラム間マージン7mmを目安とする
+%   ==> ヘッダ / フッタは必要無いのでゼロとする
+%
+\setlength{\topmargin}{-1in}             % 上余白をゼロにリセット
+\addtolength{\topmargin}{30mm}           % 上余白 30mm
+\setlength{\headheight}{0pt}
+\setlength{\headsep}{0mm}
+\setlength{\topskip}{0pt}
+\setlength{\footskip}{4\Cht}
+\setlength{\textheight}{\paperheight}
+\addtolength{\textheight}{-30mm}         % 上余白 30mm 分
+\addtolength{\textheight}{-2.5\footskip} % 下余白 (適当 :-)
+\setlength{\textwidth}{\paperwidth}
+\setlength{\oddsidemargin}{-1in}         % 左余白をゼロにリセット
+\setlength{\evensidemargin}{-1in}        % 同上(偶数ページ)
+\addtolength{\oddsidemargin}{20mm}       % 奇数ページの左余白 20mm
+\addtolength{\evensidemargin}{20mm}      % 偶数ページの左余白 20mm
+\addtolength{\textwidth}{-40mm}          % 左右余白 各 20mm 分
+\if@twocolumn \@tempdima=2zw \else \@tempdima=1zw \fi
+\divide\textwidth\@tempdima \multiply\textwidth\@tempdima
+\setlength{\marginparwidth}{0pt}
+\setlength{\columnsep}{1\Cwd}
+\setlength{\parsep}{0pt}
+\setlength{\baselineskip}{14.5pt}
+\setlength{\parskip}{0pt}
+
+%
+% \ipsjtitleの定義
+%   ==> titlepage = false を仮定して, 定義を手抜きする :-)
+%
+\newcommand{\ipsjtitle}{%
+  \begingroup
+    \renewcommand{\thefootnote}{\fnsymbol{footnote}}%
+    \def\@makefnmark{\hbox{\ifydir $\m@th^{\thefnmark}$
+      \else\hbox{\yoko$\m@th^{\@thefnmark}$}\fi}}%
+    \long\def\@makefntext##1{\parindent 1\Cwd\noindent
+      \hbox to1\Cwd{\hss$\m@th^{\@thefnmark}$}##1}%
+    \if@twocolumn
+      \ifnum \col@number=\@ne \@ipsjtitle
+      \else \twocolumn[\@ipsjtitle]%
+      \fi
+    \else
+      \newpage
+      \global\@topnum\z@
+      \@ipsjtitle
+    \fi
+    \thispagestyle{jpl@in}\@thanks
+  \endgroup
+  \setcounter{footnote}{0}%
+  \global\let\thanks\relax
+  \global\let\ipsjtitle\relax
+  \global\let\p@thanks\relax
+  \global\let\@thanks\@empty
+  \global\let\@author\@empty
+  \global\let\@title\@empty
+  \global\let\title\relax
+  \global\let\author\relax
+  \global\let\and\relax
+}
+\def\@ipsjtitle{%
+  \newpage\null
+  \let\footnote\thanks
+  \makebox[\textwidth][l]{%
+    \parbox[t]{\textwidth}{
+      \begin{center}
+        \Large \@title
+      \end{center}
+    }%
+  }%
+  \vskip -0.5\Cht%
+  {%
+    \large
+    \lineskip .5\Cht%
+    \parbox[t]{.95\textwidth}{%
+      \begin{center}
+        \begin{tabular}[t]{c}
+          \@author
+        \end{tabular}%
+      \end{center} 
+    }%
+  }%
+  \par\vskip \Cht%
+}
+
+%
+% \section と \subsection の再定義
+%
+\renewcommand{\section}{\@startsection{section}{1}{\z@}%
+  {.2\Cvs}{.2\Cvs}{\reset@font\large\bfseries}}
+\renewcommand{\subsection}{\@startsection{subsection}{2}{\z@}%
+  {.2\Cvs}{.2\Cvs}{\reset@font\normalsize\bfseries}}
+
+%
+% \makecaption の再定義
+%
+\renewcommand\@makecaption[2]{%
+  \vskip -1\Cvs
+  \iftdir\sbox\@tempboxa{#1\hskip1zw#2}%
+    \else\sbox\@tempboxa{#1 #2}%
+  \fi
+  \ifdim \wd\@tempboxa >\hsize
+    \iftdir #1\hskip1zw#2\relax\par
+      \else #1: #2\relax\par\fi
+  \else
+    \global \@minipagefalse
+    \hbox to\hsize{\hfil\box\@tempboxa\hfil}%
+  \fi
+  \vskip\belowcaptionskip%
+}
+
+%
+% \thefootnote と \markfntext の再定義
+%   ==> これで本文中に `\renewcommand{\thefootnote{}' せずに済む
+%   ==> フッタの見栄えを少し修正 :-)
+%
+\renewcommand{\thefootnote}{\relax}
+\renewcommand{\@makefntext}[1]{%
+  \advance\leftskip 1zw
+  \parindent 1zw
+  \noindent
+  \hbox to 1em{\hss\@makefnmark\hskip0.3zw}#1}
+
+%
+% その他のマクロ
+%
+\newcommand{\da}{$^{\dag}$}
+
+\newenvironment{myitemize}{%
+  \begin{list}{\labelitemi}{%
+      \setlength{\baselineskip}{\baselineskip}%
+      \setlength{\topsep}{0pt}%
+      \setlength{\itemsep}{0pt}%
+      \setlength{\parsep}{0pt}}}%
+  {\end{list}}
+%
+% \makeatletter したから \makeatother しとかなきゃ :-)
+%
+\makeatother
+\relax
