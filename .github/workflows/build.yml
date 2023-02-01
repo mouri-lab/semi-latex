@@ -24,19 +24,19 @@ jobs:
         uses: actions/cache@v3.2.4
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
+          key: ${{ runner.os }}-buildx-${{ steps.date.outputs.date }}
 
       - name: docker build
         run: |
-          docker buildx build --build-arg TS=${{ github.sha }} --load \
+          docker buildx build \
+            --load \
             --cache-from=type=local,src=/tmp/.buildx-cache \
             --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
             --tag ${{ env.TAG }} . \
           || exit 0
           if [[ $(docker images | grep -c ${{ env.TAG }}) -eq 0 ]]; then
-            docker buildx build --build-arg TS=${{ github.sha }} --load \
+            docker buildx build \
+              --load \
               --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
               --no-cache --pull \
               --tag ${{ env.TAG }} .
