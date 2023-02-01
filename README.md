@@ -10,7 +10,6 @@
       - [B4中間発表](#b4中間発表)
   - [textlint](#textlint)
     - [ターミナルで実行](#ターミナルで実行)
-    - [VSCode上でlint結果を表示](#vscode上でlint結果を表示)
     - [研のlintルール](#研のlintルール)
   - [画像の貼り方](#画像の貼り方)
     - [対応しているファイル形式](#対応しているファイル形式)
@@ -27,6 +26,7 @@
   - [コンテナのビルド](#コンテナのビルド)
   - [インストール](#インストール)
   - [Dockerのインストール](#dockerのインストール)
+  - [ビルド環境のテスト](#ビルド環境のテスト)
 
 # 概要
 * LaTeX環境をローカルにインストールしたくないので作りました
@@ -119,24 +119,6 @@ make lint
 ```
 make lint-fix
 ```
-
-
-### VSCode上でlint結果を表示
-* VScodeにRemote Developmentのインストールが必要
-1. コンテナに接続
-    ```
-    make bash
-    ```
-2. リモートエクスプローラにlatex-containerが表示されるのでAttach to Container
-   * 初回実行時にはリモートコンテナのVScodeにvscode-textlintのインストールが必要
-
-3. 編集後にコンテナを終了させる
-     * コンテナ内の変更はこのときにローカルにコピーされる
-    ```
-    exit
-    ```
-![latex-3](https://user-images.githubusercontent.com/71243805/175042384-17a4563b-654e-4d83-a79c-0070f718913a.gif)
-
 
 ### 研のlintルール
    * 場所：media/semi-rule.yml
@@ -265,4 +247,10 @@ make install
   * make installから呼ばれます
 ```
 make install-docker
+```
+
+## ビルド環境のテスト
+* サンプルがビルドできることを確認
+```
+make test
 ```
