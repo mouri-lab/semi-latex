@@ -94,7 +94,7 @@ docker-clean:
 # dockerコンテナを停止
 docker-stop:
 	@if [[ $$(docker container ls -a | grep -c "${NAME}") -ne 0 ]]; then\
-		docker container stop ${NAME};\
+		docker container kill ${NAME};\
 		echo "コンテナを停止";\
 		sync;\
 	fi
