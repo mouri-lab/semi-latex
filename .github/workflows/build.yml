@@ -21,7 +21,7 @@ jobs:
       - uses: docker/setup-buildx-action@v2.4.0
       - name: get current date
         id: date
-        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+        run: echo "{name}=date::$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
       - name: Cache Docker layers
         uses: actions/cache@v3.2.4
