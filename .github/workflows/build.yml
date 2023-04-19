@@ -17,61 +17,37 @@ jobs:
     timeout-minutes: 30
 
     steps:
-      - uses: actions/checkout@v3.3.0
-      - uses: docker/setup-buildx-action@v2.4.0
+      - uses: actions/checkout@v3.5.2
+      - uses: docker/setup-buildx-action@v2.5.0
+      - name: get current date
+        id: date
+        run: echo "{name}=date::$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
       - name: Cache Docker layers
-        uses: actions/cache@v3.2.4
+        uses: actions/cache@v3.3.1
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
+          key: ${{ runner.os }}-buildx-${{ steps.date.outputs.date }}
 
       - name: docker build
         run: |
-          docker buildx build --build-arg TS=${{ github.sha }} --load \
+          docker buildx build \
+            --load \
             --cache-from=type=local,src=/tmp/.buildx-cache \
             --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
             --tag ${{ env.TAG }} . \
           || exit 0
           if [[ $(docker images | grep -c ${{ env.TAG }}) -eq 0 ]]; then
-            docker buildx build --build-arg TS=${{ github.sha }} --load \
+            docker buildx build \
+              --load \
               --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
               --no-cache --pull \
               --tag ${{ env.TAG }} .
           fi
           docker images
 
-      - name: latex build semi-sample
-        run: |
-          rm -f sample/semi-sample/*.pdf
-          make run-sample
-          make docker-stop
-          if [ $(cat sample/semi-sample/semi.log | grep -c "No pages of output") -ne 0 ]; then
-            cat sample/semi-sample/semi.log
-            exit 1
-          fi
-
-      - name: latex build master-theme-midterm
-        run: |
-          rm -f sample/master-theme-midterm/*.pdf
-          make run f=sample/master-theme-midterm/main.tex
-          make docker-stop
-          if [ $(cat sample/master-theme-midterm/main.log | grep -c "No pages of output") -ne 0 ]; then
-            cat sample/master-theme-midterm/main.log
-            exit 1
-          fi
-
-      - name: latex build graduation-thesis
-        run: |
-          rm -f sample/graduation-thesis/*.pdf
-          make run f=sample/graduation-thesis/main.tex
-          make docker-stop
-          if [ $(cat sample/graduation-thesis/main.log | grep -c "No pages of output") -ne 0 ]; then
-            cat sample/graduation-thesis/main.log
-            exit 1
-          fi
+      - name: build test
+        run: make test
 
       - name: automatic selection of texfile
         run: |

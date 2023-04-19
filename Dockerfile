@@ -94,8 +94,8 @@ USER ${DOCKER_USER_}
 COPY --from=textlint /usr/local/bin/ /usr/local/bin/
 COPY --from=textlint /usr/local/lib/ /usr/local/lib/
 
-COPY media/semi-rule.yml ${DIRPATH}/node_modules/prh/prh-rules/media/
-COPY media/WEB+DB_PRESS.yml ${DIRPATH}/node_modules/prh/prh-rules/media/
+COPY ./internal/media/semi-rule.yml ${DIRPATH}/node_modules/prh/prh-rules/media/
+COPY ./internal/media/WEB+DB_PRESS.yml ${DIRPATH}/node_modules/prh/prh-rules/media/
 
 COPY .textlintrc ${DIRPATH}/
 
