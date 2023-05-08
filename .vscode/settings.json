@@ -22,15 +22,7 @@
 				"-C",
 				"%WORKSPACE_FOLDER%",
 				"-s",
-			]
-		},
-		{
-			"name": "lint",
-			"command": "make",
-			"args": [
-				"lint",
-				"-C",
-				"%WORKSPACE_FOLDER%",
+				"f=%DOC_EXT%",
 			]
 		},
 	],

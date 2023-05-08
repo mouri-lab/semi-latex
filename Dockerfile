@@ -32,8 +32,6 @@ RUN npm install -g \
 
 # RUN rm $(find / -name "*.def" -type f) $(find / -name "*.lz4" -type f )
 
-
-
 FROM amd64/ubuntu:20.04 AS latex
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -100,4 +98,3 @@ COPY ./internal/media/WEB+DB_PRESS.yml ${DIRPATH}/node_modules/prh/prh-rules/med
 COPY .textlintrc ${DIRPATH}/
 
 # ENV PATH $PATH:${DIRPATH}/node_modules/textlint/bin
-

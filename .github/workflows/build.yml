@@ -47,7 +47,7 @@ jobs:
           docker images
 
       - name: build test
-        run: make test
+        run: make test --trace
 
       - name: automatic selection of texfile
         run: |
