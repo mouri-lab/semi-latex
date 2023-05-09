@@ -17,7 +17,7 @@ file_date+=($(stat ${tex_files[@]} | grep Modify | cut -d " " -f 2,3 | sed -e "s
 temp=()
 for_loop_max=${#file_date[@]}
 for ((i=0; i < for_loop_max; i++)); do
-  temp+=("${tex_files[$i]}@${file_date[$i]}")
+	temp+=("${tex_files[$i]}@${file_date[$i]}")
 done
 unset for_loop_max
 

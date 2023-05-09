@@ -4,18 +4,21 @@
 - [使い方](#使い方)
   - [INSTALL](#install)
   - [コンパイル](#コンパイル)
-    - [テンプレートについて](#テンプレートについて)
-      - [全体ゼミ](#全体ゼミ)
-      - [B3輪講](#b3輪講)
-      - [B4中間発表](#b4中間発表)
-  - [textlint](#textlint)
-    - [ターミナルで実行](#ターミナルで実行)
+- [テンプレート](#テンプレート)
+  - [全体ゼミ](#全体ゼミ)
+  - [B3向け](#b3向け)
+  - [B4向け](#b4向け)
+  - [院生向け](#院生向け)
+  - [学会](#学会)
+- [textlint](#textlint)
+  - [ターミナルから実行](#ターミナルから実行)
     - [研のlintルール](#研のlintルール)
-  - [画像の貼り方](#画像の貼り方)
-    - [対応しているファイル形式](#対応しているファイル形式)
-    - [自動変換の注意](#自動変換の注意)
-    - [png](#png)
-    - [svg](#svg)
+- [画像の貼り方](#画像の貼り方)
+  - [対応しているファイル形式](#対応しているファイル形式)
+  - [自動変換の注意](#自動変換の注意)
+  - [png](#png)
+  - [svg](#svg)
+- [ディレクトリ](#ディレクトリ)
 - [コマンド一覧](#コマンド一覧)
   - [LaTexのコンパイル](#latexのコンパイル)
   - [サンプルのコンパイル](#サンプルのコンパイル)
@@ -32,24 +35,23 @@
 * LaTeX環境をローカルにインストールしたくないので作りました
 ## 動作環境
 * 必要環境
-  * Linux
   * Docker
   * make
   * Bash
 * 推奨環境
   * VScode
-  * VScodeの拡張機能
+  * 拡張機能
     * LaTeX-Workshop
       * LaTeXの補完
       * 保存時に自動コンパイル
-    * Remote Development
-      * VScode上にTextLintのエラーを表示させる場合に使用
-* ホストOS
+* ホストOSについて
+  * Linux
+    * 推奨環境です
   * Windows
     * Virtual BoxやWSL2を使ってLinux環境を用意してください
   * macOS
-    * Intel, M1, M2に関わらすDocker Desktopでの実行を確認できていません
-    * OverleafやCloud LaTeXなどの利用をおすすめします
+    * Docker Desktopを用意してください
+    * M1 Macで動作確認済み
 
 # 使い方
 ## INSTALL
@@ -58,12 +60,14 @@
      * WSLではこのコマンドでインストールできない可能性があります
        * aptのdocker.ioでDockerが入らないかも
        * Docker公式ドキュメント記載の方法でインストールしてください
+     * **MacユーザはDocker Desktopをインストールしてください**
     ```
     make install
     ```
 2. 再起動
 3. Docker Imageの作成
    * どちらか好きな方を実行してください
+     * **Macではこちらのみ動作します**
    *  Docker Hubから構築済みイメージを取得
       * Docker Imageのビルドが不要な分高速です
        ```
@@ -71,8 +75,7 @@
        ```
    * Dockerのビルド
      * DockerfileからDocker Imageをビルド
-     * ほぼ確実にDocker Imageを取得できます
-       * make get-imageより信頼性は高いです
+     * **Macで実行するとエラーが出ます**
       ```
       make docker-build
       ```
@@ -83,35 +86,61 @@
   * make run実行時に自動的に最新のtexファイルを探索し、コンパイルします
 
 * コマンドから実行
-  * semi-latexディレクトリ内で変更されたtexをコンパイル
+  * ファイルを指定してコンパイル
+  ```
+  make f=texのpath
+  ```
+  例)
+  ```
+  make f=sample/semi-sample/semi.tex
+  ```
+  * semi-latexディレクトリ内で最近変更されたtexをコンパイル
   ```
   make
   ```
 * VSCode上で実行
-  * texファイル保存時にコンパイル
-  * **LaTeX-Workshopが必要**
+  * texファイル保存時にコンパイルされます
+  * **LaTeX-Workshopの拡張機能が必要**
 
-### テンプレートについて
+# テンプレート
 texファイルのdocumentclassで使用するテンプレートを選択できます
 
-#### 全体ゼミ
+## 全体ゼミ
+[サンプルコード](sample/semi-sample/semi.tex)
 ```
 \documentclass[submit,techreq,noauthor,dvipdfmx]{eco}
 ```
-#### B3輪講
-```
-\documentclass[submit,techreq,noauthor,dvipdfmx]{b3-eco}
-```
-#### B4中間発表
-```
-\documentclass[submit,techreq,noauthor,dvipdfmx]{mid-eco}
-```
+
+## B3向け
+* B3輪講
+  ```
+  \documentclass[submit,techreq,noauthor,dvipdfmx]{b3-eco}
+  ```
+
+## B4向け
+* B4中間発表
+  ```
+  \documentclass[submit,techreq,noauthor,dvipdfmx]{mid-eco}
+  ```
+* 卒論
+  * [サンプルコード](sample/graduation-thesis/main.tex)
+  * 他のサンプルと違い，複数のtexファイルに分かれています
+
+## 院生向け
+* テーマ発表
+  * [サンプルコード](sample/master-theme-midterm/main.tex)
+
+## 学会
+* 全国大会
+  * [サンプルコード](sample/ipsj-report/ipsj_report.tex)
 
 
-## textlint
+
+# textlint
 texファイルの表記ゆれや誤植を機械的に検出できます
-### ターミナルで実行
+## ターミナルから実行
 * VSCode上のターミナルを使うとファイルパスのCtrl+クリックで該当箇所にジャンプできます
+* このリポジトリのmakefileと同じディレクトリ階層で実行してください
 ```
 make lint
 ```
@@ -123,14 +152,14 @@ make lint-fix
 ### 研のlintルール
    * 場所：media/semi-rule.yml
 
-## 画像の貼り方
-### 対応しているファイル形式
+# 画像の貼り方
+## 対応しているファイル形式
   * eps
   * pdf
   * png
   * svg
     * pdfへ自動変換
-### 自動変換の注意
+## 自動変換の注意
   * 画像用のディレクトリを作成し，すべての画像を同じディレクトリに入れることが必要
     * ディレクトリ名は任意
   * 作成したディレクトリ内でネストしない
@@ -157,13 +186,13 @@ make lint-fix
     hoge.png
     huga.svg
     ```
-### png
+## png
 * 例：ローカルにfig/hoge.pngがある場合
 ```
 \includegraphics[]{fig/hoge.png}
 ```
 
-### svg
+## svg
 * 拡張子は指定しない
   * コンテナ内で自動的にsvgからpdfを生成
   * pdbはベクタ形式で生成
@@ -172,6 +201,23 @@ make lint-fix
 ```
 \includegraphics[]{fig/huga}
 ```
+
+# ディレクトリ
+* .github
+  * GitHub Actionsの設定
+* .vscode
+  * VSCodeで保存時にコンパイルするための設定
+* internal
+  * 触る必要のないファイルがまとめてあります
+  * media
+    * 研究室独自のlintルール
+  * scripts
+    * 主にコンテナ内で実行されるスクリプトです
+  * style
+    * 全体ゼミなどのスタイルファイルです
+* sample
+  * texのサンプルがおいてあります
+
 
 # コマンド一覧
 

@@ -23,17 +23,22 @@ INTERAL_FILES += $(shell ls ${SCRIPTS_DIR})
 f :=
 TEX_FILE_PATH := ${f}
 ifeq (${TEX_FILE_PATH},)
-TEX_FILE_PATH := $(shell bash ${SCRIPTS_DIR}/file-explorer.sh)
+ifeq ($(shell uname),Linux)
+TEX_FILE_PATH := $$(bash ${SCRIPTS_DIR}/file-explorer.sh)
+TEX_FILE := $(shell echo ${TEX_FILE_PATH} | rev | cut -d '/' -f 1 | rev)
+TEX_DIR_PATH := $(shell echo ${TEX_FILE_PATH} | sed -e "s@${TEX_FILE}@@" -e "s@$(shell pwd)/@@")
+else
+TEX_FILE_PATH := $$(bash ${SCRIPTS_DIR}/file-explorer-for-mac.sh)
+TEX_FILE := $(shell echo ${TEX_FILE_PATH} | rev | cut -d '/' -f 1 | rev)
+TEX_DIR_PATH := $(shell echo ${TEX_FILE_PATH} | sed -e "s@${TEX_FILE}@@")
+endif
+else
+TEX_FILE := $(shell echo ${TEX_FILE_PATH} | rev | cut -d '/' -f 1 | rev)
+TEX_DIR_PATH := $(shell echo ${TEX_FILE_PATH} | sed -e "s@${TEX_FILE}@@" -e "s@$(shell pwd)/@@")
 endif
 
-TEX_FILE := $(shell echo ${TEX_FILE_PATH} | rev | cut -d '/' -f 1 | rev)
-
-TEX_DIR_PATH := $(shell echo ${TEX_FILE_PATH} | sed -e "s@${TEX_FILE}@@" -e "s@$(shell pwd)/@@")
 TEX_DIR := $(shell echo ${TEX_DIR_PATH} | rev | cut -d "/" -f 2 | rev)
 
-
-
-IS_LINUX := $(shell uname)
 SHELL := /bin/bash
 
 .PHONY: run
@@ -130,7 +135,6 @@ _preExec:
 	-docker container cp ${TEX_DIR_PATH} ${NAME}:${DOCKER_HOME_DIR}
 	-docker container exec --user root ${NAME}  /bin/bash -c "cp -n ${DOCKER_HOME_DIR}/style/* ${DOCKER_HOME_DIR}/${TEX_DIR}"
 	-docker container exec --user root ${NAME}  /bin/bash -c "cp -n ${DOCKER_HOME_DIR}/scripts/* ${DOCKER_HOME_DIR}/${TEX_DIR}"
-	-@[[ ${IS_LINUX} == "Linux" ]] && docker cp ~/.bashrc ${NAME}:${DOCKER_HOME_DIR}/.bashrc
 
 # コンテナ終了時の後処理
 # コンテナ内のファイルをローカルへコピー，コンテナの削除を行う
@@ -150,7 +154,7 @@ _postBuild:
 
 
 install:
-	@if [[ -n $$(docker --version 2>/dev/null) ]] || [[ $${IS_LINUX} != "Linux" ]]; then\
+	@if [[ -n $$(docker --version 2>/dev/null) ]] || [[ $$(uname) == "Linux" ]]; then\
 		make install-docker -s;\
 	fi
 
@@ -221,4 +225,5 @@ test:
 	@echo "SUCCESS!"
 
 sandbox:
-	echo ${INTERAL_FILES}
+	echo ${f}
+	echo ${TEX_FILE_PATH}
