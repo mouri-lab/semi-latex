@@ -44,14 +44,14 @@
     * LaTeX-Workshop
       * LaTeXの補完
       * 保存時に自動コンパイル
-    * Remote Development
-      * VScode上にTextLintのエラーを表示させる場合に使用
-* ホストOS
+* ホストOSについて
+  * Linux
+    * 推奨環境です
   * Windows
     * Virtual BoxやWSL2を使ってLinux環境を用意してください
   * macOS
-    * Intel, M1, M2に関わらすDocker Desktopでの実行を確認できていません
-    * OverleafやCloud LaTeXなどの利用をおすすめします
+    * Docker Desktopを用意してください
+    * M1 Macで動作確認済み
 
 # 使い方
 ## INSTALL
@@ -60,12 +60,14 @@
      * WSLではこのコマンドでインストールできない可能性があります
        * aptのdocker.ioでDockerが入らないかも
        * Docker公式ドキュメント記載の方法でインストールしてください
+     * **MacユーザはDocker Desktopをインストールしてください**
     ```
     make install
     ```
 2. 再起動
 3. Docker Imageの作成
    * どちらか好きな方を実行してください
+     * **Macではこちらのみ動作します**
    *  Docker Hubから構築済みイメージを取得
       * Docker Imageのビルドが不要な分高速です
        ```
@@ -73,8 +75,7 @@
        ```
    * Dockerのビルド
      * DockerfileからDocker Imageをビルド
-     * ほぼ確実にDocker Imageを取得できます
-       * make get-imageより信頼性は高いです
+     * **Macで実行するとエラーが出ます**
       ```
       make docker-build
       ```
@@ -85,13 +86,21 @@
   * make run実行時に自動的に最新のtexファイルを探索し、コンパイルします
 
 * コマンドから実行
-  * semi-latexディレクトリ内で変更されたtexをコンパイル
+  * ファイルを指定してコンパイル
+  ```
+  make f=texのpath
+  ```
+  例)
+  ```
+  make f=sample/semi-sample/semi.tex
+  ```
+  * semi-latexディレクトリ内で最近変更されたtexをコンパイル
   ```
   make
   ```
 * VSCode上で実行
-  * texファイル保存時にコンパイル
-  * **LaTeX-Workshopが必要**
+  * texファイル保存時にコンパイルされます
+  * **LaTeX-Workshopの拡張機能が必要**
 
 # テンプレート
 texファイルのdocumentclassで使用するテンプレートを選択できます
