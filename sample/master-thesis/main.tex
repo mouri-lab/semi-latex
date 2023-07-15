@@ -1,0 +1,64 @@
+﻿\documentclass[a4j,12pt]{jarticle}
+\usepackage{graphicx}
+\usepackage{moreverb, scalefnt, url, master, multirow}
+\usepackage{color, omake, mediabb}
+
+
+% 変更箇所明記
+%   0: not colored
+%   1: colored
+\newcounter{ChangedColor}
+\setcounter{ChangedColor}{1}
+
+\ifthenelse{\equal{\theChangedColor}{0}} %
+  {\newcommand{\Ca}[1]{#1}} %
+  {\newcommand{\Ca}[1]{\textcolor{red}{#1}}} %
+\ifthenelse{\equal{\theChangedColor}{0}} %
+  {\newcommand{\Cb}[1]{#1}} %
+  {\newcommand{\Cb}[1]{\textcolor{blue}{#1}}} %
+
+
+\setcounter{PrintWarn}{1}
+\setcounter{PrintNote}{1}
+
+\setcounter{secnumdepth}{6}
+\makeatletter
+\renewcommand{\paragraph}{\@startsection{paragraph}{4}{\z@}%
+   {1.5\Cvs \@plus.5\Cdp \@minus.2\Cdp}%
+   {.5\Cvs \@plus.3\Cdp}%
+   {\reset@font\normalsize\bfseries}}
+\makeatother
+
+%\newcommand{\pdforeps}{eps}
+\newcommand{\pdforeps}{pdf}
+
+\begin{document}
+\setlength{\baselineskip}{7mm} % 行間
+\setlength{\oddsidemargin}{6mm}
+\pagestyle{empty}
+
+\include{cover}             % 表紙 (年度，タイトル，氏名，学籍番号を記述)
+\include{abstract}          % 内容梗概（タイトル，氏名を記述）
+
+% 目次（行間を修正して1ページに納めたいなどはこちら）
+% {\setlength{\baselineskip}{17.2pt} \tableofcontents}
+\tableofcontents            % 目次
+\clearpage
+\listoffigures              % 図目次
+\listoftables               % 表目次
+\clearpage
+
+\setcounter{page}{1}
+\pagestyle{myheadings}
+
+\include{introduction}      % はじめに
+
+\include{acknowledgments}   % 謝辞
+
+\AddTableOfContents{参考文献}
+\bibliography{references}
+\bibliographystyle{ipsjunsrt}
+
+% \include{appendix}
+
+\end{document}

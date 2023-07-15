@@ -1,0 +1,31 @@
+% param.sty (written by ksuzuki)
+\NeedsTeXFormat{pLaTeX2e}
+\ProvidesPackage{param}
+  [2003/04/23 v0.1 An Original Package for Sol seminar paper]
+\typeout{%
+Special package: param.sty 2003/04/23 v0.1 parameters for Sol seminar paper%
+}
+
+% @をマクロとして利用可能にする
+\makeatletter
+
+% 行間・余白・本文領域の幅などの設定
+\setlength\baselineskip{16pt}        % 行間(和文では16pt〜18ptが適切)
+\setlength\oddsidemargin{-1in}       % 左余白をゼロにリセット(奇数ページ)
+\setlength\evensidemargin{-1in}      % 左余白をゼロにリセット(偶数ページ)
+
+\setlength\textwidth{\paperwidth}    % textwidth = paperwidth
+\addtolength{\oddsidemargin}{20mm}   % 奇数ページの左余白 20mm
+\addtolength{\evensidemargin}{20mm}  % 偶数ページの左余白 20mm
+\addtolength{\textwidth}{-40mm}      % 左右余白 各 20mm 分
+\if@twocolumn \@tempdima=2zw         % 2段組なら @tempdima = 2zw
+\else \@tempdima=1zw \fi             % 1段組なら @tempdima = 1zw
+\divide\textwidth\@tempdima          % textwidth を @tempdima の
+\multiply\textwidth\@tempdima        % 整数倍となるように計算
+
+\setlength{\columnsep}{2zw}          % 段間の空き(2段組時に有効)
+\setlength{\marginparwidth}{0pt}     % 欄外書込み領域
+
+
+% @の意味を元に戻す
+\makeatother\relax
