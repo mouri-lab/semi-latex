@@ -1,0 +1,33 @@
+\usepackage{ifthen}
+
+\newcounter{PrintWarn}
+\newcounter{PrintNote}
+% if 0: print warn
+% else: silent
+\setcounter{PrintWarn}{0}
+
+% Print \note
+%   0: not print
+%   1: print
+\setcounter{PrintNote}{0}
+
+\newcounter{WarnCounter}
+\newcommand{\warn}[1]{%
+  \stepcounter{WarnCounter}%
+  \ifthenelse{\equal{\thePrintWarn}{0}}%
+    { }%
+    {\textbf{\textcolor{red}{\Huge #1}}}%
+}
+
+\newcommand{\WarnResult}{%
+  \ifthenelse{\equal{\theWarnCounter}{0}}%
+    {}%
+    {\textbf{\textcolor{red}
+      {\Huge There are {\theWarnCounter} warnings exist.}}}%}%
+}
+
+\newcommand{\note}[1]{%
+  \ifthenelse{\equal{\thePrintNote}{0}}%
+    { }%
+    {\textbf{\textcolor{green}{#1}}}%
+}

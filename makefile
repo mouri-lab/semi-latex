@@ -219,7 +219,16 @@ test:
 	@make docker-stop
 	@if [[ $$(cat sample/graduation-thesis/main.log | grep -c "No pages of output") -ne 0 ]] || [[ -z $$(ls sample/graduation-thesis/*.pdf) ]] ; then\
 		cat sample/graduation-thesis/main.log;\
-		echo "graduation FAILED";\
+		echo "graduation thesis FAILED";\
+		exit 1;\
+	fi
+# 修論
+	@rm -f sample/master-thesis/*.pdf
+	@make run f=sample/master-thesis/main.tex
+	@make docker-stop
+	@if [[ $$(cat sample/master-thesis/main.log | grep -c "No pages of output") -ne 0 ]] || [[ -z $$(ls sample/master-thesis/*.pdf) ]] ; then\
+		cat sample/master-thesis/main.log;\
+		echo "master thesis FAILED";\
 		exit 1;\
 	fi
 	@echo "SUCCESS!"
