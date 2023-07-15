@@ -17,8 +17,8 @@ jobs:
     timeout-minutes: 30
 
     steps:
-      - uses: actions/checkout@v3.5.3
-      - uses: docker/setup-buildx-action@v2.5.0
+      - uses: actions/checkout@v3.5.2
+      - uses: docker/setup-buildx-action@v2.9.1
       - name: get current date
         id: date
         run: echo "{name}=date::$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
