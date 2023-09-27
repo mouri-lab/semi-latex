@@ -3,7 +3,7 @@
   - [動作環境](#動作環境)
 - [使い方](#使い方)
   - [INSTALL](#install)
-  - [コンパイル](#コンパイル)
+  - [LaTeXのビルド](#latexのビルド)
 - [テンプレート](#テンプレート)
   - [全体ゼミ](#全体ゼミ)
   - [B3向け](#b3向け)
@@ -22,8 +22,7 @@
   - [svg](#svg)
 - [ディレクトリ](#ディレクトリ)
 - [コマンド一覧](#コマンド一覧)
-  - [LaTexのコンパイル](#latexのコンパイル)
-  - [サンプルのコンパイル](#サンプルのコンパイル)
+  - [LaTeXのビルド](#latexのビルド-1)
   - [TextLint](#textlint-1)
   - [コンテナに入りコマンド実行](#コンテナに入りコマンド実行)
   - [コンテナを停止](#コンテナを停止)
@@ -46,7 +45,7 @@
   * 拡張機能
     * LaTeX-Workshop
       * LaTeXの補完
-      * 保存時に自動コンパイル
+      * 保存時に自動ビルド
     * Remote SSH
       * WindowsからVBox上のUbuntuに接続する場合に便利です
 * ホストOSについて
@@ -61,39 +60,21 @@
 
 # 使い方
 ## INSTALL
-1. Docker環境をインストール
-     * Docker環境を構築済みの方は1と2をスキップしてください
-     * WSLではこのコマンドでインストールできない可能性があります
-       * aptのdocker.ioでDockerが入らないかも
-       * Docker公式ドキュメント記載の方法でインストールしてください
-     * **MacユーザはDocker Desktopをインストールしてください**
-    ```
-    make install
-    ```
-2. 再起動
-3. Docker Imageの作成
-   * どちらか好きな方を実行してください
-   *  Docker Hubから構築済みイメージを取得
-      * Docker Imageのビルドが不要な分高速です
-       * **Macユーザはこちらを実行してください**
-       ```
-       make get-image
-       ```
-   * Dockerのビルド
-     * DockerfileからDocker Imageをビルド
-     * **Macで実行するとエラーが出ます**
-      ```
-      make docker-build
-      ```
+* Docker環境をインストールしてsemi-latexのDocker imageを取得
+* WSLではこのコマンドでインストールできない可能性があります
+* **MacユーザはDocker Desktopをインストールしてください**
+```
+make install
+```
 
-## コンパイル
+## LaTeXのビルド
 * 作業ディレクトリ
   * このディレクトリ(semi-latex)内であれば任意のディレクトリを使用できます
     * 適当なディレクトリを作成し，その中で別途Gitでtexのバージョン管理するのがおススメです
-  * make run実行時に自動的に最新のtexファイルを探索し、コンパイルします
+  * make run実行時に自動的に最新のtexファイルを探索し、ビルドします
 
 * コマンドから実行
-  * ファイルを指定してコンパイル
+  * ファイルを指定してLaTeXをビルド
   ```
   make f=texのpath
   ```
@@ -101,12 +82,12 @@
   ```
   make f=sample/semi-sample/semi.tex
   ```
-  * semi-latexディレクトリ内で最近変更されたtexをコンパイル
+  * semi-latexディレクトリ内で最近変更されたtexをビルド
   ```
   make
   ```
 * VSCode上で実行
-  * texファイル保存時にコンパイルされます
+  * texファイル保存時にビルドします
   * **LaTeX-Workshopの拡張機能が必要**
 
 # テンプレート
@@ -181,8 +162,8 @@ make lint-fix
     |--huga.svg
     ```
 ### NG例
-    * ディレクトリがネスト
-      * fig/内にfig/が存在
+* ディレクトリがネスト
+    * fig/内にfig/が存在
     ```
     sample.tex
     fig/
@@ -190,7 +171,7 @@ make lint-fix
         |--hoge.png
         |--huga.svg
     ```
-    * ディレクトリに保存されていない
+* ディレクトリに保存されていない
     ```
     sample.tex
     hoge.png
@@ -216,7 +197,7 @@ make lint-fix
 * .github
   * GitHub Actionsの設定
 * .vscode
-  * VSCodeで保存時にコンパイルするための設定
+  * VSCodeで保存時にビルドするための設定
 * internal
   * 触る必要のないファイル
   * media
@@ -231,8 +212,8 @@ make lint-fix
 
 # コマンド一覧
 
-## LaTexのコンパイル
-コンパイルされるのはsemi-latex/内で最も最近更新されたtexファイルです
+## LaTeXのビルド
+ビルドされるのはsemi-latex/内で最も最近更新されたtexファイルです
 
 makeとmake runは同じ処理
 ```
@@ -241,12 +222,6 @@ make
 または
 ```
 make run
-```
-
-## サンプルのコンパイル
-sample/sample.texがコンパイルされます
-```
-make run-sample
 ```
 
 ## TextLint
@@ -266,7 +241,7 @@ make lint
     ```
 
 ## コンテナを停止
-* 1度コンパイルすると再起動するまでコンテナは起動したままなので停止したい人向け
+* 1度ビルドすると再起動するまでコンテナは起動したままなので停止したい人向け
   * コンテナを毎回起動するとコンパルに時間がかかるため起動したままにしています
 ```
 make docker-stop
