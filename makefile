@@ -153,25 +153,10 @@ _postBuild:
 	fi
 
 
+# semi-latex環境の構築
 install:
-	@if [[ -n $$(docker --version 2>/dev/null) ]] || [[ $$(uname) == "Linux" ]]; then\
-		make install-docker -s;\
-	fi
-
-
-# UbuntuにDockerをインストールし，sudoなしでDockerコマンドを実行する設定を行う
-install-docker:
-	@if [[ -n $$(docker --version 2>/dev/null) ]]; then\
-		echo "Docker is already installed";\
-		docker --version;\
-		exit 1;\
-	fi
-	sudo apt update
-	sudo apt install -y docker.io
-	[[ $$(getent group docker | cut -f 4 --delim=":") != $$(whoami) ]] && sudo gpasswd -a $$(whoami) docker
-	sudo chgrp docker /var/run/docker.sock
-	sudo systemctl restart docker
-	@echo "環境構築を完了するために再起動してください"
+	bash internal/scripts/install.sh
+	make get-image
 
 push-image:
 	docker tag ${NAME}:latest ${DOCKER_REPOSITORY}
