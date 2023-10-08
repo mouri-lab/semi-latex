@@ -1,6 +1,0 @@
-FROM amd64/ubuntu:20.04
-
-ARG user=nobody
-USER ${user}
-
-WORKDIR /home/${user}/

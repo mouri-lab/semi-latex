@@ -4,6 +4,7 @@ NAME := latex-container
 # DockerHubのリポジトリ名
 # make get-imageの取得先
 DOCKER_REPOSITORY := taka0628/semi-latex
+ARCH := $$(uname -m)
 
 # texfileの自動整形をする
 # yes -> true, no -> true以外
@@ -78,17 +79,31 @@ run-sample:
 # コンテナのビルド
 docker-build:
 	make docker-stop -s
-	DOCKER_BUILDKIT=1 docker image build -t ${NAME} .
+	DOCKER_BUILDKIT=1 docker image build -t ${NAME}:x86_64 .
+	make _postBuild -s
+
+docker-buildforArm:
+	make docker-stop -s
+	DOCKER_BUILDKIT=1 docker image build -t ${NAME}:arm64 -f DockerfileArm .
 	make _postBuild -s
 
 
 # キャッシュを使わずにビルド
 docker-rebuild:
 	make docker-stop -s
-	DOCKER_BUILDKIT=1 docker image build -t ${NAME} \
+	DOCKER_BUILDKIT=1 docker image build -t ${NAME}:x86_64 \
 	--pull \
 	--force-rm=true \
 	--no-cache=true .
+	make _postBuild -s
+
+docker-rebuildforArm:
+	make docker-stop -s
+	DOCKER_BUILDKIT=1 docker image build -t ${NAME}:arm64 \
+	--pull \
+	--force-rm=true \
+	--no-cache=true \
+	-f DockerfileArm .
 	make _postBuild -s
 
 
@@ -128,7 +143,7 @@ _preExec:
 		--rm \
 		-d \
 		--name ${NAME} \
-		${NAME}:latest;\
+		${NAME}:${ARCH};\
 	fi
 	-docker container cp ${STYLE_DIR} ${NAME}:${DOCKER_HOME_DIR}
 	-docker container cp ${SCRIPTS_DIR} ${NAME}:${DOCKER_HOME_DIR}
@@ -155,17 +170,39 @@ _postBuild:
 
 # semi-latex環境の構築
 install:
-	bash internal/scripts/install.sh
-	make get-image
+	@if [[ -n $$(docker --version 2>/dev/null) ]] || [[ $$(uname) == "Linux" ]]; then\
+		make install-docker -s;\
+	fi
+
+
+# UbuntuにDockerをインストールし，sudoなしでDockerコマンドを実行するよう設定
+install-docker:
+	@if [[ -n $$(docker --version 2>/dev/null) ]]; then\
+		echo "Docker is already installed";\
+		docker --version;\
+		exit 1;\
+	fi
+	sudo apt update
+	sudo apt install -y docker.io
+	[[ $$(getent group docker | cut -f 4 --delim=":") != $$(whoami) ]] && sudo gpasswd -a $$(whoami) docker
+	sudo chgrp docker /var/run/docker.sock
+	sudo systemctl restart docker
+	@echo "環境構築を完了するために再起動してください"
 
 push-image:
-	docker tag ${NAME}:latest ${DOCKER_REPOSITORY}
-	docker push ${DOCKER_REPOSITORY}
-	docker image rm ${DOCKER_REPOSITORY}
+	docker tag ${NAME}:x86_64 ${DOCKER_REPOSITORY}:x86_64
+	docker push ${DOCKER_REPOSITORY}:x86_64
+	docker image rm ${DOCKER_REPOSITORY}:x86_64
+
+push-imageforArm:
+	docker tag ${NAME}:arm64 ${DOCKER_REPOSITORY}:arm64
+	docker push ${DOCKER_REPOSITORY}:arm64
+	docker image rm ${DOCKER_REPOSITORY}:arm64
+
 
 get-image:
-	docker pull ${DOCKER_REPOSITORY}:latest
-	docker tag ${DOCKER_REPOSITORY}:latest ${NAME}:latest
+	docker pull ${DOCKER_REPOSITORY}:${ARCH}
+	docker tag ${DOCKER_REPOSITORY}:${ARCH} ${NAME}:${ARCH}
 	docker image rm ${DOCKER_REPOSITORY}
 
 
@@ -219,5 +256,4 @@ test:
 	@echo "SUCCESS!"
 
 sandbox:
-	echo ${f}
-	echo ${TEX_FILE_PATH}
+	echo ${ARCH}
