@@ -203,7 +203,7 @@ push-imageforArm:
 get-image:
 	docker pull ${DOCKER_REPOSITORY}:${ARCH}
 	docker tag ${DOCKER_REPOSITORY}:${ARCH} ${NAME}:${ARCH}
-	docker image rm ${DOCKER_REPOSITORY}
+	docker image rm ${DOCKER_REPOSITORY}:${ARCH}
 
 
 # サンプルのビルドテスト
