@@ -4,6 +4,7 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: read
@@ -112,20 +113,6 @@ jobs:
               -f DockerfileArm .
           fi
           docker images
-
-      # - name: docker build
-      #   run: |
-      #     make docker-rebuildforArm --trace
-      #     docker images
-
-      # - name: docker build
-      #   uses: docker/build-push-action@v3
-      #   with:
-      #     context: .
-      #     push: false
-      #     file: DockerfileArm
-      #     tags: semi-latex:arm64
-      #   timeout-minutes: 60
 
       - name: build test
         run: make test ARCH=arm64 --trace
