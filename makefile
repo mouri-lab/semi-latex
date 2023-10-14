@@ -189,6 +189,12 @@ install-docker:
 	sudo systemctl restart docker
 	@echo "環境構築を完了するために再起動してください"
 
+install-textlint:
+	sudo apt install nodejs npm
+	npm install n
+	sudo n lts
+	npm install
+
 push-image:
 	docker tag ${NAME}:x86_64 ${DOCKER_REPOSITORY}:x86_64
 	docker push ${DOCKER_REPOSITORY}:x86_64
