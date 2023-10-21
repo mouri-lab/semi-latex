@@ -17,7 +17,7 @@ jobs:
     timeout-minutes: 120
 
     steps:
-      - uses: actions/checkout@v4.1.0
+      - uses: actions/checkout@v4.1.1
       - uses: docker/setup-buildx-action@v3.0.0
 
       - name: docker build
@@ -51,7 +51,7 @@ jobs:
     timeout-minutes: 120
 
     steps:
-      - uses: actions/checkout@v4.1.0
+      - uses: actions/checkout@v4.1.1
       - uses: docker/setup-buildx-action@v3.0.0
       - name: install qemu
         run: sudo apt-get install qemu-user-static
