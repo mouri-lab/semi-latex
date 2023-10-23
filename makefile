@@ -191,7 +191,7 @@ install-docker:
 
 install-textlint:
 	sudo apt install nodejs npm
-	npm install n
+	sudo npm install n -g
 	sudo n lts
 	npm install
 

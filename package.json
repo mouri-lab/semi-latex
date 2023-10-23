@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@textlint/ast-node-types": "^13.3.3",
-    "n": "^9.1.0",
+    "n": "^9.2.0",
     "textlint": "^13.3.3",
     "textlint-plugin-latex2e": "^1.2.1",
     "textlint-rule-preset-ja-engineering-paper": "^1.0.4",
