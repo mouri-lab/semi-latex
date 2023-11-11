@@ -4,6 +4,7 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: read
@@ -17,7 +18,7 @@ jobs:
     timeout-minutes: 30
 
     steps:
-      - uses: actions/checkout@v3.5.2
+      - uses: actions/checkout@v4.1.1
       - uses: docker/setup-buildx-action@v3.0.0
       - name: Get current date and time
         env:
@@ -76,7 +77,7 @@ jobs:
     timeout-minutes: 100
 
     steps:
-      - uses: actions/checkout@v3.5.2
+      - uses: actions/checkout@v4.1.1
       - uses: docker/setup-buildx-action@v3.0.0
 
       - name: install qemu
@@ -89,7 +90,7 @@ jobs:
         run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
       - name: Cache Docker layers
-        uses: actions/cache@v3.3.1
+        uses: actions/cache@v3.3.2
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-arm-buildx-${{ env.date }}
@@ -112,20 +113,6 @@ jobs:
               -f DockerfileArm .
           fi
           docker images
-
-      # - name: docker build
-      #   run: |
-      #     make docker-rebuildforArm --trace
-      #     docker images
-
-      # - name: docker build
-      #   uses: docker/build-push-action@v3
-      #   with:
-      #     context: .
-      #     push: false
-      #     file: DockerfileArm
-      #     tags: semi-latex:arm64
-      #   timeout-minutes: 60
 
       - name: build test
         run: make test ARCH=arm64 --trace

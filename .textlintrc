@@ -1,7 +1,8 @@
 plugins:
-- latex2e
+  - latex2e
 rules:
   preset-ja-spacing: true
+  ja-hiragana-fukushi: false
   preset-ja-technical-writing:
     # 助詞の重複をチェック(no-doubled-joshi)
     no-doubled-joshi: true
@@ -12,9 +13,9 @@ rules:
   preset-ja-engineering-paper:
     # prh: false
     prh:
-     rulePaths:
-     - node_modules/prh/prh-rules/media/WEB+DB_PRESS.yml
-     - node_modules/prh/prh-rules/media/semi-rule.yml
+      rulePaths:
+        - ./internal/media/WEB+DB_PRESS.yml
+        - ./internal/media/semi-rule.yml
 
     # 句読点「，」「．」のチェック
     unify-kuten-and-touten: true

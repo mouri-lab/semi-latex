@@ -2204,7 +2204,7 @@ rules:
     pattern: /キャラクター([^ー])/
   - expected: コミッター$1
     pattern: /コミッタ([^ー])/
-  - expected: ユーザー$1
+  - expected: ユーザ$1
     pattern: /ユーザ([^ー])/
   - expected: ユーザビリティ
     pattern: /ユーザービリティ/

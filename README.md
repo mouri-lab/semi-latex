@@ -1,11 +1,14 @@
 
 - [概要](#概要)
   - [動作環境](#動作環境)
-- [使い方](#使い方)
-  - [INSTALL](#install)
+- [INSTALL](#install)
+  - [LaTeXビルド環境の構築](#latexビルド環境の構築)
     - [1. Docker環境の構築](#1-docker環境の構築)
     - [2. ビルドイメージの取得](#2-ビルドイメージの取得)
-    - [インストールの確認](#インストールの確認)
+    - [3. インストールの確認](#3-インストールの確認)
+  - [TextLintのインストール](#textlintのインストール)
+    - [Install方法](#install方法)
+- [使い方](#使い方)
   - [LaTeXのビルド](#latexのビルド)
 - [テンプレート](#テンプレート)
   - [全体ゼミ](#全体ゼミ)
@@ -42,7 +45,7 @@
 * 必要環境
   * Docker
   * make
-  * Bash
+  * bash
 * 推奨環境
   * VScode
   * 拡張機能
@@ -50,19 +53,19 @@
       * LaTeXの補完
       * 保存時に自動ビルド
     * Remote SSH
-      * WindowsからVBox上のUbuntuに接続する場合に便利です
+      * WindowsからVBox上のUbuntuに接続する際に便利です
 * ホストOSについて
   * Linux
     * 推奨環境です
   * Windows
-    * Virtual BoxやWSL2を使ってLinux環境を用意してください
+    * VirtualBoxやWSL2を使ってLinux環境を用意してください
     * VSCodeのRemote SSHを使用すると快適に作業できます
   * macOS
     * Dockerを動かすためにDocker Desktopを用意してください
     * M1 Macで動作確認済みです
 
-# 使い方
-## INSTALL
+# INSTALL
+## LaTeXビルド環境の構築
 ### 1. Docker環境の構築
 * LinuxでDocker環境がない場合はこのコマンドを実行してください
 * WSLではこのコマンドでインストールできない可能性があります
@@ -72,16 +75,30 @@ make install
 ```
 
 ### 2. ビルドイメージの取得
-```
-make get-image
-```
+- Docker Imageの取得
+  ```
+  make get-image
+  ```
 
-### インストールの確認
-SUCCESS!と表示されれば，ゼミ，卒論，修論，全国大会，マスター中間発表をビルドできています．
+### 3. インストールの確認
+"SUCCESS!"と表示されれば，ゼミ，卒論，修論，全国大会，マスター中間発表をビルドできています．
 ```
 make test
 ```
 
+## TextLintのインストール
+VSCodeのTextLint拡張機能を利用して，VSCode上にTextLintの結果を表示する場合はローカル環境にTextLintをインストールする必要があります．
+**```make lint```コマンドを利用する場合は，ローカルへのTextLintのインストールは不要です．**
+
+### Install方法
+- Ubuntuの場合
+  ```
+  make install-textlint
+  ```
+- それ以外
+  - node環境を構築し，```npm install```を実行してください
+
+# 使い方
 ## LaTeXのビルド
 * 作業ディレクトリ
   * このディレクトリ(semi-latex)内であれば任意のディレクトリを使用できます
@@ -228,7 +245,7 @@ make lint-fix
 # コマンド一覧
 
 ## LaTeXのビルド
-ビルドされるのはsemi-latex/内で最も最近更新されたtexファイルです
+ビルドされるのはsemi-latex/内でも最も最近更新されたtexファイルです
 
 makeとmake runは同じ処理
 ```
@@ -256,7 +273,7 @@ make lint
     ```
 
 ## コンテナを停止
-* 1度ビルドすると再起動するまでコンテナは起動したままなので停止したい人向け
+* 一度ビルドすると再起動するまでコンテナは起動したままなので停止したい人向け
   * コンテナを毎回起動するとコンパルに時間がかかるため起動したままにしています
 ```
 make docker-stop
@@ -275,7 +292,7 @@ make docker-clean
   ```
   make docker-build
   ```
-* コンテナをキャッシュ無しでビルド
+* コンテナをキャッシュなしでビルド
   * キャッシュを利用しないので信頼性は高いですがビルドに時間がかかります
   ```
   make docker-rebuild
@@ -289,7 +306,7 @@ make install
 ```
 
 ## Dockerのインストール
-* Dockerをインストールし，sudo権限なしで動作させる設定を行う
+* Dockerをインストールし，sudo権限なしで動作させるよう設定
   * make installから呼ばれます
 ```
 make install-docker
