@@ -63,7 +63,7 @@ endif
 lint:
 	@make _preExec -s
 	@- docker container exec --user root ${NAME} /bin/bash -c "textlint ${TEX_DIR}/${TEX_FILE} > ${TEX_DIR}/lint.txt"
-	- docker container exec --user root -t --env TEX_PATH="$(shell readlink -f ${TEX_DIR})" ${NAME} /bin/bash -c "cd ${TEX_DIR} && bash lint-formatter.sh ${TEX_FILE_PATH}"
+	- docker container exec --user root -t --env TEX_PATH="$$(readlink -f ${TEX_DIR})" ${NAME} /bin/bash -c "cd ${TEX_DIR} && bash lint-formatter.sh ${TEX_FILE_PATH}"
 	@- docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && rm -f lint.txt"
 	@make _postExec -s
 
@@ -262,4 +262,4 @@ test:
 	@echo "SUCCESS!"
 
 sandbox:
-	echo ${ARCH}
+	bash internal/scripts/test.sh
