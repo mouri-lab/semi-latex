@@ -1,0 +1,127 @@
+% scis2024j.sty: style file for SCIS 2024 Japanese manuscript
+% 2024 Cryptography and Information Security Symposium Committee
+%
+% Usage: \documentstyle[scis2024j]{jarticle}
+%
+\typeout{scis2024j.sty: 2023/08/08}
+
+% No page number
+%\pagestyle{empty}
+
+% Baselineskip
+\def\@normalsize{\@setsize\normalsize{15pt plus1pt minus1pt}\xpt\@xpt
+\abovedisplayskip 10pt plus2pt minus5pt\belowdisplayskip \abovedisplayskip
+\abovedisplayshortskip \z@ plus3pt\belowdisplayshortskip 6pt plus3pt
+minus3pt\let\@listi\@listI}
+
+% Size of characters
+% SCIS 2024 label characters
+\def\scislabelsize{\@setsize\scriptsize{8pt}\viipt\@viipt}
+
+% Page layout
+\textwidth       174.0mm
+\textheight      252.0mm
+\oddsidemargin    -7.4mm
+\evensidemargin   -7.4mm
+\topmargin        -8.0mm
+\headheight        0.0mm
+\headsep           0.0mm
+\footskip          8.0mm
+\columnsep         7.0mm
+\parindent 1zw\relax
+
+% Two column
+\twocolumn
+\raggedbottom
+
+% Title, author, affiliation, abstract, and keywords
+\def\maketitle{
+  \par
+  \begingroup
+  \def\thefootnote{\fnsymbol{footnote}}
+  \def\@makefnmark{\hbox to 0pt{$^{\@thefnmark}$\hss}}
+  \twocolumn[\@maketitle]\@thanks
+  \endgroup
+  \setcounter{footnote}{0}
+  \let\maketitle\relax
+  \let\@maketitle\relax
+  \gdef\@thanks{}\gdef\@author{}\gdef\@title{}\let\thanks\relax
+}
+\def\@maketitle{
+  \newpage
+{\scislabelsize \parbox[b]{10cm}{
+Copyright \copyright 2024 The Institute of Electronics,\\
+Information and Communication Engineers
+} }\hfill
+%\null
+  \parbox[t]{57mm}{
+    \vrule
+    \vbox { \scislabelsize \hrule
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %% here to be updated
+      \hbox to 57mm{\hbox to 2.5mm {} \vrule width 0pt height 9pt {\bf SCIS 2024}
+        \hbox to 5.5mm {} 2024 Symposium on \hss}
+      \hbox to 57mm{\hss Cryptography and Information Security \hss}
+      \hbox to 57mm{\hss Nagasaki, Japan, Jan.\ 23 --\ 26, 2024 \hss}
+      \hbox to 57mm{\hss The Institute of Electronics, \hss}
+      \hbox to 57mm{\hss Information and Communication Engineers \vrule width 0pt depth 5pt \hss}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      \hrule
+    }\vrule
+  }
+  \par \vskip 1.5em
+  \begin{center}
+    {\Large \bf \@title \par} \vskip 1.5em
+    {
+      \large \lineskip .5em
+      \begin{tabular}[t]{c} \@author \end{tabular}
+      \par}
+  \end{center}
+  \par \vskip 1.5em
+  \begin{center}
+    {
+      \setlength{\baselineskip}{12pt}
+      \quotation \@abstract \endquotation
+    }
+  \end{center}
+  \begin{center}
+    {
+      \setlength{\baselineskip}{12pt}
+      \quotation \@keywords \endquotation
+    }
+  \end{center}
+  \par \vskip 1.5em
+}
+
+\def\samethanks#1{$^{\@fnsymbol{#1}}$}
+
+\def\@abstract{}
+\def\abstract{\@ifstar{\jabstract}{\eabstract}}
+\def\jabstract#1{\def\@abstract{\noindent \hbox to 0.5\parindent{}{\bf あらまし }#1}}
+\def\eabstract#1{\def\@abstract{\noindent \hbox to 0.5\parindent{}{\bf Abstract--- }#1}}
+
+\def\@keywords{}
+\def\keywords{\@ifstar{\jkeywords}{\ekeywords}}
+\def\jkeywords#1{\def\@keywords{\noindent \hbox to 0.5\parindent{}{\bf キーワード }#1}}
+\def\ekeywords#1{\def\@keywords{\noindent \hbox to 0.5\parindent{}{\bf Keywords: }#1}}
+
+% Affiliation
+\long\def\@makefntext#1{%
+  \everypar={\hangindent=1zw \hangafter=1 \@nobreakfalse\@minipagefalse}%
+  \parindent 1zw\noindent%
+  \hbox to 0.5zw{\hss$^{\@thefnmark}$} \strut #1\strut
+}
+
+% Section, subsection
+\def\section{\@startsection{section}{1}{\z@}{2.5ex plus 1ex minus .2ex}
+  {1.5ex plus .2ex}{\large\bf}}
+\def\subsection{\@startsection{subsection}{2}{\z@}{2.25ex plus 1ex minus .2ex}
+  {0.8ex plus .2ex}{\normalsize\bf}}
+\def\subsubsection{\@startsection{subsubsection}{3}{\z@}{2.0ex plus 1ex minus .2ex}
+  {0.5ex plus .2ex}{\normalsize\bf}}
+\def\paragraph{\@startsection{paragraph}{4}{\z@}{1.75ex plus 1ex minus .2ex}
+  {-1em}{\normalsize\bf}}
+\def\subparagraph{\@startsection {subparagraph}{4}{\parindent}
+  {1.5ex plus 1ex minus .2ex}{-1em}{\normalsize\bf}}
+
+% end of file

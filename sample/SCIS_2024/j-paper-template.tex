@@ -1,0 +1,58 @@
+% SCIS 2024 論文用テンプレート (和文, LaTeX2e用)
+
+\documentclass{jarticle} % for platex
+%\documentclass{ujarticle} % for uplatex
+\usepackage{scis2024j}
+
+\begin{document}
+
+\title{
+	和文の論文題目
+	\\
+	Title in English
+}
+
+\author{
+	第一 著者             %和文の第一著者名
+	\thanks{
+		所属, 住所,         %和文の所属と住所
+		Affiliation, Address    %英文の所属と住所
+		(ご希望の場合は, 続けて電子メールアドレスを記載)
+	}\\
+	First Author          %英文の第一著者名
+	\and
+	第二 著者             %和文の第二著者名
+	\thanks{ %もし第一著者と同じならば，\samethanks{1}とする．
+		所属, 住所,         %和文の所属と住所
+		Affiliation, Address   %英文の所属と住所
+	}\\
+	Second Author         %英文で第二著者名
+}
+\abstract*{ %もし英文であらましを書く場合は，\abstractとする．
+	あらまし        %和文のあらまし
+}
+\keywords*{ %もし英文でキーワードを書く場合は，\keywordsとする．
+	キーワード      %和文のキーワード
+}
+
+\maketitle
+
+\section{最初の節}
+
+第 1 節の内容．
+
+\section{二番目の節}
+
+第 2 節の内容．
+
+
+\begin{thebibliography}{9}
+	\bibitem{a}
+	著者名,\lq\lq 論文タイトル,'' 論文誌名，ページなど
+	\bibitem{b}
+	著者名,「本タイトル」, 出版社名，発行年など
+\end{thebibliography}
+
+\end{document}
+
+% end of file
