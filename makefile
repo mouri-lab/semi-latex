@@ -51,13 +51,13 @@ SHELL := /bin/bash
 
 # LaTeXのコンパイル
 run:
-	make _preExec -s
+	make _preExec
 	-bash ${SCRIPTS_DIR}/build.sh ${NAME} ${TEX_DIR} ${TEX_FILE}
 # texファイルの整形
 ifeq (${AUTO_FORMAT},true)
 	-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && latexindent -w ${TEX_FILE} -s && rm -f *.bak*"
 endif
-	make _postExec -s
+	make _postExec
 
 # TextLint
 lint:
@@ -125,7 +125,6 @@ docker-stop:
 bash:
 	make _preExec -s
 	-docker container exec -it ${NAME} bash
-	make _postExec -s
 
 # root権限で起動中のコンテナに接続
 # aptパッケージのインストールをテストする際に使用
@@ -145,11 +144,9 @@ _preExec:
 		--name ${NAME} \
 		${NAME}:${ARCH};\
 	fi
-	-docker container cp ${STYLE_DIR} ${NAME}:${DOCKER_HOME_DIR}
-	-docker container cp ${SCRIPTS_DIR} ${NAME}:${DOCKER_HOME_DIR}
 	-docker container cp ${TEX_DIR_PATH} ${NAME}:${DOCKER_HOME_DIR}
-	-docker container exec --user root ${NAME}  /bin/bash -c "cp -n ${DOCKER_HOME_DIR}/style/* ${DOCKER_HOME_DIR}/${TEX_DIR}"
-	-docker container exec --user root ${NAME}  /bin/bash -c "cp -n ${DOCKER_HOME_DIR}/scripts/* ${DOCKER_HOME_DIR}/${TEX_DIR}"
+	-docker container exec --user root ${NAME}  /bin/bash -c "cp -n ${DOCKER_HOME_DIR}/internal/style/* ${DOCKER_HOME_DIR}/${TEX_DIR} \
+		&& cp -n ${DOCKER_HOME_DIR}/internal/scripts/* ${DOCKER_HOME_DIR}/${TEX_DIR}"
 
 # コンテナ終了時の後処理
 # コンテナ内のファイルをローカルへコピー，コンテナの削除を行う
@@ -157,8 +154,14 @@ _postExec:
 	-docker container exec --user root ${NAME}  bash -c "cd ${DOCKER_HOME_DIR}/${TEX_DIR} && rm ${INTERAL_FILES} "
 	-docker container exec --user root ${NAME} /bin/bash -c "rm -f \
 		$$(docker container exec --user root ${NAME} /bin/bash -c  "find . -name "*.xbb" -type f" | sed -z 's/\n/ /g' )"
-	-docker container cp ${NAME}:${DOCKER_HOME_DIR}/${TEX_DIR} ${TEX_DIR_PATH}../
-	-docker container exec --user root ${NAME}  /bin/bash -c "cd ${DOCKER_HOME_DIR} && rm -rf ${TEX_DIR} "
+# ビルド中にローカルのtexファイルが更新されている場合，コンテナ内のtexファイルを上書きしない
+	@if [[ $$(date -r ${TEX_FILE_PATH} +%s) -lt $$(docker container exec --user root ${NAME} /bin/bash -c "date -r ${DOCKER_HOME_DIR}/${TEX_DIR}/${TEX_FILE} +%s") ]]; then\
+		docker container cp ${NAME}:${DOCKER_HOME_DIR}/${TEX_DIR} ${TEX_DIR_PATH}../ ;\
+	else\
+		docker container exec --user root ${NAME} bash -c "rm ${DOCKER_HOME_DIR}/${TEX_DIR}/${TEX_FILE}" ;\
+		docker container cp ${NAME}:${DOCKER_HOME_DIR}/${TEX_DIR} ${TEX_DIR_PATH}../ ;\
+	fi
+	-docker container exec --user root ${NAME}  /bin/bash -c "rm -rf ${DOCKER_HOME_DIR}/${TEX_DIR} "
 
 
 # 不要になったビルドイメージを削除
