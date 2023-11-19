@@ -92,8 +92,7 @@ USER ${DOCKER_USER_}
 COPY --from=textlint /usr/local/bin/ /usr/local/bin/
 COPY --from=textlint /usr/local/lib/ /usr/local/lib/
 
-COPY ./internal/media/semi-rule.yml ${DIRPATH}/internal/media/
-COPY ./internal/media/WEB+DB_PRESS.yml ${DIRPATH}/internal/media/
+COPY ./internal/ ${DIRPATH}/internal/
 
 COPY .textlintrc ${DIRPATH}/
 
