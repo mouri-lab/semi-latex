@@ -1,5 +1,5 @@
-FROM node@sha256:c3e48eb7e915af7217ae1342215e4c5a26822b9474109c9dc8ee8209ddc8ce45 AS node
-FROM arm64v8/ubuntu:20.04 AS textlint
+FROM --platform=linux/arm64/v8 node:20-slim AS node
+FROM --platform=linux/arm64/v8 ubuntu:20.04 AS textlint
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -32,7 +32,7 @@ RUN npm install -g \
 
 # RUN rm $(find / -name "*.def" -type f) $(find / -name "*.lz4" -type f )
 
-FROM arm64v8/ubuntu:20.04 AS latex
+FROM --platform=linux/arm64/v8 ubuntu:20.04 AS latex
 
 # SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -92,8 +92,7 @@ USER ${DOCKER_USER_}
 COPY --from=textlint /usr/local/bin/ /usr/local/bin/
 COPY --from=textlint /usr/local/lib/ /usr/local/lib/
 
-COPY ./internal/media/semi-rule.yml ${DIRPATH}/node_modules/prh/prh-rules/media/
-COPY ./internal/media/WEB+DB_PRESS.yml ${DIRPATH}/node_modules/prh/prh-rules/media/
+COPY ./internal/ ${DIRPATH}/internal/
 
 COPY .textlintrc ${DIRPATH}/
 
