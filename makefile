@@ -4,7 +4,6 @@ NAME := latex-container
 # DockerHubのリポジトリ名
 # make get-imageの取得先
 DOCKER_REPOSITORY := taka0628/semi-latex
-ARCH := $$(uname -m)
 
 # texfileの自動整形をする
 # yes -> true, no -> true以外
@@ -24,18 +23,18 @@ INTERAL_FILES += $(shell ls ${SCRIPTS_DIR})
 f :=
 TEX_FILE_PATH := ${f}
 ifeq (${TEX_FILE_PATH},)
-ifeq ($(shell uname),Linux)
-TEX_FILE_PATH := $$(bash ${SCRIPTS_DIR}/file-explorer.sh)
-TEX_FILE := $(shell echo ${TEX_FILE_PATH} | rev | cut -d '/' -f 1 | rev)
-TEX_DIR_PATH := $(shell echo ${TEX_FILE_PATH} | sed -e "s@${TEX_FILE}@@" -e "s@$(shell pwd)/@@")
+	ifeq ($(shell uname),Linux)
+		TEX_FILE_PATH := $$(bash ${SCRIPTS_DIR}/file-explorer.sh)
+		TEX_FILE := $(shell echo ${TEX_FILE_PATH} | rev | cut -d '/' -f 1 | rev)
+		TEX_DIR_PATH := $(shell echo ${TEX_FILE_PATH} | sed -e "s@${TEX_FILE}@@" -e "s@$(shell pwd)/@@")
+	else
+		TEX_FILE_PATH := $$(bash ${SCRIPTS_DIR}/file-explorer-for-mac.sh)
+		TEX_FILE := $(shell echo ${TEX_FILE_PATH} | rev | cut -d '/' -f 1 | rev)
+		TEX_DIR_PATH := $(shell echo ${TEX_FILE_PATH} | sed -e "s@${TEX_FILE}@@")
+	endif
 else
-TEX_FILE_PATH := $$(bash ${SCRIPTS_DIR}/file-explorer-for-mac.sh)
-TEX_FILE := $(shell echo ${TEX_FILE_PATH} | rev | cut -d '/' -f 1 | rev)
-TEX_DIR_PATH := $(shell echo ${TEX_FILE_PATH} | sed -e "s@${TEX_FILE}@@")
-endif
-else
-TEX_FILE := $(shell echo ${TEX_FILE_PATH} | rev | cut -d '/' -f 1 | rev)
-TEX_DIR_PATH := $(shell echo ${TEX_FILE_PATH} | sed -e "s@${TEX_FILE}@@" -e "s@$(shell pwd)/@@")
+	TEX_FILE := $(shell echo ${TEX_FILE_PATH} | rev | cut -d '/' -f 1 | rev)
+	TEX_DIR_PATH := $(shell echo ${TEX_FILE_PATH} | sed -e "s@${TEX_FILE}@@" -e "s@$(shell pwd)/@@")
 endif
 
 TEX_DIR := $(shell echo ${TEX_DIR_PATH} | rev | cut -d "/" -f 2 | rev)
@@ -51,13 +50,13 @@ SHELL := /bin/bash
 
 # LaTeXのコンパイル
 run:
-	make _preExec -s
+	make _preExec
 	-bash ${SCRIPTS_DIR}/build.sh ${NAME} ${TEX_DIR} ${TEX_FILE}
 # texファイルの整形
 ifeq (${AUTO_FORMAT},true)
 	-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && latexindent -w ${TEX_FILE} -s && rm -f *.bak*"
 endif
-	make _postExec -s
+	make _postExec
 
 # TextLint
 lint:
@@ -79,33 +78,17 @@ run-sample:
 # コンテナのビルド
 docker-build:
 	make docker-stop -s
-	DOCKER_BUILDKIT=1 docker image build -t ${NAME}:x86_64 .
+	DOCKER_BUILDKIT=1 docker image build -t ${NAME}:latest .
 	make _postBuild -s
-
-docker-buildforArm:
-	make docker-stop -s
-	DOCKER_BUILDKIT=1 docker image build -t ${NAME}:arm64 -f DockerfileArm .
-	make _postBuild -s
-
 
 # キャッシュを使わずにビルド
 docker-rebuild:
 	make docker-stop -s
-	DOCKER_BUILDKIT=1 docker image build -t ${NAME}:x86_64 \
+	DOCKER_BUILDKIT=1 docker image build -t ${NAME}:latest \
 	--pull \
 	--force-rm=true \
 	--no-cache=true .
 	make _postBuild -s
-
-docker-rebuildforArm:
-	make docker-stop -s
-	DOCKER_BUILDKIT=1 docker image build -t ${NAME}:arm64 \
-	--pull \
-	--force-rm=true \
-	--no-cache=true \
-	-f DockerfileArm .
-	make _postBuild -s
-
 
 # dockerのリソースを開放
 docker-clean:
@@ -125,7 +108,6 @@ docker-stop:
 bash:
 	make _preExec -s
 	-docker container exec -it ${NAME} bash
-	make _postExec -s
 
 # root権限で起動中のコンテナに接続
 # aptパッケージのインストールをテストする際に使用
@@ -143,13 +125,11 @@ _preExec:
 		--rm \
 		-d \
 		--name ${NAME} \
-		${NAME}:${ARCH};\
+		${NAME}:latest;\
 	fi
-	-docker container cp ${STYLE_DIR} ${NAME}:${DOCKER_HOME_DIR}
-	-docker container cp ${SCRIPTS_DIR} ${NAME}:${DOCKER_HOME_DIR}
 	-docker container cp ${TEX_DIR_PATH} ${NAME}:${DOCKER_HOME_DIR}
-	-docker container exec --user root ${NAME}  /bin/bash -c "cp -n ${DOCKER_HOME_DIR}/style/* ${DOCKER_HOME_DIR}/${TEX_DIR}"
-	-docker container exec --user root ${NAME}  /bin/bash -c "cp -n ${DOCKER_HOME_DIR}/scripts/* ${DOCKER_HOME_DIR}/${TEX_DIR}"
+	-docker container exec --user root ${NAME}  /bin/bash -c "cp -n ${DOCKER_HOME_DIR}/internal/style/* ${DOCKER_HOME_DIR}/${TEX_DIR} \
+		&& cp -n ${DOCKER_HOME_DIR}/internal/scripts/* ${DOCKER_HOME_DIR}/${TEX_DIR}"
 
 # コンテナ終了時の後処理
 # コンテナ内のファイルをローカルへコピー，コンテナの削除を行う
@@ -157,8 +137,14 @@ _postExec:
 	-docker container exec --user root ${NAME}  bash -c "cd ${DOCKER_HOME_DIR}/${TEX_DIR} && rm ${INTERAL_FILES} "
 	-docker container exec --user root ${NAME} /bin/bash -c "rm -f \
 		$$(docker container exec --user root ${NAME} /bin/bash -c  "find . -name "*.xbb" -type f" | sed -z 's/\n/ /g' )"
-	-docker container cp ${NAME}:${DOCKER_HOME_DIR}/${TEX_DIR} ${TEX_DIR_PATH}../
-	-docker container exec --user root ${NAME}  /bin/bash -c "cd ${DOCKER_HOME_DIR} && rm -rf ${TEX_DIR} "
+# ビルド中にローカルのtexファイルが更新されている場合，コンテナ内のtexファイルを上書きしない
+	@if [[ $$(date -r ${TEX_FILE_PATH} +%s) -lt $$(docker container exec --user root ${NAME} /bin/bash -c "date -r ${DOCKER_HOME_DIR}/${TEX_DIR}/${TEX_FILE} +%s") ]]; then\
+		docker container cp ${NAME}:${DOCKER_HOME_DIR}/${TEX_DIR} ${TEX_DIR_PATH}../ ;\
+	else\
+		docker container exec --user root ${NAME} bash -c "rm ${DOCKER_HOME_DIR}/${TEX_DIR}/${TEX_FILE}" ;\
+		docker container cp ${NAME}:${DOCKER_HOME_DIR}/${TEX_DIR} ${TEX_DIR_PATH}../ ;\
+	fi
+	-docker container exec --user root ${NAME}  /bin/bash -c "rm -rf ${DOCKER_HOME_DIR}/${TEX_DIR} "
 
 
 # 不要になったビルドイメージを削除
@@ -196,20 +182,14 @@ install-textlint:
 	npm install
 
 push-image:
-	docker tag ${NAME}:x86_64 ${DOCKER_REPOSITORY}:x86_64
-	docker push ${DOCKER_REPOSITORY}:x86_64
-	docker image rm ${DOCKER_REPOSITORY}:x86_64
-
-push-imageforArm:
-	docker tag ${NAME}:arm64 ${DOCKER_REPOSITORY}:arm64
-	docker push ${DOCKER_REPOSITORY}:arm64
-	docker image rm ${DOCKER_REPOSITORY}:arm64
-
+	docker tag ${NAME}:latest ${DOCKER_REPOSITORY}:latest
+	docker push ${DOCKER_REPOSITORY}:latest
+	docker image rm ${DOCKER_REPOSITORY}:latest
 
 get-image:
-	docker pull ${DOCKER_REPOSITORY}:${ARCH}
-	docker tag ${DOCKER_REPOSITORY}:${ARCH} ${NAME}:${ARCH}
-	docker image rm ${DOCKER_REPOSITORY}:${ARCH}
+	docker pull ${DOCKER_REPOSITORY}:latest
+	docker tag ${DOCKER_REPOSITORY}:latest ${NAME}:latest
+	docker image rm ${DOCKER_REPOSITORY}:latest
 
 
 # サンプルのビルドテスト
@@ -262,4 +242,6 @@ test:
 	@echo "SUCCESS!"
 
 sandbox:
-	echo ${ARCH}
+	DOCKER_BUILDKIT=1 docker image build -t node-test:latest .
+
+
