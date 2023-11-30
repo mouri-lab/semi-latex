@@ -6,10 +6,11 @@
     - [1. Docker環境の構築](#1-docker環境の構築)
     - [2. ビルドイメージの取得](#2-ビルドイメージの取得)
     - [3. インストールの確認](#3-インストールの確認)
-  - [TextLintのインストール](#textlintのインストール)
+  - [ローカル環境へのTextLintのインストール](#ローカル環境へのtextlintのインストール)
     - [Install方法](#install方法)
 - [使い方](#使い方)
   - [LaTeXのビルド](#latexのビルド)
+  - [semi-latexの更新](#semi-latexの更新)
 - [テンプレート](#テンプレート)
   - [全体ゼミ](#全体ゼミ)
   - [B3向け](#b3向け)
@@ -76,9 +77,9 @@ make install
 
 ### 2. ビルドイメージの取得
 - Docker Imageの取得
-  ```
-  make get-image
-  ```
+```
+make get-image
+```
 
 ### 3. インストールの確認
 "SUCCESS!"と表示されれば，ゼミ，卒論，修論，全国大会，マスター中間発表をビルドできています．
@@ -86,8 +87,9 @@ make install
 make test
 ```
 
-## TextLintのインストール
-VSCodeのTextLint拡張機能を利用して，VSCode上にTextLintの結果を表示する場合はローカル環境にTextLintをインストールする必要があります．
+## ローカル環境へのTextLintのインストール
+VSCodeのTextLint拡張機能を利用し，VSCode上にTextLintの結果を表示することができます．
+その場合はローカル環境にTextLintをインストールしてください．
 **```make lint```コマンドを利用する場合は，ローカルへのTextLintのインストールは不要です．**
 
 ### Install方法
@@ -121,6 +123,16 @@ VSCodeのTextLint拡張機能を利用して，VSCode上にTextLintの結果を�
 * VSCode上で実行
   * texファイル保存時にビルドします
   * **LaTeX-Workshopの拡張機能が必要**
+
+## semi-latexの更新
+1. 変更を取得
+```
+git pull
+```
+2. 最新のdocker imageを取得
+```
+make get-image
+```
 
 # テンプレート
 texファイルのdocumentclassで使用するテンプレートを選択できます
@@ -156,6 +168,10 @@ texファイルのdocumentclassで使用するテンプレートを選択でき�
 ## 学会
 * 全国大会
   * [サンプルコード](sample/ipsj-report/ipsj_report.tex)
+* CSS
+  * [サンプルコード](sample/css2023_style_unix/tech-sample-css.tex)
+* SCIS
+  * [サンプルコード](sample/SCIS_2024/j-paper-template.tex)
 
 
 
@@ -173,7 +189,7 @@ make lint-fix
 ```
 
 ### 研のlintルール
-   * 場所：media/semi-rule.yml
+   * [配置場所](internal/media/semi-rule.yml)
 
 # 画像の貼り方
 ## 対応しているファイル形式
