@@ -1,4 +1,4 @@
-FROM node:18.11.0-slim AS node
+FROM --platform=amd64 node:18.11.0-slim AS node
 FROM amd64/ubuntu:20.04 AS textlint
 
 ENV DEBIAN_FRONTEND noninteractive
