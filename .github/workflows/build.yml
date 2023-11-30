@@ -37,19 +37,20 @@ jobs:
             --load \
             --cache-from=type=local,src=/tmp/.buildx-cache \
             --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
-            --tag ${{ env.TAG }}:x86_64 . \
+            --tag ${{ env.TAG }}:latest . \
           || exit 0
           if [[ $(docker images | grep -c ${{ env.TAG }}) -eq 0 ]]; then
             docker buildx build \
               --load \
               --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
               --no-cache --pull \
-              --tag ${{ env.TAG }}:x86_64 .
+              --tag ${{ env.TAG }}:latest .
           fi
-          docker images
 
       - name: latex build test
-        run: make test --trace
+        run: |
+          docker images
+          make test --trace
 
       - name: automatic selection of texfile
         run: |
