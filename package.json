@@ -1,12 +1,20 @@
 {
   "dependencies": {
     "@textlint/ast-node-types": "^13.3.3",
+    "@textlint/types": "^13.4.1",
+    "create-textlint-rule": "^2.0.0",
     "n": "^9.2.0",
     "textlint": "^13.3.3",
     "textlint-plugin-latex2e": "^1.2.1",
+    "textlint-rule-helper": "^2.3.1",
+    "textlint-rule-ja-custom-ng-word": "file:internal/custom-rules/textlint-rule-ja-custom-ng-word",
+    "textlint-rule-ja-no-weak-phrase": "^2.0.0",
     "textlint-rule-preset-ja-engineering-paper": "^1.0.4",
     "textlint-rule-preset-ja-spacing": "^2.3.0",
     "textlint-rule-preset-ja-technical-writing": "^8.0.0",
     "textlint-rule-preset-jtf-style": "^2.3.13"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.1"
   }
 }

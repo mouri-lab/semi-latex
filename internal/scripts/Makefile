@@ -57,10 +57,10 @@ VIEW     := acroread -openInNewWindow /a "zoom=0"
 FINDER   := nautilus
 BIBTEX   := pbibtex	# or jbibtex
 EMACS    := emacs
-ifeq ($(shell cat ${MAIN}.tex | head -n3 | grep -v '%\\' | grep '\documentclass[' | grep -c "uplatex"),0)
+ifeq ($(shell cat ${MAIN}.tex | head -n3 | grep -v '%\\' | grep '\documentclass\[' | grep -c "uplatex"),0)
 	PLATEX   := platex -halt-on-error -interaction=nonstopmode -file-line-error
 else
-	PLATEX   := uplatex -halt-on-error -interaction=nonstopmode -file-line-error
+	PLATEX   := uplatex -halt-on-error -interaction=nonstopmode -file-line-error -shell-escape
 endif
 INKSCAPE := inkscape
 TGIF     := tgif

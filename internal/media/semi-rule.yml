@@ -62,24 +62,10 @@ rules:
     pattern: 八つ
   - expected: "9つ"
     pattern: 九つ
-  - expected: "禁句です"
-    pattern: だから
-  - expected: "禁句です"
-    pattern: つまり
-  - expected: "禁句です"
-    pattern: そして
-  - expected: "禁句です"
-    pattern: だが
-  - expected: "禁句です"
-    pattern: たら
   - expected: 解析
     pattern: /解析(をする|によって)解析
   - expected: デバッグ
     pattern: でバッグ
-  - expected: 口語的表現はNG
-    pattern:
-      - なってしまう
-      - できるのではないか
   - expected: 閲覧できないか
     pattern: 見られないか
   - expected: システム
