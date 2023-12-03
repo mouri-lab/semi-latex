@@ -1,4 +1,4 @@
-FROM --platform=amd64 node:18.11.0-slim AS node
+FROM --platform=amd64 node:20-slim AS node
 FROM amd64/ubuntu:20.04 AS textlint
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -20,15 +20,21 @@ RUN apt-get update \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
 
+COPY ./internal/custom-rules/textlint-rule-ja-custom-ng-word /textlint-rule-ja-custom-ng-word
+RUN cd /textlint-rule-ja-custom-ng-word \
+    && npm install
+
 RUN npm install -g \
-    textlint@v12.2.3 \
-    textlint-rule-preset-ja-technical-writing@7.0.0 \
-    textlint-rule-preset-ja-spacing@2.2.0 \
-    textlint-rule-preset-jtf-style@2.3.13 \
-    textlint-rule-preset-ja-engineering-paper@1.0.4 \
-    textlint-plugin-latex2e@1.2.0 \
-    @textlint/ast-node-types@12.2.2 \
-    && npm cache clean --force
+    textlint \
+    textlint-rule-preset-ja-technical-writing \
+    textlint-rule-preset-ja-spacing \
+    textlint-rule-preset-jtf-style \
+    textlint-rule-preset-ja-engineering-paper \
+    textlint-plugin-latex2e \
+    textlint-rule-ja-no-weak-phrase \
+    @textlint/ast-node-types \
+    /textlint-rule-ja-custom-ng-word
+
 
 # RUN rm $(find / -name "*.def" -type f) $(find / -name "*.lz4" -type f )
 
@@ -91,8 +97,11 @@ USER ${DOCKER_USER_}
 
 COPY --from=textlint /usr/local/bin/ /usr/local/bin/
 COPY --from=textlint /usr/local/lib/ /usr/local/lib/
+COPY --from=textlint /textlint-rule-ja-custom-ng-word/ /textlint-rule-ja-custom-ng-word/
 
-COPY ./internal/ ${DIRPATH}/internal/
+COPY ./internal/media/ ${DIRPATH}/internal/media/
+COPY ./internal/scripts/ ${DIRPATH}/internal/scripts/
+COPY ./internal/style/ ${DIRPATH}/internal/style/
 
 COPY .textlintrc ${DIRPATH}/
 

@@ -1,8 +1,11 @@
 plugins:
   - latex2e
+  # - ./internal/ng-word/textlint-rule-ng-word.js
 rules:
   preset-ja-spacing: true
   ja-hiragana-fukushi: false
+  ja-no-weak-phrase: false
+  ja-custom-ng-word: true
   preset-ja-technical-writing:
     # 助詞の重複をチェック(no-doubled-joshi)
     no-doubled-joshi: true
@@ -19,6 +22,6 @@ rules:
 
     # 句読点「，」「．」のチェック
     unify-kuten-and-touten: true
-filters:
-  enablingComment: textlint-enable
-  disablingComment: textlint-disable
+# filters:
+#   enablingComment: textlint-enable
+#   disablingComment: textlint-disable

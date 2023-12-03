@@ -1,0 +1,41 @@
+name: TextLint Custom Rule Test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  CustomRuleTest:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4.1.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: npm install
+        working-directory: internal/custom-rules/textlint-rule-ja-custom-ng-word
+        run: |
+          npm install --save-dev
+          npm run build
+      - name: Development test
+        working-directory: internal/custom-rules/textlint-rule-ja-custom-ng-word
+        shell: bash -x {0}
+        run: |
+          npm test | tee result.txt
+          if [ -z $(cat result.txt | grep "passing") ]; then
+            exit 1
+          fi
+      - name: Production test
+        shell: bash -x {0}
+        run: |
+          npm install
+          npx textlint --debug sample/semi-sample/semi.tex | tee result.txt
+          if [ -z $(cat result.txt | grep "problems") ]; then
+            if [ -z $(cat result.txt | grep "fixable") ]; then
+              exit 1
+            fi
+          fi

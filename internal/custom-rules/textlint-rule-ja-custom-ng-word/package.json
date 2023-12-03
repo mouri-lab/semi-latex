@@ -1,0 +1,33 @@
+{
+  "version": "1.0.0",
+  "keywords": [
+    "textlintrule"
+  ],
+  "main": "lib/textlint-rule-ja-custom-ng-word.js",
+  "files": [
+    "lib/",
+    "src/"
+  ],
+  "scripts": {
+    "test": "textlint-scripts test",
+    "build": "textlint-scripts build",
+    "prepublish": "npm run --if-present build"
+  },
+  "devDependencies": {
+    "create-textlint-rule": "^2.0.0",
+    "textlint": "^13.4.1",
+    "textlint-scripts": "^13.4.0",
+    "textlint-tester": "^13.4.0"
+  },
+  "name": "textlint-rule-ja-custom-ng-word",
+  "directories": {
+    "test": "test"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "kuromojin": "^3.0.0",
+    "morpheme-match-all": "^2.0.5"
+  }
+}

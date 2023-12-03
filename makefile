@@ -169,7 +169,7 @@ install-docker:
 		exit 1;\
 	fi
 	sudo apt update
-	sudo apt install -y docker.io
+	sudo apt install -y docker.io docker-buildx
 	[[ $$(getent group docker | cut -f 4 --delim=":") != $$(whoami) ]] && sudo gpasswd -a $$(whoami) docker
 	sudo chgrp docker /var/run/docker.sock
 	sudo systemctl restart docker
