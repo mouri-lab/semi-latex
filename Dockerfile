@@ -15,7 +15,7 @@ RUN sed -i "s-$(grep -v "#" /etc/apt/sources.list | cut -d " " -f 2 | grep -v "s
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-    npm=6.14.4+ds-1ubuntu2 \
+    npm \
     && apt-get -y clean \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
