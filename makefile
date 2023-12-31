@@ -18,6 +18,8 @@ SCRIPTS_DIR := internal/scripts
 INTERAL_FILES := $(shell ls ${STYLE_DIR})
 INTERAL_FILES += $(shell ls ${SCRIPTS_DIR})
 
+ARCH := $$(uname -m)
+
 # コンパイルするtexファイルのディレクトリ
 # 指定したディレクトリにtexファイルは1つであることが必要
 f :=
@@ -80,6 +82,7 @@ docker-build:
 	make docker-stop -s
 	DOCKER_BUILDKIT=1 docker image build -t ${NAME}:latest .
 	make _postBuild -s
+
 
 # キャッシュを使わずにビルド
 docker-rebuild:
