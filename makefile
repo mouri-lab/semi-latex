@@ -80,14 +80,28 @@ run-sample:
 # コンテナのビルド
 docker-build:
 	make docker-stop -s
-	DOCKER_BUILDKIT=1 docker image build -t ${NAME}:latest .
+	DOCKER_BUILDKIT=1 docker image build -t ${NAME}:x86_64 .
+	make _postBuild -s
+
+docker-buildforArm:
+	make docker-stop -s
+	DOCKER_BUILDKIT=1 docker image build -t ${NAME}:arm64 -f Dockerfile.arm64 .
 	make _postBuild -s
 
 
 # キャッシュを使わずにビルド
 docker-rebuild:
 	make docker-stop -s
-	DOCKER_BUILDKIT=1 docker image build -t ${NAME}:latest \
+	DOCKER_BUILDKIT=1 docker image build -t ${NAME}:x86_64 \
+	--pull \
+	--force-rm=true \
+	--no-cache=true .
+	make _postBuild -s
+
+docker-rebuildforArm:
+	make docker-stop -s
+	DOCKER_BUILDKIT=1 docker image build -t ${NAME}:arm64 \
+	-f Dockerfile.arm64 \
 	--pull \
 	--force-rm=true \
 	--no-cache=true .
