@@ -27,13 +27,10 @@ jobs:
         timeout-minutes: 30
 
       - name: build test
-        run: make test --trace
-
-      - name: build test
         run: |
-          make test --trace | tee buildTest.log
-          if [[ -z $(cat buildTest.log | grep "SUCCESS!") ]]; then
-            exit 1
+          make test | tee result.log || true
+          if [[ $(cat result.log | grep -c FAILED) -ne 0 ]]; then
+            make test --trace
           fi
 
       - name: Log in to Docker Hub
@@ -63,13 +60,10 @@ jobs:
         timeout-minutes: 60
 
       - name: build test
-        run: make test ARCH=arm64 --trace
-
-      - name: build test
         run: |
-          make test ARCH=arm64 --trace | tee buildTest.log
-          if [[ -z $(cat buildTest.log | grep "SUCCESS!") ]]; then
-            exit 1
+          make test ARCH=arm64 | tee result.log || true
+          if [[ $(cat result.log | grep -c FAILED) -ne 0 ]]; then
+            make test ARCH=arm64 --trace
           fi
 
       - name: Log in to Docker Hub

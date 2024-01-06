@@ -214,52 +214,7 @@ get-image:
 
 # サンプルのビルドテスト
 test:
-# セミ資料
-	@rm -f sample/semi-sample/*.pdf
-	@make run f=sample/semi-sample/semi.tex
-	@make docker-stop
-	@if [[ $$(cat sample/semi-sample/semi.log | grep -c "No pages of output") -ne 0 ]] || [[ -z $$(ls sample/semi-sample/*.pdf) ]]; then\
-		cat sample/semi-sample/semi.log;\
-		echo "semi-sample FAILED";\
-		exit 1;\
-	fi
-# 全国大会
-	@rm -f sample/ipsj-report/*.pdf
-	@make run f=sample/ipsj-report/ipsj_report.tex
-	@make docker-stop
-	@if [[ $$(cat sample/ipsj-report/ipsj_report.log | grep -c "No pages of output") -ne 0 ]] || [[ -z $$(ls sample/ipsj-report/*.pdf) ]]; then\
-		cat sample/ipsj-report/ipsj_report.log;\
-		echo "ipsj-report FAILED";\
-		exit 1;\
-	fi
-# マスター中間発表
-	@rm -f sample/master-theme-midterm/*.pdf
-	@make run f=sample/master-theme-midterm/main.tex
-	@make docker-stop
-	@if [[ $$(cat sample/master-theme-midterm/main.log | grep -c "No pages of output") -ne 0 ]] || [[ -z $$(ls sample/master-theme-midterm/*.pdf) ]]; then\
-		cat sample/master-theme-midterm/main.log;\
-		echo "master-theme-midterm FAILED";\
-		exit 1;\
-	fi
-# 卒論
-	@rm -f sample/graduation-thesis/*.pdf
-	@make run f=sample/graduation-thesis/main.tex
-	@make docker-stop
-	@if [[ $$(cat sample/graduation-thesis/main.log | grep -c "No pages of output") -ne 0 ]] || [[ -z $$(ls sample/graduation-thesis/*.pdf) ]] ; then\
-		cat sample/graduation-thesis/main.log;\
-		echo "graduation thesis FAILED";\
-		exit 1;\
-	fi
-# 修論
-	@rm -f sample/master-thesis/*.pdf
-	@make run f=sample/master-thesis/main.tex
-	@make docker-stop
-	@if [[ $$(cat sample/master-thesis/main.log | grep -c "No pages of output") -ne 0 ]] || [[ -z $$(ls sample/master-thesis/*.pdf) ]] ; then\
-		cat sample/master-thesis/main.log;\
-		echo "master thesis FAILED";\
-		exit 1;\
-	fi
-	@echo "SUCCESS!"
+	bash internal/test/test.sh
 
 sandbox:
 	bash internal/scripts/test.sh

@@ -49,7 +49,11 @@ jobs:
           docker images
 
       - name: latex build test
-        run: make test --trace
+        run: |
+          make test | tee result.log || true
+          if [[ $(cat result.log | grep -c FAILED) -ne 0 ]]; then
+            make test --trace
+          fi
 
       - name: automatic selection of texfile
         run: |
@@ -114,8 +118,12 @@ jobs:
           fi
           docker images
 
-      - name: build test
-        run: make test ARCH=arm64 --trace
+      - name: latex build test
+        run: |
+          make test ARCH=arm64 | tee result.log || true
+          if [[ $(cat result.log | grep -c FAILED) -ne 0 ]]; then
+            make test ARCH=arm64 --trace
+          fi
 
       - name: automatic selection of texfile
         run: |

@@ -22,7 +22,11 @@ jobs:
         run: make get-image
 
       - name: build test
-        run: make test --trace
+        run: |
+          make test | tee result.log || true
+          if [[ $(cat result.log | grep -c FAILED) -ne 0 ]]; then
+            make test --trace
+          fi
 
   image-test-arm64:
     runs-on: ubuntu-22.04
@@ -40,7 +44,11 @@ jobs:
         run: make get-image ARCH=arm64
 
       - name: build test
-        run: make test ARCH=arm64 --trace
+        run: |
+          make test ARCH=arm64 | tee result.log || true
+          if [[ $(cat result.log | grep -c FAILED) -ne 0 ]]; then
+            make test ARCH=arm64 --trace
+          fi
 
   latest-ubuntu:
     runs-on: ubuntu-latest
@@ -54,4 +62,8 @@ jobs:
         run: |
           make docker-build
       - name: build test
-        run: make test --trace
+        run: |
+          make test | tee result.log || true
+          if [[ $(cat result.log | grep -c FAILED) -ne 0 ]]; then
+            make test --trace
+          fi
