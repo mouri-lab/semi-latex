@@ -142,7 +142,7 @@ _preExec:
 		--rm \
 		-d \
 		--name ${NAME} \
-		${NAME}:latest;\
+		${NAME}:${ARCH};\
 	fi
 	-docker container cp ${TEX_DIR_PATH} ${NAME}:${DOCKER_HOME_DIR}
 	-docker container exec --user root ${NAME}  /bin/bash -c "cp -n ${DOCKER_HOME_DIR}/internal/style/* ${DOCKER_HOME_DIR}/${TEX_DIR} \
@@ -199,14 +199,14 @@ install-textlint:
 	npm install
 
 push-image:
-	docker tag ${NAME}:latest ${DOCKER_REPOSITORY}:latest
-	docker push ${DOCKER_REPOSITORY}:latest
-	docker image rm ${DOCKER_REPOSITORY}:latest
+	docker tag ${NAME}:${ARCH} ${DOCKER_REPOSITORY}:${ARCH}
+	docker push ${DOCKER_REPOSITORY}:${ARCH}
+	docker image rm ${DOCKER_REPOSITORY}:${ARCH}
 
 get-image:
-	docker pull ${DOCKER_REPOSITORY}:latest
-	docker tag ${DOCKER_REPOSITORY}:latest ${NAME}:latest
-	docker image rm ${DOCKER_REPOSITORY}:latest
+	docker pull ${DOCKER_REPOSITORY}:${ARCH}
+	docker tag ${DOCKER_REPOSITORY}:${ARCH} ${NAME}:${ARCH}
+	docker image rm ${DOCKER_REPOSITORY}:${ARCH}
 
 
 # サンプルのビルドテスト
