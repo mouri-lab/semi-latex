@@ -1,4 +1,4 @@
-﻿%%
+%%
 %% This is file `jarticle.cls',
 %% generated with the docstrip utility.
 %%
@@ -44,6 +44,31 @@
 \newcounter{@paper}
 \newif\if@landscape \@landscapefalse
 \newcommand{\@ptsize}{}
+
+\def\urle{%
+\@ifnextchar[%% ]
+{\n@urle}
+{\@urle}
+}
+
+\def\n@urle[#1]#2{%
+\normalfont 
+\if #11\relax
+available \\ from \else%
+\if #12\relax
+available from \\ \else
+\fi\fi
+$\langle$\nobreak{#2}\nobreak$\rangle$}
+
+
+\def\@urle#1{%
+\normalfont available from $\langle$\nobreak{#1}\nobreak$\rangle$}
+
+\def\refdatej#1{\normalfont （参照{#1}）\<}
+\def\refdatee#1{\normalfont (accessed {#1})}
+
+\def\doi#1{\normalfont doi: #1}
+
 \newif\if@restonecol
 \newif\if@titlepage
 \@titlepagefalse
