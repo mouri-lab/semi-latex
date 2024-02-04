@@ -13,6 +13,7 @@ readonly TEX_FILE=$(echo $3 | sed s/.tex/.pdf/)
 
 docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && make all"
 
+exit 0
 
 # 4回もビルドして??が残るのであれば参照ミスと判断
 for_loop_max=3

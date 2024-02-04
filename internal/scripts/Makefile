@@ -179,8 +179,11 @@ $(MAIN).dvi: $(DVISRC)
 		$(PLATEX) $(MAIN).tex		 ;\
 	fi
 
+# デフォルトは-z 9で最大圧縮
+# 圧縮率が高いのpdfの生成に時間がかかる
+# -I: 画像のキャッシュオプション, 0: 古い画像をすべて消去し、新しい画像を残す（デフォルトは画像キャッシュを無視）
 $(MAIN).pdf: dvi
-	dvipdfmx -f texfonts.map -q $(MAIN).dvi
+	dvipdfmx -z 2 -I 0 -f texfonts.map -q $(MAIN).dvi
 
 
 ## Figure conversion algorithms

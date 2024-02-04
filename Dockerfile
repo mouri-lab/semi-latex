@@ -82,6 +82,7 @@ RUN apt-get install -y --no-install-recommends \
 # 推奨パッケージをインストール
 RUN apt-get install -y \
     texlive-extra-utils=2019.202000218-1 \
+    latexdiff \
     && apt-get clean \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*

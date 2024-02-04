@@ -73,6 +73,28 @@ lint-fix:
 	@- docker container exec --user root -t ${NAME} /bin/bash -c "textlint --fix ${TEX_DIR}/${TEX_FILE}"
 	@make _postExec -s
 
+old :=
+new :=
+diff:
+	@if [[ $$(docker ps -a | grep -c ${NAME}) -eq 0 ]]; then\
+		docker container run \
+		-it \
+		--rm \
+		-d \
+		--name ${NAME} \
+		${NAME}:${ARCH};\
+	fi
+	-docker container cp ${old} ${NAME}:${DOCKER_HOME_DIR}
+	-docker container cp ${new} ${NAME}:${DOCKER_HOME_DIR}
+	@- docker container exec --user root ${NAME} /bin/bash -c "latexdiff --exclude-safecmd="cite" -e utf8 -t CFONT $$(basename ${old}) $$(basename ${new})  > diff.tex"
+
+	make _preExec f=${new}
+	@- docker container exec --user root ${NAME} /bin/bash -c "rm ${DOCKER_HOME_DIR}/${TEX_DIR}/*.tex"
+	@- docker container exec --user root ${NAME} /bin/bash -c "cp ${DOCKER_HOME_DIR}/diff.tex ${DOCKER_HOME_DIR}/${TEX_DIR}"
+	@- docker container exec --user root ${NAME} /bin/bash -c "cd ${DOCKER_HOME_DIR}/${TEX_DIR} && make all && make all && make all"
+	-docker container cp ${NAME}:${DOCKER_HOME_DIR}/${TEX_DIR}/diff.pdf ${TEX_DIR_PATH}/diff.pdf
+	-docker container exec --user root ${NAME}  /bin/bash -c "rm -rf ${DOCKER_HOME_DIR}/${TEX_DIR} ${DOCKER_HOME_DIR}/*.tex"
+
 # sampleをビルド
 run-sample:
 	make run f=sample/semi-sample/semi.tex -s
