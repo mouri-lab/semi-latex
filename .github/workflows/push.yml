@@ -12,7 +12,7 @@ env:
   TAG: latex-container
 
 jobs:
-  LatexImagePush:
+  DockerImagePush:
     runs-on: ubuntu-22.04
     timeout-minutes: 120
 
@@ -43,7 +43,7 @@ jobs:
         run: make push-image
         timeout-minutes: 60
 
-  LatexImagePushArm64:
+  DockerImagePushArm:
     runs-on: ubuntu-22.04
     timeout-minutes: 120
 
@@ -51,7 +51,9 @@ jobs:
       - uses: actions/checkout@v4.1.1
       - uses: docker/setup-buildx-action@v3.0.0
       - name: install qemu
-        run: sudo apt-get install qemu-user-static
+        run: |
+          apt-get update
+          apt-get install -y qemu-user-static
 
       - name: docker build
         run: |
@@ -60,10 +62,13 @@ jobs:
         timeout-minutes: 60
 
       - name: build test
+        run: make test --trace
+
+      - name: build test
         run: |
-          make test ARCH=arm64 | tee result.log || true
-          if [[ $(cat result.log | grep -c FAILED) -ne 0 ]]; then
-            make test ARCH=arm64 --trace
+          make test --trace | tee buildTest.log
+          if [[ -z $(cat buildTest.log | grep "SUCCESS!") ]]; then
+            exit 1
           fi
 
       - name: Log in to Docker Hub
@@ -72,6 +77,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: push arm image
-        run: make push-imageforArm
+      - name: push image
+        run: make push-image ARCH=arm64
         timeout-minutes: 60

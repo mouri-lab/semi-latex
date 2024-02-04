@@ -20,8 +20,6 @@ rules:
         - ./internal/media/WEB+DB_PRESS.yml
         - ./internal/media/semi-rule.yml
 
-    # 句読点「，」「．」のチェック
-    unify-kuten-and-touten: true
 # filters:
 #   enablingComment: textlint-enable
 #   disablingComment: textlint-disable

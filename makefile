@@ -18,6 +18,8 @@ SCRIPTS_DIR := internal/scripts
 INTERAL_FILES := $(shell ls ${STYLE_DIR})
 INTERAL_FILES += $(shell ls ${SCRIPTS_DIR})
 
+ARCH := $$(uname -m)
+
 # コンパイルするtexファイルのディレクトリ
 # 指定したディレクトリにtexファイルは1つであることが必要
 f :=
@@ -78,13 +80,28 @@ run-sample:
 # コンテナのビルド
 docker-build:
 	make docker-stop -s
-	DOCKER_BUILDKIT=1 docker image build -t ${NAME}:latest .
+	DOCKER_BUILDKIT=1 docker image build -t ${NAME}:x86_64 .
 	make _postBuild -s
+
+docker-buildforArm:
+	make docker-stop -s
+	DOCKER_BUILDKIT=1 docker image build -t ${NAME}:arm64 -f Dockerfile.arm64 .
+	make _postBuild -s
+
 
 # キャッシュを使わずにビルド
 docker-rebuild:
 	make docker-stop -s
-	DOCKER_BUILDKIT=1 docker image build -t ${NAME}:latest \
+	DOCKER_BUILDKIT=1 docker image build -t ${NAME}:x86_64 \
+	--pull \
+	--force-rm=true \
+	--no-cache=true .
+	make _postBuild -s
+
+docker-rebuildforArm:
+	make docker-stop -s
+	DOCKER_BUILDKIT=1 docker image build -t ${NAME}:arm64 \
+	-f Dockerfile.arm64 \
 	--pull \
 	--force-rm=true \
 	--no-cache=true .
@@ -125,7 +142,7 @@ _preExec:
 		--rm \
 		-d \
 		--name ${NAME} \
-		${NAME}:latest;\
+		${NAME}:${ARCH};\
 	fi
 	-docker container cp ${TEX_DIR_PATH} ${NAME}:${DOCKER_HOME_DIR}
 	-docker container exec --user root ${NAME}  /bin/bash -c "cp -n ${DOCKER_HOME_DIR}/internal/style/* ${DOCKER_HOME_DIR}/${TEX_DIR} \
@@ -182,14 +199,14 @@ install-textlint:
 	npm install
 
 push-image:
-	docker tag ${NAME}:latest ${DOCKER_REPOSITORY}:latest
-	docker push ${DOCKER_REPOSITORY}:latest
-	docker image rm ${DOCKER_REPOSITORY}:latest
+	docker tag ${NAME}:${ARCH} ${DOCKER_REPOSITORY}:${ARCH}
+	docker push ${DOCKER_REPOSITORY}:${ARCH}
+	docker image rm ${DOCKER_REPOSITORY}:${ARCH}
 
 get-image:
-	docker pull ${DOCKER_REPOSITORY}:latest
-	docker tag ${DOCKER_REPOSITORY}:latest ${NAME}:latest
-	docker image rm ${DOCKER_REPOSITORY}:latest
+	docker pull ${DOCKER_REPOSITORY}:${ARCH}
+	docker tag ${DOCKER_REPOSITORY}:${ARCH} ${NAME}:${ARCH}
+	docker image rm ${DOCKER_REPOSITORY}:${ARCH}
 
 
 # サンプルのビルドテスト
