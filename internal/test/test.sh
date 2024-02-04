@@ -11,7 +11,7 @@ cd ../../sample
 readonly NAME="latex-container"
 readonly STYLE_DIR=$(readlink -f "../internal/style")
 readonly SCRIPTS_DIR=$(readlink -f "../internal/scripts")
-readonly ARCH=$(uname -m)
+readonly ARCH=${1}
 
 readonly DOCKER_HOME_DIR="/home/$(cat ../Dockerfile | grep "ARG DOCKER_USER_" | cut -d "=" -f 2)"
 

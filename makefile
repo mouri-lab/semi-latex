@@ -211,7 +211,7 @@ get-image:
 
 # サンプルのビルドテスト
 test:
-	bash internal/test/test.sh
+	bash internal/test/test.sh ${ARCH}
 
 sandbox:
 	echo ${ARCH}
