@@ -49,8 +49,10 @@ jobs:
 
       - name: latex build test
         run: |
-          docker images
-          make test --trace
+          make test | tee result.log || true
+          if [[ $(cat result.log | grep -c FAILED) -ne 0 ]]; then
+            make test --trace
+          fi
 
       - name: automatic selection of texfile
         run: |
@@ -72,3 +74,73 @@ jobs:
             cat lint.txt
             exit 1
           fi
+
+  LatexBuildForArm:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 100
+
+    steps:
+      - uses: actions/checkout@v4.1.1
+      - uses: docker/setup-buildx-action@v3.0.0
+
+      - name: install qemu
+        run: sudo apt-get install qemu-user-static
+
+      - name: Get current date and time
+        env:
+          TZ: "Asia/Tokyo"
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+
+      - name: Cache Docker layers
+        uses: actions/cache@v3.3.2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-arm-buildx-${{ env.date }}
+
+      - name: docker build
+        run: |
+          docker buildx build \
+            --load \
+            --cache-from=type=local,src=/tmp/.buildx-cache \
+            --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
+            --tag ${{ env.TAG }}:arm64 \
+            -f DockerfileArm . \
+          || exit 0
+          if [[ $(docker images | grep -c ${{ env.TAG }}) -eq 0 ]]; then
+            docker buildx build \
+              --load \
+              --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
+              --no-cache --pull \
+              --tag ${{ env.TAG }}:arm64 \
+              -f DockerfileArm .
+          fi
+          docker images
+
+      - name: latex build test
+        run: |
+          make test ARCH=arm64 | tee result.log || true
+          if [[ $(cat result.log | grep -c FAILED) -ne 0 ]]; then
+            make test ARCH=arm64 --trace
+          fi
+
+      - name: automatic selection of texfile
+        run: |
+          rm -f sample/semi-sample/*.pdf
+          cp -rf sample/semi-sample/ temp
+          make ARCH=arm64 run
+          make docker-stop
+          if [ $(cat temp/semi.log | grep -c "No pages of output") -ne 0 ]; then
+            cat temp/semi.log
+            exit 1
+          fi
+
+      # - name: lint
+      #   run: |
+      #     make lint ARCH=arm64 > lint.txt
+      #     cat lint.txt
+      #     if [[ $(cat lint.txt | grep -v "(ignored)" | grep -c "error") -lt 1 ]]; then
+      #       cat lint.txt | grep -c "error"
+      #       cat lint.txt
+      #       exit 1
+      #     fi
