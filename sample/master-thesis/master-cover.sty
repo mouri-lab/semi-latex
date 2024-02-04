@@ -1,0 +1,42 @@
+%       卒業研究報告書原稿用スタイルファイル
+
+\def\年度#1{\gdef\@year{#1}}
+\def\題目#1{\gdef\@title{#1}}
+\def\指導教官#1{\gdef\@teacher{#1}}
+\def\学籍番号#1{\gdef\@IDcode{#1}}
+\def\氏名#1{\gdef\@author{#1}}
+\def\コース#1{\gdef\@course{#1}}
+
+
+\newlength{\coverheight}
+\setlength{\coverheight}{\textheight}
+
+\def\maketitle{\begin{titlepage}
+
+\begin{center}
+
+{\huge \@year 年度\\} \vskip 2em
+{\Huge 修　士　論　文 \par} \vskip 6em
+{{\bfseries\Huge \@title\\}}
+\vfil
+\begin{tabular}{rl}
+{\Large 指導教員:}& {{\huge \@teacher}} \\ \\
+\end{tabular}\\
+\vfil
+{\huge 立命館大学大学院 情報理工学研究科\\}
+{\huge 情報理工学専攻 博士課程前期課程 \\}
+{\huge \@course\\}
+\begin{tabular}{rl}
+\\ \\
+{\Large 学生証番号:}& {{\huge \@IDcode}} \\ \\
+{\Large 氏名:}& {{\huge \@author }}\\ \\
+\end{tabular}\\
+\end{center}
+
+
+\end{titlepage}
+
+\let\maketitle\relax}
+
+
+
