@@ -18,6 +18,8 @@ SCRIPTS_DIR := internal/scripts
 INTERAL_FILES := $(shell ls ${STYLE_DIR})
 INTERAL_FILES += $(shell ls ${SCRIPTS_DIR})
 
+ARCH := $$(uname -m)
+
 # コンパイルするtexファイルのディレクトリ
 # 指定したディレクトリにtexファイルは1つであることが必要
 f :=
@@ -62,7 +64,7 @@ endif
 lint:
 	@make _preExec -s
 	@- docker container exec --user root ${NAME} /bin/bash -c "textlint ${TEX_DIR}/${TEX_FILE} > ${TEX_DIR}/lint.txt"
-	- docker container exec --user root -t --env TEX_PATH="$(shell readlink -f ${TEX_DIR})" ${NAME} /bin/bash -c "cd ${TEX_DIR} && bash lint-formatter.sh ${TEX_FILE_PATH}"
+	- docker container exec --user root -t --env TEX_PATH="$$(readlink -f ${TEX_DIR})" ${NAME} /bin/bash -c "cd ${TEX_DIR} && bash lint-formatter.sh ${TEX_FILE_PATH}"
 	@- docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && rm -f lint.txt"
 	@make _postExec -s
 
@@ -78,13 +80,28 @@ run-sample:
 # コンテナのビルド
 docker-build:
 	make docker-stop -s
-	DOCKER_BUILDKIT=1 docker image build -t ${NAME}:latest .
+	DOCKER_BUILDKIT=1 docker image build -t ${NAME}:x86_64 .
 	make _postBuild -s
+
+docker-buildforArm:
+	make docker-stop -s
+	DOCKER_BUILDKIT=1 docker image build -t ${NAME}:arm64 -f Dockerfile.arm64 .
+	make _postBuild -s
+
 
 # キャッシュを使わずにビルド
 docker-rebuild:
 	make docker-stop -s
-	DOCKER_BUILDKIT=1 docker image build -t ${NAME}:latest \
+	DOCKER_BUILDKIT=1 docker image build -t ${NAME}:x86_64 \
+	--pull \
+	--force-rm=true \
+	--no-cache=true .
+	make _postBuild -s
+
+docker-rebuildforArm:
+	make docker-stop -s
+	DOCKER_BUILDKIT=1 docker image build -t ${NAME}:arm64 \
+	-f Dockerfile.arm64 \
 	--pull \
 	--force-rm=true \
 	--no-cache=true .
@@ -125,7 +142,7 @@ _preExec:
 		--rm \
 		-d \
 		--name ${NAME} \
-		${NAME}:latest;\
+		${NAME}:${ARCH};\
 	fi
 	-docker container cp ${TEX_DIR_PATH} ${NAME}:${DOCKER_HOME_DIR}
 	-docker container exec --user root ${NAME}  /bin/bash -c "cp -n ${DOCKER_HOME_DIR}/internal/style/* ${DOCKER_HOME_DIR}/${TEX_DIR} \
@@ -182,66 +199,19 @@ install-textlint:
 	npm install
 
 push-image:
-	docker tag ${NAME}:latest ${DOCKER_REPOSITORY}:latest
-	docker push ${DOCKER_REPOSITORY}:latest
-	docker image rm ${DOCKER_REPOSITORY}:latest
+	docker tag ${NAME}:${ARCH} ${DOCKER_REPOSITORY}:${ARCH}
+	docker push ${DOCKER_REPOSITORY}:${ARCH}
+	docker image rm ${DOCKER_REPOSITORY}:${ARCH}
 
 get-image:
-	docker pull ${DOCKER_REPOSITORY}:latest
-	docker tag ${DOCKER_REPOSITORY}:latest ${NAME}:latest
-	docker image rm ${DOCKER_REPOSITORY}:latest
+	docker pull ${DOCKER_REPOSITORY}:${ARCH}
+	docker tag ${DOCKER_REPOSITORY}:${ARCH} ${NAME}:${ARCH}
+	docker image rm ${DOCKER_REPOSITORY}:${ARCH}
 
 
 # サンプルのビルドテスト
 test:
-# セミ資料
-	@rm -f sample/semi-sample/*.pdf
-	@make run f=sample/semi-sample/semi.tex
-	@make docker-stop
-	@if [[ $$(cat sample/semi-sample/semi.log | grep -c "No pages of output") -ne 0 ]] || [[ -z $$(ls sample/semi-sample/*.pdf) ]]; then\
-		cat sample/semi-sample/semi.log;\
-		echo "semi-sample FAILED";\
-		exit 1;\
-	fi
-# 全国大会
-	@rm -f sample/ipsj-report/*.pdf
-	@make run f=sample/ipsj-report/ipsj_report.tex
-	@make docker-stop
-	@if [[ $$(cat sample/ipsj-report/ipsj_report.log | grep -c "No pages of output") -ne 0 ]] || [[ -z $$(ls sample/ipsj-report/*.pdf) ]]; then\
-		cat sample/ipsj-report/ipsj_report.log;\
-		echo "ipsj-report FAILED";\
-		exit 1;\
-	fi
-# マスター中間発表
-	@rm -f sample/master-theme-midterm/*.pdf
-	@make run f=sample/master-theme-midterm/main.tex
-	@make docker-stop
-	@if [[ $$(cat sample/master-theme-midterm/main.log | grep -c "No pages of output") -ne 0 ]] || [[ -z $$(ls sample/master-theme-midterm/*.pdf) ]]; then\
-		cat sample/master-theme-midterm/main.log;\
-		echo "master-theme-midterm FAILED";\
-		exit 1;\
-	fi
-# 卒論
-	@rm -f sample/graduation-thesis/*.pdf
-	@make run f=sample/graduation-thesis/main.tex
-	@make docker-stop
-	@if [[ $$(cat sample/graduation-thesis/main.log | grep -c "No pages of output") -ne 0 ]] || [[ -z $$(ls sample/graduation-thesis/*.pdf) ]] ; then\
-		cat sample/graduation-thesis/main.log;\
-		echo "graduation thesis FAILED";\
-		exit 1;\
-	fi
-# 修論
-	@rm -f sample/master-thesis/*.pdf
-	@make run f=sample/master-thesis/main.tex
-	@make docker-stop
-	@if [[ $$(cat sample/master-thesis/main.log | grep -c "No pages of output") -ne 0 ]] || [[ -z $$(ls sample/master-thesis/*.pdf) ]] ; then\
-		cat sample/master-thesis/main.log;\
-		echo "master thesis FAILED";\
-		exit 1;\
-	fi
-	@echo "SUCCESS!"
+	bash internal/test/test.sh ${ARCH}
 
 sandbox:
-	DOCKER_BUILDKIT=1 docker image build -t node-test:latest .
-
-
+	echo ${ARCH}

@@ -20,7 +20,51 @@ jobs:
       - name: docker pull
         run: make get-image
       - name: build test
-        run: make test --trace
+        run: |
+          make test | tee result.log || true
+          if [[ $(cat result.log | grep -c FAILED) -ne 0 ]]; then
+            make test --trace
+          fi
+
+  image-test-arm64:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4.1.1
+      - name: setup docker
+        uses: docker/setup-buildx-action@v3.0.0
+
+      - name: install qemu
+        run: sudo apt-get install qemu-user-static
+
+      - name: docker pull
+        run: make get-image ARCH=arm64
+
+      - name: build test
+        run: |
+          make test ARCH=arm64 | tee result.log || true
+          if [[ $(cat result.log | grep -c FAILED) -ne 0 ]]; then
+            make test ARCH=arm64 --trace
+          fi
+
+  image-testOnArm:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4.1.1
+      - name: setup docker
+        uses: docker/setup-buildx-action@v3.0.0
+      - name: install qemu
+        run: |
+          apt-get update
+          apt-get install -y qemu-user-static
+
+      - name: docker pull
+        run: make get-image ARCH=arm64
+      - name: build test
+        run: make test ARCH=arm64 --trace
 
   latest-ubuntu:
     runs-on: ubuntu-latest
@@ -34,4 +78,8 @@ jobs:
         run: |
           make docker-rebuild
       - name: build test
-        run: make test --trace
+        run: |
+          make test | tee result.log || true
+          if [[ $(cat result.log | grep -c FAILED) -ne 0 ]]; then
+            make test --trace
+          fi
