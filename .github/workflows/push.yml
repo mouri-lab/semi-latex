@@ -62,7 +62,7 @@ jobs:
         timeout-minutes: 60
 
       - name: build test
-        run: make test --trace
+        run: make test ARCH=arm64 --trace
 
       - name: build test
         run: |
