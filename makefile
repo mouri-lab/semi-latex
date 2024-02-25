@@ -22,6 +22,7 @@ ARCH := $$(uname -m)
 
 # コンパイルするtexファイルのディレクトリ
 # 指定したディレクトリにtexファイルは1つであることが必要
+# fはTEX_FILE_PATHのエイリアス
 f :=
 TEX_FILE_PATH := ${f}
 ifeq (${TEX_FILE_PATH},)
@@ -73,6 +74,7 @@ lint-fix:
 	@- docker container exec --user root -t ${NAME} /bin/bash -c "textlint --fix ${TEX_DIR}/${TEX_FILE}"
 	@make _postExec -s
 
+# 差分を色付けして出力
 old :=
 new :=
 diff:
@@ -238,4 +240,4 @@ test:
 	bash internal/test/test.sh ${ARCH}
 
 sandbox:
-	echo ${ARCH}
+	@echo ${TEX_FILE_PATH}
