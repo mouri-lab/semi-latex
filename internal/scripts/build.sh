@@ -1,6 +1,6 @@
 # !/bin/bash
 
-set -eu
+set -u
 
 # texで複数回のビルドを行う判断をする
 # 参照箇所で??となっている場合には再ビルドを行う（上限回数あり）
@@ -9,10 +9,19 @@ set -eu
 
 readonly CONTAINER_NAME=$1
 readonly TEX_DIR=$2
-readonly TEX_FILE=$3
+TEX_FILE=$3
 readonly PDF_FILE=$(echo ${TEX_FILE} | sed s/.tex/.pdf/)
+TEX_FILE_PATH=$4
 
-docker container exec --user root ${CONTAINER_NAME} /bin/bash -c "cd ${TEX_DIR} && make --trace all MY-MAIN=$(echo ${TEX_FILE} | sed s/.tex//) PLATEX='platex -halt-on-error -file-line-error'"
+readonly DIR_PATH=$(readlink -f $(dirname ${0}))
+echo ${DIR_PATH}
+cd ${DIR_PATH}
+
+TEX_FILE_PATH=$(bash search-main.sh)
+echo "target: ${TEX_FILE_PATH}"
+TEX_FILE=$(basename ${TEX_FILE_PATH})
+
+docker container exec --user root ${CONTAINER_NAME} /bin/bash -c "cd ${TEX_DIR} && make --trace all MY-MAIN=$(echo ${TEX_FILE} | sed s/.tex//)"
 
 exit 0
 
