@@ -84,6 +84,8 @@ diff:
 		--name ${NAME} \
 		${NAME}:${ARCH};\
 	fi
+	[[ -z ${old}  ]] && exit 1
+	[[ -z ${new}  ]] && exit 1
 	-docker container cp ${old} ${NAME}:${DOCKER_HOME_DIR}
 	-docker container cp ${new} ${NAME}:${DOCKER_HOME_DIR}
 	- docker container exec --user root ${NAME} /bin/bash -c "latexdiff --graphics-markup=none -e utf8 -t CFONT $$(basename ${old}) $$(basename ${new})  > diff.tex"
