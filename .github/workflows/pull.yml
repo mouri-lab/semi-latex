@@ -21,10 +21,7 @@ jobs:
         run: make get-image
       - name: build test
         run: |
-          make test | tee result.log || true
-          if [[ $(cat result.log | grep -c FAILED) -ne 0 ]]; then
-            make test --trace
-          fi
+          make test
 
   image-test-arm64:
     runs-on: ubuntu-22.04
@@ -36,17 +33,15 @@ jobs:
         uses: docker/setup-buildx-action@v3.0.0
 
       - name: install qemu
-        run: sudo apt-get install qemu-user-static
+        run: |
+          sudo apt-get update
+          sudo apt-get install qemu-user-static
 
       - name: docker pull
         run: make get-image ARCH=arm64
 
       - name: build test
-        run: |
-          make test ARCH=arm64 | tee result.log || true
-          if [[ $(cat result.log | grep -c FAILED) -ne 0 ]]; then
-            make test ARCH=arm64 --trace
-          fi
+        run: make test ARCH=arm64
 
   image-testOnArm:
     runs-on: ubuntu-22.04
@@ -58,8 +53,8 @@ jobs:
         uses: docker/setup-buildx-action@v3.0.0
       - name: install qemu
         run: |
-          apt-get update
-          apt-get install -y qemu-user-static
+          sudo apt-get update
+          sudo apt-get install -y qemu-user-static
 
       - name: docker pull
         run: make get-image ARCH=arm64
