@@ -1,0 +1,43 @@
+runs:
+  using: "Composite"
+  steps:
+    - uses: docker/setup-buildx-action@v3.0.0
+    - name: install qemu
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y qemu-user-static
+      shell: bash
+
+    - name: docker build
+      run: |
+        make docker-rebuildforArm
+      shell: bash
+
+    - name: latex build test
+      run: |
+        docker images
+        make test ARCH=arm64 --trace
+      shell: bash
+
+    - name: automatic selection of texfile
+      run: |
+        rm -f sample/semi-sample/*.pdf
+        cp -rf sample/semi-sample/ temp
+        make run ARCH=arm64
+        make docker-stop
+        if [ $(cat temp/semi.log | grep -c "No pages of output") -ne 0 ]; then
+          cat temp/semi.log
+          exit 1
+        fi
+      shell: bash
+
+    - name: lint
+      run: |
+        make lint ARCH=arm64 > lint.txt
+        cat lint.txt
+        if [[ $(cat lint.txt | grep -c "error") -lt 1 ]]; then
+          cat lint.txt | grep -c "error"
+          cat lint.txt
+          exit 1
+        fi
+      shell: bash

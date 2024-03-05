@@ -22,6 +22,7 @@ ARCH := $$(uname -m)
 
 # コンパイルするtexファイルのディレクトリ
 # 指定したディレクトリにtexファイルは1つであることが必要
+# fはTEX_FILE_PATHのエイリアス
 f :=
 TEX_FILE_PATH := ${f}
 ifeq (${TEX_FILE_PATH},)
@@ -72,6 +73,31 @@ lint-fix:
 	@make _preExec -s
 	@- docker container exec --user root -t ${NAME} /bin/bash -c "textlint --fix ${TEX_DIR}/${TEX_FILE}"
 	@make _postExec -s
+
+# 差分を色付けして出力
+old :=
+new :=
+diff:
+	@if [[ $$(docker ps -a | grep -c ${NAME}) -eq 0 ]]; then\
+		docker container run \
+		-it \
+		--rm \
+		-d \
+		--name ${NAME} \
+		${NAME}:${ARCH};\
+	fi
+	[[ -z ${old}  ]] && exit 1
+	[[ -z ${new}  ]] && exit 1
+	-docker container cp ${old} ${NAME}:${DOCKER_HOME_DIR}
+	-docker container cp ${new} ${NAME}:${DOCKER_HOME_DIR}
+	- docker container exec --user root ${NAME} /bin/bash -c "latexdiff --graphics-markup=none -e utf8 -t CFONT $$(basename ${old}) $$(basename ${new})  > diff.tex"
+	make _preExec f=${new}
+	- docker container exec --user root ${NAME} /bin/bash -c "rm ${DOCKER_HOME_DIR}/${TEX_DIR}/*.tex"
+	- docker container exec --user root ${NAME} /bin/bash -c "cp ${DOCKER_HOME_DIR}/diff.tex ${DOCKER_HOME_DIR}/${TEX_DIR}"
+	- docker container exec --user root ${NAME} /bin/bash -c "cd ${DOCKER_HOME_DIR}/${TEX_DIR} && make all && make all && make all"
+	-docker container cp ${NAME}:${DOCKER_HOME_DIR}/${TEX_DIR}/diff.pdf ${TEX_DIR_PATH}diff.pdf
+	-docker container cp ${NAME}:${DOCKER_HOME_DIR}/${TEX_DIR}/diff.log ${TEX_DIR_PATH}diff.log
+	-docker container exec --user root ${NAME}  /bin/bash -c "rm -rf ${DOCKER_HOME_DIR}/${TEX_DIR} ${DOCKER_HOME_DIR}/*.tex"
 
 # sampleをビルド
 run-sample:
@@ -214,4 +240,4 @@ test:
 	bash internal/test/test.sh ${ARCH}
 
 sandbox:
-	echo ${ARCH}
+	@echo ${TEX_FILE_PATH}

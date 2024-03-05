@@ -1,0 +1,20 @@
+runs:
+  using: "Composite"
+  steps:
+    - uses: actions/checkout@v4.1.1
+    - uses: docker/setup-buildx-action@v3.0.0
+
+    - name: install qemu
+      run: |
+        sudo apt-get update
+        sudo apt-get install qemu-user-static
+      shell: bash
+
+    - name: docker pull
+      run: make get-image ARCH=arm64
+      shell: bash
+
+    - name: build test
+      run: make test ARCH=arm64
+      shell: bash
+
