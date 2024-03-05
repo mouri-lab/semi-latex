@@ -1,0 +1,14 @@
+runs:
+  using: "Composite"
+  steps:
+    - uses: actions/checkout@v4.1.1
+    - uses: docker/setup-buildx-action@v3.0.0
+
+    - name: docker pull
+      run: make get-image
+      shell: bash
+
+    - name: build test
+      run: make test
+      shell: bash
+
