@@ -59,7 +59,7 @@ function search_main_texfile(){
 		echo $(find ${target_dir_path} -name "*.tex" -type f)
 	else
 		# メインのtex内にはdocumentclassが宣言されているはず
-		local -r main_texfile_path=($(find ${target_dir_path} -name "*.tex" -type f -print | xargs grep "\\documentclass\[" | cut -d ":" -f 1))
+		local -r main_texfile_path=($(find ${target_dir_path} -name "*.tex" -type f -print | xargs grep '\\documentclass\[' | cut -d ":" -f 1))
 		echo ${main_texfile_path}
 	fi
 }
@@ -137,6 +137,7 @@ function main(){
 	for target in ${targets[@]}; do
 		echo -e "\e[32m[----------]\e[m Target: ${target}"
 		local target_tex_path=$(search_main_texfile $(readlink -f $target))
+		echo ${target_tex_path}
 		test ${target_tex_path}
 		echo
 	done
