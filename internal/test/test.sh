@@ -123,21 +123,20 @@ function ERROR(){
 
 function FAILED(){
 	local -r comment=$1
-	echo -e "\e[31m[  FAILED  ]\e[m ${comment}"
+	echo -e "$(tput setaf 1)[  FAILED  ]$(tput sgr0) ${comment}"
 	IS_FAILED=1
 }
 
 function CORRECT(){
 	local -r comment=$1
-	echo -e "\e[32m[       OK ]\e[m ${comment}"
+	echo -e "$(tput setaf 2)[       OK ]$(tput sgr0) ${comment}"
 }
 
 function main(){
-	echo -e "\e[32m[==========]\e[m Running ${#targets[@]} tests"
+	echo -e "$(tput setaf 2)[==========]$(tput sgr0) Running ${#targets[@]} tests"
 	for target in ${targets[@]}; do
-		echo -e "\e[32m[----------]\e[m Target: ${target}"
+		echo -e "$(tput setaf 2)[----------]$(tput sgr0) Target: ${target}"
 		local target_tex_path=$(search_main_texfile $(readlink -f $target))
-		echo ${target_tex_path}
 		test ${target_tex_path}
 		echo
 	done
