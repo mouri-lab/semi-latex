@@ -24,6 +24,10 @@ ARCH := $$(uname -m)
 # 指定したディレクトリにtexファイルは1つであることが必要
 # fはTEX_FILE_PATHのエイリアス
 f :=
+ifneq (${new},)
+	f := ${new}
+endif
+
 TEX_FILE_PATH := ${f}
 ifeq (${TEX_FILE_PATH},)
 	ifeq ($(shell uname),Linux)
@@ -86,12 +90,13 @@ diff:
 		--name ${NAME} \
 		${NAME}:${ARCH};\
 	fi
-	[[ -z ${old}  ]] && exit 1
-	[[ -z ${new}  ]] && exit 1
+	@if [[ -z ${old} ]] || [[ -z ${new} ]]; then\
+		exit 1;\
+	fi
 	-docker container cp ${old} ${NAME}:${DOCKER_HOME_DIR}
 	-docker container cp ${new} ${NAME}:${DOCKER_HOME_DIR}
 	- docker container exec --user root ${NAME} /bin/bash -c "latexdiff --graphics-markup=none -e utf8 -t CFONT $$(basename ${old}) $$(basename ${new})  > diff.tex"
-	make _preExec f=${new}
+	make _preExec TEX_DIR_PATH=$$(dirname ${new}) TEX_DIR=$$(dirname ${new} | rev | cut -d "/" -f 1 | rev)
 	- docker container exec --user root ${NAME} /bin/bash -c "rm ${DOCKER_HOME_DIR}/${TEX_DIR}/*.tex"
 	- docker container exec --user root ${NAME} /bin/bash -c "cp ${DOCKER_HOME_DIR}/diff.tex ${DOCKER_HOME_DIR}/${TEX_DIR}"
 	- docker container exec --user root ${NAME} /bin/bash -c "cd ${DOCKER_HOME_DIR}/${TEX_DIR} && make all && make all && make all"
@@ -240,4 +245,4 @@ test:
 	bash internal/test/test.sh ${ARCH}
 
 sandbox:
-	@echo ${TEX_FILE_PATH}
+	echo $$(basename ${new})
