@@ -30,12 +30,9 @@ endif
 TEX_FILE_PATH := ${f}
 ifeq (${TEX_FILE_PATH},)
 	TEX_FILE_PATH := $$(bash ${SCRIPTS_DIR}/search-main.sh)
-	TEX_FILE := $(shell echo ${TEX_FILE_PATH} | rev | cut -d '/' -f 1 | rev)
-	TEX_DIR_PATH := $(shell echo ${TEX_FILE_PATH} | sed -e "s@${TEX_FILE}@@" -e "s@$(shell pwd)/@@")
-else
-	TEX_FILE := $(shell echo ${TEX_FILE_PATH} | rev | cut -d '/' -f 1 | rev)
-	TEX_DIR_PATH := $(shell echo ${TEX_FILE_PATH} | sed -e "s@${TEX_FILE}@@" -e "s@$(shell pwd)/@@")
 endif
+TEX_FILE_NAME := $$(echo ${TEX_FILE_PATH} | rev | cut -d '/' -f 1 | rev)
+TEX_DIR_PATH := $$(echo ${TEX_FILE_PATH} | sed -e "s@${TEX_FILE_NAME}@@" -e "s@$$(pwd)/@@")
 
 TEX_DIR := $$(echo ${TEX_DIR_PATH} | rev | cut -d "/" -f 2 | rev)
 FOCUS_FILE_NAME := $$(basename ${f})
@@ -52,7 +49,7 @@ SHELL := /bin/bash
 # LaTeXのビルド
 run:
 	make _preExec
-	-bash ${SCRIPTS_DIR}/build.sh ${NAME} ${TEX_DIR} ${TEX_FILE} ${TEX_FILE_PATH}
+	-bash ${SCRIPTS_DIR}/build.sh ${NAME} ${TEX_DIR} ${TEX_FILE_NAME} ${TEX_FILE_PATH}
 # texファイルの整形
 ifeq (${AUTO_FORMAT},true)
 	-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && latexindent -w ${FOCUS_FILE_NAME} -s && rm -f *.bak*"
@@ -62,14 +59,14 @@ endif
 # TextLint
 lint:
 	@make _preExec -s
-	@- docker container exec --user root ${NAME} /bin/bash -c "textlint ${TEX_DIR}/${TEX_FILE} > ${TEX_DIR}/lint.txt"
+	@- docker container exec --user root ${NAME} /bin/bash -c "textlint ${TEX_DIR}/${TEX_FILE_NAME} > ${TEX_DIR}/lint.txt"
 	- docker container exec --user root -t --env TEX_PATH="$$(readlink -f ${TEX_DIR})" ${NAME} /bin/bash -c "cd ${TEX_DIR} && bash lint-formatter.sh ${TEX_FILE_PATH}"
 	@- docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && rm -f lint.txt"
 	@make _postExec -s
 
 lint-fix:
 	@make _preExec -s
-	@- docker container exec --user root -t ${NAME} /bin/bash -c "textlint --fix ${TEX_DIR}/${TEX_FILE}"
+	@- docker container exec --user root -t ${NAME} /bin/bash -c "textlint --fix ${TEX_DIR}/${TEX_FILE_NAME}"
 	@make _postExec -s
 
 # 差分を色付けして出力
@@ -180,10 +177,10 @@ _postExec:
 	-docker container exec --user root ${NAME} /bin/bash -c "rm -f \
 		$$(docker container exec --user root ${NAME} /bin/bash -c  "find . -name "*.xbb" -type f" | sed -z 's/\n/ /g' )"
 # ビルド中にローカルのtexファイルが更新されている場合，コンテナ内のtexファイルを上書きしない
-	@if [[ $$(date -r ${TEX_FILE_PATH} +%s) -lt $$(docker container exec --user root ${NAME} /bin/bash -c "date -r ${DOCKER_HOME_DIR}/${TEX_DIR}/${TEX_FILE} +%s") ]]; then\
+	@if [[ $$(date -r ${TEX_FILE_PATH} +%s) -lt $$(docker container exec --user root ${NAME} /bin/bash -c "date -r ${DOCKER_HOME_DIR}/${TEX_DIR}/${TEX_FILE_NAME} +%s") ]]; then\
 		docker container cp ${NAME}:${DOCKER_HOME_DIR}/${TEX_DIR} ${TEX_DIR_PATH}../ ;\
 	else\
-		docker container exec --user root ${NAME} bash -c "rm ${DOCKER_HOME_DIR}/${TEX_DIR}/${TEX_FILE}" ;\
+		docker container exec --user root ${NAME} bash -c "rm ${DOCKER_HOME_DIR}/${TEX_DIR}/${TEX_FILE_NAME}" ;\
 		docker container cp ${NAME}:${DOCKER_HOME_DIR}/${TEX_DIR} ${TEX_DIR_PATH}../ ;\
 	fi
 	-docker container exec --user root ${NAME}  /bin/bash -c "rm -rf ${DOCKER_HOME_DIR}/${TEX_DIR} "
@@ -242,4 +239,4 @@ test:
 	bash internal/test/test.sh ${ARCH}
 
 sandbox:
-	bash internal/scripts/search-main.sh
+	echo ${TEX_FILE_PATH}

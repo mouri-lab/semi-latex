@@ -8,16 +8,30 @@ readonly CONTAINER_NAME=python-container
 readonly CONTAINER_USER_DIR=/home/nobody
 readonly DOCKER_IMAGE=python:3.10-alpine
 
-readonly TEX_FILE_PATH=$1
-
+# 絶対パス
+if [[ -z $1 ]]; then
+	readonly TEX_FILE_PATH=$1
+else
+	readonly TEX_FILE_PATH=$(readlink -f $1)
+fi
 
 # このファイルが格納されているディレクトリの絶対パス
-readonly DIR_PATH=$(readlink -f $(dirname ${0}) | rev | cut -d "/" -f 4- | rev)
+# ${path}/semi-latex/
+readonly DIR_PATH=$(readlink -f $(dirname ${0}) | rev | cut -d "/" -f 3- | rev)
+
+readonly WORK_DIR=${CONTAINER_USER_DIR}${DIR_PATH}
 
 [[ -z $(docker ps | grep ${CONTAINER_NAME}) ]] \
-	&& docker run -it -d --rm --name ${CONTAINER_NAME} -v ${DIR_PATH}/semi-latex:${CONTAINER_USER_DIR}/semi-latex:ro ${DOCKER_IMAGE}
+	&& docker run -i -d --rm --name ${CONTAINER_NAME} -v ${DIR_PATH}:${WORK_DIR}:ro ${DOCKER_IMAGE}
 
-temp=$(docker exec ${CONTAINER_NAME} /bin/ash -c "cd ${CONTAINER_USER_DIR} && python3 semi-latex/internal/scripts/target_tex_find.py semi-latex ${TEX_FILE_PATH}")
+if [[ -z ${TEX_FILE_PATH} ]]; then
 
+	temp=$(docker exec ${CONTAINER_NAME} /bin/ash -c "cd ${WORK_DIR} && python3 ${WORK_DIR}/internal/scripts/target_tex_find.py ${CONTAINER_USER_DIR} ${WORK_DIR}")
 
-echo ${DIR_PATH}/${temp}
+else
+
+	temp=$(docker exec ${CONTAINER_NAME} /bin/ash -c "cd ${WORK_DIR} && python3 ${WORK_DIR}/internal/scripts/target_tex_find.py ${CONTAINER_USER_DIR} ${WORK_DIR} ${TEX_FILE_PATH}")
+
+fi
+
+echo ${temp}

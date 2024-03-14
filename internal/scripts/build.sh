@@ -14,10 +14,8 @@ readonly PDF_FILE=$(echo ${TEX_FILE} | sed s/.tex/.pdf/)
 TEX_FILE_PATH=$4
 
 readonly DIR_PATH=$(readlink -f $(dirname ${0}))
-echo ${DIR_PATH}
-cd ${DIR_PATH}
 
-TEX_FILE_PATH=$(bash search-main.sh)
+TEX_FILE_PATH=$(bash ${DIR_PATH}/search-main.sh ${TEX_FILE_PATH})
 echo "target: ${TEX_FILE_PATH}"
 TEX_FILE=$(basename ${TEX_FILE_PATH})
 
