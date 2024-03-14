@@ -1,4 +1,4 @@
-name: LaTeX Test
+name: LaTeX Build Test
 
 on:
   push:
@@ -18,101 +18,22 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v4.1.1
-      - uses: docker/setup-buildx-action@v3.0.0
+      - uses: actions/checkout@v4.1.2
       - name: Get current date and time
         env:
           TZ: "Asia/Tokyo"
         id: date
         run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
-      - name: Cache Docker layers
-        uses: actions/cache@v4.0.0
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ env.date }}
 
       - name: docker build
-        run: |
-          docker buildx build \
-            --load \
-            --cache-from=type=local,src=/tmp/.buildx-cache \
-            --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
-            --tag ${{ env.TAG }}:x86_64 . \
-          || exit 0
-          if [[ $(docker images | grep -c ${{ env.TAG }}) -eq 0 ]]; then
-            docker buildx build \
-              --load \
-              --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
-              --no-cache --pull \
-              --tag ${{ env.TAG }}:x86_64 .
-          fi
-
-      - name: latex build test
-        run: |
-          make test | tee result.log || true
-          if [[ $(cat result.log | grep -c FAILED) -ne 0 ]]; then
-            make test --trace
-          fi
-
-      - name: automatic selection of texfile
-        run: |
-          rm -f sample/semi-sample/*.pdf
-          cp -rf sample/semi-sample/ temp
-          make run
-          make docker-stop
-          if [ $(cat temp/semi.log | grep -c "No pages of output") -ne 0 ]; then
-            cat temp/semi.log
-            exit 1
-          fi
-
-      - name: lint
-        run: |
-          make lint > lint.txt
-          cat lint.txt
-          if [[ $(cat lint.txt | grep -c "error") -lt 1 ]]; then
-            cat lint.txt | grep -c "error"
-            cat lint.txt
-            exit 1
-          fi
+        uses: ./.github/actions/dockerBuildArm
 
   LatexBuildOnArm:
     runs-on: ubuntu-22.04
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v4.1.1
-      - uses: docker/setup-buildx-action@v3.0.0
-      - name: install qemu
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y qemu-user-static
+      - uses: actions/checkout@v4.1.2
 
-      - name: docker build
-        run: |
-          make docker-rebuildforArm
-
-      - name: latex build test
-        run: |
-          docker images
-          make test ARCH=arm64 --trace
-
-      - name: automatic selection of texfile
-        run: |
-          rm -f sample/semi-sample/*.pdf
-          cp -rf sample/semi-sample/ temp
-          make run ARCH=arm64
-          make docker-stop
-          if [ $(cat temp/semi.log | grep -c "No pages of output") -ne 0 ]; then
-            cat temp/semi.log
-            exit 1
-          fi
-
-      - name: lint
-        run: |
-          make lint ARCH=arm64 > lint.txt
-          cat lint.txt
-          if [[ $(cat lint.txt | grep -c "error") -lt 1 ]]; then
-            cat lint.txt | grep -c "error"
-            cat lint.txt
-            exit 1
-          fi
+      - name: docker build for ARM
+        uses: ./.github/actions/dockerBuildArm
