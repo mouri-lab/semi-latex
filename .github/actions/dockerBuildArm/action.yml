@@ -8,9 +8,27 @@ runs:
         sudo apt-get install -y qemu-user-static
       shell: bash
 
+    - name: Cache Docker layers
+      uses: actions/cache@v4.0.0
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-ARM64-${{ env.date }}
+
     - name: docker build
       run: |
-        make docker-rebuildforArm
+        docker buildx build \
+            --load \
+            --cache-from=type=local,src=/tmp/.buildx-cache \
+            --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
+            --tag ${{ env.TAG }}:arm64 . \
+          || exit 0
+          if [[ $(docker images | grep -c ${{ env.TAG }}) -eq 0 ]]; then
+            docker buildx build \
+              --load \
+              --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
+              --no-cache --pull \
+              --tag ${{ env.TAG }}:arm64 .
+          fi
       shell: bash
 
     - name: latex build test
