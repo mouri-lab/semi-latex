@@ -4,13 +4,13 @@ NAME := latex-container
 # DockerHubのリポジトリ名
 # make get-imageの取得先
 DOCKER_REPOSITORY := taka0628/semi-latex
-
+PYTHON_REPOSITORY := python:3.10-alpine
 # texfileの自動整形をする
 # yes -> true, no -> true以外
 AUTO_FORMAT := true
 
-DOCKER_USER_NAME := $(shell cat Dockerfile | grep "ARG DOCKER_USER_" | cut -d "=" -f 2)
-DOCKER_HOME_DIR := /home/${DOCKER_USER_NAME}
+DOCKER_USER_NAME := guest
+DOCKER_HOME_DIR := /home/guest
 CURRENT_PATH := $(shell pwd)
 
 STYLE_DIR := internal/style
@@ -20,8 +20,7 @@ INTERAL_FILES += $(shell ls ${SCRIPTS_DIR})
 
 ARCH := $$(uname -m)
 
-# コンパイルするtexファイルのディレクトリ
-# 指定したディレクトリにtexファイルは1つであることが必要
+# ビルドするtexファイルのディレクトリ
 # fはTEX_FILE_PATHのエイリアス
 f :=
 ifneq (${new},)
@@ -30,21 +29,13 @@ endif
 
 TEX_FILE_PATH := ${f}
 ifeq (${TEX_FILE_PATH},)
-	ifeq ($(shell uname),Linux)
-		TEX_FILE_PATH := $$(bash ${SCRIPTS_DIR}/file-explorer.sh)
-		TEX_FILE := $(shell echo ${TEX_FILE_PATH} | rev | cut -d '/' -f 1 | rev)
-		TEX_DIR_PATH := $(shell echo ${TEX_FILE_PATH} | sed -e "s@${TEX_FILE}@@" -e "s@$(shell pwd)/@@")
-	else
-		TEX_FILE_PATH := $$(bash ${SCRIPTS_DIR}/file-explorer-for-mac.sh)
-		TEX_FILE := $(shell echo ${TEX_FILE_PATH} | rev | cut -d '/' -f 1 | rev)
-		TEX_DIR_PATH := $(shell echo ${TEX_FILE_PATH} | sed -e "s@${TEX_FILE}@@")
-	endif
-else
-	TEX_FILE := $(shell echo ${TEX_FILE_PATH} | rev | cut -d '/' -f 1 | rev)
-	TEX_DIR_PATH := $(shell echo ${TEX_FILE_PATH} | sed -e "s@${TEX_FILE}@@" -e "s@$(shell pwd)/@@")
+	TEX_FILE_PATH := $$(bash ${SCRIPTS_DIR}/search-main.sh)
 endif
+TEX_FILE_NAME := $$(echo ${TEX_FILE_PATH} | rev | cut -d '/' -f 1 | rev)
+TEX_DIR_PATH := $$(echo ${TEX_FILE_PATH} | sed -e "s@${TEX_FILE_NAME}@@" -e "s@$$(pwd)/@@")
 
-TEX_DIR := $(shell echo ${TEX_DIR_PATH} | rev | cut -d "/" -f 2 | rev)
+TEX_DIR := $$(echo ${TEX_DIR_PATH} | rev | cut -d "/" -f 2 | rev)
+FOCUS_FILE_NAME := $$(basename ${f})
 
 SHELL := /bin/bash
 
@@ -55,27 +46,27 @@ SHELL := /bin/bash
 # make実行時に実行されるmakeコマンドの設定
 .DEFAULT_GOAL := run
 
-# LaTeXのコンパイル
+# LaTeXのビルド
 run:
 	make _preExec
-	-bash ${SCRIPTS_DIR}/build.sh ${NAME} ${TEX_DIR} ${TEX_FILE}
+	-bash ${SCRIPTS_DIR}/build.sh ${NAME} ${TEX_DIR} ${TEX_FILE_NAME} ${TEX_FILE_PATH}
 # texファイルの整形
 ifeq (${AUTO_FORMAT},true)
-	-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && latexindent -w ${TEX_FILE} -s && rm -f *.bak*"
+	-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && latexindent -w ${FOCUS_FILE_NAME} -s && rm -f *.bak*"
 endif
 	make _postExec
 
 # TextLint
 lint:
 	@make _preExec -s
-	@- docker container exec --user root ${NAME} /bin/bash -c "textlint ${TEX_DIR}/${TEX_FILE} > ${TEX_DIR}/lint.txt"
+	@- docker container exec --user root ${NAME} /bin/bash -c "textlint ${TEX_DIR}/${TEX_FILE_NAME} > ${TEX_DIR}/lint.txt"
 	- docker container exec --user root -t --env TEX_PATH="$$(readlink -f ${TEX_DIR})" ${NAME} /bin/bash -c "cd ${TEX_DIR} && bash lint-formatter.sh ${TEX_FILE_PATH}"
 	@- docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && rm -f lint.txt"
 	@make _postExec -s
 
 lint-fix:
 	@make _preExec -s
-	@- docker container exec --user root -t ${NAME} /bin/bash -c "textlint --fix ${TEX_DIR}/${TEX_FILE}"
+	@- docker container exec --user root -t ${NAME} /bin/bash -c "textlint --fix ${TEX_DIR}/${TEX_FILE_NAME}"
 	@make _postExec -s
 
 # 差分を色付けして出力
@@ -186,10 +177,10 @@ _postExec:
 	-docker container exec --user root ${NAME} /bin/bash -c "rm -f \
 		$$(docker container exec --user root ${NAME} /bin/bash -c  "find . -name "*.xbb" -type f" | sed -z 's/\n/ /g' )"
 # ビルド中にローカルのtexファイルが更新されている場合，コンテナ内のtexファイルを上書きしない
-	@if [[ $$(date -r ${TEX_FILE_PATH} +%s) -lt $$(docker container exec --user root ${NAME} /bin/bash -c "date -r ${DOCKER_HOME_DIR}/${TEX_DIR}/${TEX_FILE} +%s") ]]; then\
+	@if [[ $$(date -r ${TEX_FILE_PATH} +%s) -lt $$(docker container exec --user root ${NAME} /bin/bash -c "date -r ${DOCKER_HOME_DIR}/${TEX_DIR}/${TEX_FILE_NAME} +%s") ]]; then\
 		docker container cp ${NAME}:${DOCKER_HOME_DIR}/${TEX_DIR} ${TEX_DIR_PATH}../ ;\
 	else\
-		docker container exec --user root ${NAME} bash -c "rm ${DOCKER_HOME_DIR}/${TEX_DIR}/${TEX_FILE}" ;\
+		docker container exec --user root ${NAME} bash -c "rm ${DOCKER_HOME_DIR}/${TEX_DIR}/${TEX_FILE_NAME}" ;\
 		docker container cp ${NAME}:${DOCKER_HOME_DIR}/${TEX_DIR} ${TEX_DIR_PATH}../ ;\
 	fi
 	-docker container exec --user root ${NAME}  /bin/bash -c "rm -rf ${DOCKER_HOME_DIR}/${TEX_DIR} "
@@ -200,6 +191,8 @@ _postBuild:
 	@if [[ -n $$(docker images -f 'dangling=true' -q) ]]; then\
 		docker image rm $$(docker images -f 'dangling=true' -q);\
 	fi
+	docker system df
+
 
 
 # semi-latex環境の構築
@@ -238,6 +231,7 @@ get-image:
 	docker pull ${DOCKER_REPOSITORY}:${ARCH}
 	docker tag ${DOCKER_REPOSITORY}:${ARCH} ${NAME}:${ARCH}
 	docker image rm ${DOCKER_REPOSITORY}:${ARCH}
+	docker pull ${PYTHON_REPOSITORY}
 
 
 # サンプルのビルドテスト
@@ -245,4 +239,4 @@ test:
 	bash internal/test/test.sh ${ARCH}
 
 sandbox:
-	echo $$(basename ${new})
+	echo ${TEX_FILE_PATH}
