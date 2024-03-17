@@ -17,8 +17,8 @@ rules:
     # prh: false
     prh:
       rulePaths:
-        - ./internal/media/WEB+DB_PRESS.yml
-        - ./internal/media/semi-rule.yml
+        - ./internal/container/media/WEB+DB_PRESS.yml
+        - ./internal/container/media/semi-rule.yml
 
 # filters:
 #   enablingComment: textlint-enable

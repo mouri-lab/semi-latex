@@ -161,8 +161,8 @@ _preExec:
 		${NAME}:${ARCH};\
 	fi
 	-docker container cp ${TEX_DIR_PATH} ${NAME}:${DOCKER_HOME_DIR}
-	-docker container exec --user root ${NAME}  /bin/bash -c "cp -n ${DOCKER_HOME_DIR}/internal/style/* ${DOCKER_HOME_DIR}/${TEX_DIR} \
-		&& cp -n ${DOCKER_HOME_DIR}/internal/scripts/* ${DOCKER_HOME_DIR}/${TEX_DIR}"
+	-docker container exec --user root ${NAME}  /bin/bash -c "cp -n ${DOCKER_HOME_DIR}/internal/container/style/* ${DOCKER_HOME_DIR}/${TEX_DIR} \
+		&& cp -n ${DOCKER_HOME_DIR}/internal/container/scripts/* ${DOCKER_HOME_DIR}/${TEX_DIR}"
 
 # コンテナ終了時の後処理
 # コンテナ内のファイルをローカルへコピー，コンテナの削除を行う

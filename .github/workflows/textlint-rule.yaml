@@ -17,12 +17,12 @@ jobs:
         with:
           node-version: 20
       - name: npm install
-        working-directory: internal/custom-rules/textlint-rule-ja-custom-ng-word
+        working-directory: internal/container/custom-rules/textlint-rule-ja-custom-ng-word
         run: |
           npm install --save-dev
           npm run build
       - name: Development test
-        working-directory: internal/custom-rules/textlint-rule-ja-custom-ng-word
+        working-directory: internal/container/custom-rules/textlint-rule-ja-custom-ng-word
         shell: bash -x {0}
         run: |
           npm test | tee result.txt

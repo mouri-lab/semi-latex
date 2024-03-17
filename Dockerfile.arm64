@@ -92,9 +92,9 @@ COPY --from=textlint /usr/local/bin/ /usr/local/bin/
 COPY --from=textlint /usr/local/lib/ /usr/local/lib/
 COPY --from=textlint /textlint-rule-ja-custom-ng-word/ /textlint-rule-ja-custom-ng-word/
 
-COPY ./internal/container/media/ ${DIRPATH}/internal/media/
-COPY ./internal/container/scripts/ ${DIRPATH}/internal/scripts/
-COPY ./internal/container/style/ ${DIRPATH}/internal/style/
+COPY ./internal/container/media/ ${DIRPATH}/internal/container/media/
+COPY ./internal/container/scripts/ ${DIRPATH}/internal/container/scripts/
+COPY ./internal/container/style/ ${DIRPATH}/internal/container/style/
 
 COPY .textlintrc ${DIRPATH}/
 

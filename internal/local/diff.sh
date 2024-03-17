@@ -49,8 +49,8 @@ function makeDiff {
     docker container exec ${CONTAINER_NAME} /bin/bash -c "mkdir -p ${DOCKER_HOME_DIR}${TEX_DIR_PATH}"
 	docker container cp ${TEX_DIR_PATH} ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_DIR_PATH}/../
 	docker container exec /bin/bash -c \
-		"cp -n ${DOCKER_HOME_DIR}/internal/style/* ${DOCKER_HOME_DIR}${TEX_DIR_PATH} \
-		&& cp -n ${DOCKER_HOME_DIR}/internal/scripts/* ${DOCKER_HOME_DIR}${TEX_DIR_PATH}"
+		"cp -n ${DOCKER_HOME_DIR}/internal/container/style/* ${DOCKER_HOME_DIR}${TEX_DIR_PATH} \
+		&& cp -n ${DOCKER_HOME_DIR}/internal/container/scripts/* ${DOCKER_HOME_DIR}${TEX_DIR_PATH}"
 
 	docker container exec --user root ${CONTAINER_NAME} /bin/bash -c \
         "rm ${DOCKER_HOME_DIR}${TEX_DIR_PATH}/*.tex"
