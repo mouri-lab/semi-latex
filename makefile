@@ -13,8 +13,8 @@ DOCKER_USER_NAME := guest
 DOCKER_HOME_DIR := /home/guest
 CURRENT_PATH := $(shell pwd)
 
-STYLE_DIR := internal/style
-SCRIPTS_DIR := internal/scripts
+STYLE_DIR := internal/container/style
+SCRIPTS_DIR := internal/local
 INTERAL_FILES := $(shell ls ${STYLE_DIR})
 INTERAL_FILES += $(shell ls ${SCRIPTS_DIR})
 
@@ -48,13 +48,7 @@ SHELL := /bin/bash
 
 # LaTeXのビルド
 run:
-	make _preExec
-	-bash ${SCRIPTS_DIR}/build.sh ${NAME} ${TEX_DIR} ${TEX_FILE_NAME} ${TEX_FILE_PATH}
-# texファイルの整形
-ifeq (${AUTO_FORMAT},true)
-	-docker container exec --user root ${NAME} /bin/bash -c "cd ${TEX_DIR} && latexindent -w ${FOCUS_FILE_NAME} -s && rm -f *.bak*"
-endif
-	make _postExec
+	bash internal/local/tesBuild.tex
 
 # TextLint
 lint:
