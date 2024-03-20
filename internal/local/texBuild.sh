@@ -3,7 +3,11 @@
 # TEX_FILE_PATH: texファイルのパス = $1
 # 	nullが指定されるとsemi-texから探索
 # 	TEST_MODEに引数を渡すために使用
+# 	絶対パスと相対パスのどちらでもOK
+
 # TEST_MODE: bool = $2
+
+set -x
 
 readonly CONTAINER_NAME=latex-container
 readonly STYLE_DIR=internal/container/style
@@ -20,6 +24,7 @@ else
 	fi
 	readonly TEX_FILE_PATH=$(bash ${SCRIPTS_DIR}/search-main.sh $1)
 fi
+
 [[ ! -z $(echo ${TEX_FILE_PATH} | grep "[ERROR]") ]] && echo ${TEX_FILE_PATH} && exit 1
 
 # if [[ -z $2 ]]; then
@@ -42,7 +47,7 @@ set -ux
 
 function texBuild {
 	echo "$(tput setaf 2)TEX PATH: ${TEX_FILE_PATH} $(tput sgr0)"
-	docker container exec --user root ${CONTAINER_NAME} /bin/bash -c "cd ${DOCKER_HOME_DIR}${TEX_DIR_PATH} && make all MY-MAIN=$(echo ${TEX_FILE_NAME} | sed s/.tex//)"
+	docker container exec --user root ${CONTAINER_NAME} /bin/bash -c "cd ${DOCKER_HOME_DIR}${TEX_DIR_PATH} && make all MY-MAIN=${TEX_FILE_NAME/.tex/}"
 }
 
 function fileFormat {
@@ -83,9 +88,8 @@ function postExec {
 			# pdfをコピーする
 			docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_DIR_PATH} ${TEX_DIR_PATH}/../
 		fi
+		docker container exec --user root ${CONTAINER_NAME} /bin/bash -c "rm -rf ${DOCKER_HOME_DIR}/home"
 	fi
-
-	docker container exec --user root ${CONTAINER_NAME} /bin/bash -c "rm -rf ${DOCKER_HOME_DIR}/home"
 }
 
 function containerAttach {
@@ -100,3 +104,7 @@ function main {
 }
 
 main
+
+# echo ${TEX_FILE_NAME}
+# echo ${TEX_FILE_PATH}
+# echo ${TEX_FILE_NAME/.tex/.pdf}

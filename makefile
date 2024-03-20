@@ -28,14 +28,6 @@ ifneq (${new},)
 endif
 
 TEX_FILE_PATH := ${f}
-ifeq (${TEX_FILE_PATH},)
-	TEX_FILE_PATH := $$(bash ${SCRIPTS_DIR}/search-main.sh)
-endif
-TEX_FILE_NAME := $$(echo ${TEX_FILE_PATH} | rev | cut -d '/' -f 1 | rev)
-TEX_DIR_PATH := $$(echo ${TEX_FILE_PATH} | sed -e "s@${TEX_FILE_NAME}@@" -e "s@$$(pwd)/@@")
-
-TEX_DIR := $$(echo ${TEX_DIR_PATH} | rev | cut -d "/" -f 2 | rev)
-FOCUS_FILE_NAME := $$(basename ${f})
 
 SHELL := /bin/bash
 
@@ -48,7 +40,7 @@ SHELL := /bin/bash
 
 # LaTeXのビルド
 run:
-	bash internal/local/tesBuild.tex
+	bash internal/local/tesBuild.tex ${TEX_FILE_PATH}
 
 # TextLint
 lint:
