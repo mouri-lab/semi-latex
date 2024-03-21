@@ -7,8 +7,6 @@
 
 # TEST_MODE: bool = $2
 
-set -x
-
 readonly DIR_PATH=$(readlink -f $(dirname ${0}))
 
 source ${DIR_PATH}/config.sh
@@ -40,15 +38,18 @@ fi
 
 readonly TEX_DIR_PATH=$(dirname ${TEX_FILE_PATH})
 readonly TEX_FILE_NAME=$(basename ${TEX_FILE_PATH})
-set -ux
+set -u
 
 function lint {
 	echo "$(tput setaf 2)TEX PATH:$(tput sgr0) ${TEX_FILE_PATH}"
-	docker container exec --user root ${CONTAINER_NAME} /bin/bash -c \
-        "textlint ${DOCKER_HOME_DIR}${TEX_FILE_PATH} > ${DOCKER_HOME_DIR}${TEX_DIR_PATH}/lint.txt"
-
-	docker container exec --user root -i ${CONTAINER_NAME} /bin/bash -c \
-        "cd ${DOCKER_HOME_DIR}${TEX_DIR_PATH} && bash lint-formatter.sh ${TEX_FILE_PATH}"
+	docker container exec -it ${CONTAINER_NAME} /bin/bash -c \
+        "textlint ${DOCKER_HOME_DIR}${TEX_FILE_PATH} \
+		| sed -e 's^\([0-9]\)\+:\([0-9]\)\+^\n${TEX_FILE_PATH}:&\n\t^g' \
+		| sed 's/errors/$(tput setaf 1)&$(tput sgr0)/g' \
+		| sed 's/error/$(tput setaf 1)&$(tput sgr0)/g' \
+		| sed 's/"✓"/$(tput setaf 2)&$(tput sgr0)/g' \
+		| sed 's/"✖"/$(tput setaf 1)&$(tput sgr0)/g' \
+		"
 }
 
 function preExec {
