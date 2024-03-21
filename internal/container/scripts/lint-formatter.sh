@@ -24,6 +24,6 @@ unset for_loop_max
 sed -i 's/textlint --fix \[file\]/make lint-fix/' lint.txt
 sed -i "s@^ \+@ @" lint.txt
 
-cat lint.txt
+cat lint.txt | sed s/error/$(tput setaf 1)error$(tput sgr0)/g | sed s/"✓"/$(tput setaf 1)"✓"$(tput sgr0)/g
 
 # sed -E s@"([0-9])+:([0-9])+"@"hoge/\1: \2"@ lint.txt
