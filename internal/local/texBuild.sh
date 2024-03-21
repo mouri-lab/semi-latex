@@ -9,10 +9,14 @@
 
 set -x
 
-readonly CONTAINER_NAME=latex-container
-readonly STYLE_DIR=internal/container/style
-readonly SCRIPTS_DIR=internal/local
-readonly DOCKER_HOME_DIR=/home/guest
+readonly DIR_PATH=$(readlink -f $(dirname ${0}))
+
+source ${DIR_PATH}/config.sh
+
+# readonly CONTAINER_NAME=latex-container
+# readonly STYLE_DIR=internal/container/style
+# readonly SCRIPTS_DIR=internal/local
+# readonly DOCKER_HOME_DIR=/home/guest
 readonly ARCH=$(uname -m)
 
 if [[ -z $1 ]] || [[ $1 == "null" ]]; then
@@ -40,13 +44,12 @@ else
 	readonly TEST_MODE=$2
 fi
 
-readonly DIR_PATH=$(readlink -f $(dirname ${0}))
 readonly TEX_DIR_PATH=$(dirname ${TEX_FILE_PATH})
 readonly TEX_FILE_NAME=$(basename ${TEX_FILE_PATH})
 set -ux
 
 function texBuild {
-	echo "$(tput setaf 2)TEX PATH: ${TEX_FILE_PATH} $(tput sgr0)"
+	echo "$(tput setaf 2)TEX PATH:$(tput sgr0): ${TEX_FILE_PATH}"
 	docker container exec --user root ${CONTAINER_NAME} /bin/bash -c "cd ${DOCKER_HOME_DIR}${TEX_DIR_PATH} && make all MY-MAIN=${TEX_FILE_NAME/.tex/}"
 }
 
@@ -103,8 +106,8 @@ function main {
 	postExec
 }
 
-main
+# main
 
-# echo ${TEX_FILE_NAME}
-# echo ${TEX_FILE_PATH}
-# echo ${TEX_FILE_NAME/.tex/.pdf}
+echo ${TEX_FILE_NAME}
+echo ${TEX_FILE_PATH}
+echo ${TEX_FILE_NAME/.tex/.pdf}
