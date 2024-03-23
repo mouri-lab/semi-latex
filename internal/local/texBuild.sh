@@ -7,8 +7,6 @@
 
 # TEST_MODE: bool = $2
 
-set -x
-
 readonly DIR_PATH=$(readlink -f $(dirname ${0}))
 
 source ${DIR_PATH}/config.sh
@@ -17,16 +15,16 @@ source ${DIR_PATH}/config.sh
 # readonly STYLE_DIR=internal/container/style
 # readonly SCRIPTS_DIR=internal/local
 # readonly DOCKER_HOME_DIR=/home/guest
-readonly ARCH=$(uname -m)
 
 if [[ -z $1 ]] || [[ $1 == "null" ]]; then
 	readonly TEX_FILE_PATH=$(bash ${SCRIPTS_DIR}/search-main.sh)
 else
-	if [[ ! -f $1 ]]; then
+	if [[ -f $1 ]] || [[ -d $1 ]]; then
+		readonly TEX_FILE_PATH=$(bash ${SCRIPTS_DIR}/search-main.sh $1)
+	else
 		echo "ファイルパスが不正: $1"
 		exit 1
 	fi
-	readonly TEX_FILE_PATH=$(bash ${SCRIPTS_DIR}/search-main.sh $1)
 fi
 
 [[ ! -z $(echo ${TEX_FILE_PATH} | grep "[ERROR]") ]] && echo ${TEX_FILE_PATH} && exit 1
@@ -38,15 +36,14 @@ fi
 # fi
 
 # TEST_MODE: ビルドした成果物をローカルに保存しない
-if [[ -z $2 ]]; then
+if [[ -z $2 ]] || [[ $2 != true ]]; then
 	readonly TEST_MODE=false
 else
-	readonly TEST_MODE=$2
+	readonly TEST_MODE=true
 fi
 
 readonly TEX_DIR_PATH=$(dirname ${TEX_FILE_PATH})
 readonly TEX_FILE_NAME=$(basename ${TEX_FILE_PATH})
-set -ux
 
 function texBuild {
 	echo "$(tput setaf 2)TEX PATH:$(tput sgr0): ${TEX_FILE_PATH}"
@@ -79,7 +76,7 @@ function postExec {
 	# texの成果物のみを残す
 	docker container exec ${CONTAINER_NAME} /bin/bash -c \
 		"cd ${DOCKER_HOME_DIR}${TEX_DIR_PATH} \
-		&& find . -maxdepth 1 -type f -not \( -name '*.tex' -o -name '*.aux' -o -name '*.div' -o -name '*.log' \) -exec rm -f {} + "
+		&& find . -maxdepth 1 -type f -not \( -name '*.tex' -o -name '*.pdf' -o -name '*.aux' -o -name '*.div' -o -name '*.log' \) -exec rm -f {} + "
 
 	#ビルド中にローカルのtexファイルが更新されている場合，ローカルのtexファイルを上書きしない
 	if [[ ${TEST_MODE} != true ]]; then
@@ -87,11 +84,16 @@ function postExec {
 			docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_DIR_PATH} ${TEX_DIR_PATH}/../
 		else
 			# texを削除
-			docker container exec --user root ${CONTAINER_NAME} bash -c "rm ${DOCKER_HOME_DIR}${TEX_FILE_PATH}"
+			docker container exec ${CONTAINER_NAME} bash -c "rm ${DOCKER_HOME_DIR}${TEX_FILE_PATH}"
 			# pdfをコピーする
 			docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_DIR_PATH} ${TEX_DIR_PATH}/../
 		fi
-		docker container exec --user root ${CONTAINER_NAME} /bin/bash -c "rm -rf ${DOCKER_HOME_DIR}/home"
+		if [[ $(docker container exec -i ${CONTAINER_NAME} /bin/bash -c "find ${DOCKER_HOME_DIR}/home -type d | wc -l") -lt 100 ]]; then
+			docker container exec ${CONTAINER_NAME} /bin/bash -c "rm -rf ${DOCKER_HOME_DIR}/home"
+		else
+			echo "想定外の場所をrmしようとしている可能性があります"
+			exit 1
+		fi
 	fi
 }
 
@@ -106,8 +108,8 @@ function main {
 	postExec
 }
 
-# main
+main
 
-echo ${TEX_FILE_NAME}
-echo ${TEX_FILE_PATH}
-echo ${TEX_FILE_NAME/.tex/.pdf}
+# echo ${TEX_FILE_NAME}
+# echo ${TEX_FILE_PATH}
+# echo ${TEX_FILE_NAME/.tex/.pdf}
