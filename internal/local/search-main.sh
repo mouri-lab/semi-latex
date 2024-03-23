@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+# set -ex
 
 # macOSはBashコマンドがLinuxのものと互換性がないので，一部のスクリプトが動作しない
 # なのでmacOSではスクリプト実行用のコンテナ内でスクリプトを動作させることで回避
@@ -9,7 +9,7 @@ set -e
 readonly CONTAINER_NAME=python-container
 readonly CONTAINER_USER_DIR=/home/nobody
 readonly DOCKER_IMAGE=python:3.12-alpine
-readonly LOCAL_PATH=internal/local/target_tex_find.py
+readonly SCRIPT_PATH=internal/local/target_tex_find.py
 
 # 絶対パス
 if [[ -z $1 ]]; then
@@ -29,9 +29,9 @@ if [[ -z $(docker ps | grep ${CONTAINER_NAME}) ]]; then
 fi
 
 if [[ -z ${TEX_FILE_PATH} ]]; then
-	result=$(docker exec -i ${CONTAINER_NAME} /bin/ash -c "cd ${WORK_DIR} && python3 ${WORK_DIR}/${LOCAL_PATH} ${CONTAINER_USER_DIR} ${WORK_DIR}")
+	result=$(docker exec -i ${CONTAINER_NAME} /bin/ash -c "cd ${WORK_DIR} && python3 ${WORK_DIR}/${SCRIPT_PATH} ${CONTAINER_USER_DIR} ${WORK_DIR}")
 else
-	result=$(docker exec -i ${CONTAINER_NAME} /bin/ash -c "cd ${WORK_DIR} && python3 ${WORK_DIR}/${LOCAL_PATH} ${CONTAINER_USER_DIR} ${WORK_DIR} ${TEX_FILE_PATH}")
+	result=$(docker exec -i ${CONTAINER_NAME} /bin/ash -c "cd ${WORK_DIR} && python3 ${WORK_DIR}/${SCRIPT_PATH} ${CONTAINER_USER_DIR} ${WORK_DIR} ${TEX_FILE_PATH}")
 fi
 
 if [[ -f ${result} ]]; then
