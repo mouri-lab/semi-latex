@@ -32,7 +32,7 @@ SHELL := /bin/bash
 
 # LaTeXのビルド
 run:
-	@bash ${SCRIPTS_DIR}/tesBuild.sh ${TEX_FILE_PATH}
+	@bash ${SCRIPTS_DIR}/texBuild.sh ${TEX_FILE_PATH}
 
 # TextLint
 lint:
@@ -158,7 +158,7 @@ get-image:
 
 # サンプルのビルドテスト
 test:
-	bash internal/test/test.sh ${ARCH}
+	@bash ${SCRIPTS_DIR}/test.sh ${ARCH}
 
 sandbox:
 	echo ${TEX_FILE_PATH}
