@@ -5,8 +5,6 @@
 # 	TEST_MODEに引数を渡すために使用
 # 	絶対パスと相対パスのどちらでもOK
 
-# TEST_MODE: bool = $2
-
 readonly DIR_PATH=$(readlink -f $(dirname ${0}))
 
 source ${DIR_PATH}/config.sh
@@ -35,11 +33,14 @@ fi
 # 	readonly USE_FORMAT=$2
 # fi
 
-# TEST_MODE: ビルドした成果物をローカルに保存しない
-if [[ -z $2 ]] || [[ $2 != true ]]; then
-	readonly TEST_MODE=false
+if [[ -z $TEST ]]; then
+	TEST=0
 else
-	readonly TEST_MODE=true
+	TEST=1
+fi
+
+if [[ -z $ARCH ]]; then
+	ARCH=$(uname -m)
 fi
 
 readonly TEX_DIR_PATH=$(dirname ${TEX_FILE_PATH})
@@ -73,27 +74,21 @@ function preExec {
 }
 
 function postExec {
-	# texの成果物のみを残す
-	docker container exec ${CONTAINER_NAME} /bin/bash -c \
-		"cd ${DOCKER_HOME_DIR}${TEX_DIR_PATH} \
-		&& find . -maxdepth 1 -type f -not \( -name '*.tex' -o -name '*.pdf' -o -name '*.aux' -o -name '*.div' -o -name '*.log' \) -exec rm -f {} + "
-
 	#ビルド中にローカルのtexファイルが更新されている場合，ローカルのtexファイルを上書きしない
-	if [[ ${TEST_MODE} != true ]]; then
+	if [[ ${TEST} != true ]]; then
 		if [[ $(date -r ${TEX_FILE_PATH} +%s) -lt $(docker container exec ${CONTAINER_NAME} /bin/bash -c "date -r ${DOCKER_HOME_DIR}${TEX_FILE_PATH} +%s") ]]; then
-			docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_DIR_PATH} ${TEX_DIR_PATH}/../
-		else
-			# texを削除
-			docker container exec ${CONTAINER_NAME} bash -c "rm ${DOCKER_HOME_DIR}${TEX_FILE_PATH}"
-			# pdfをコピーする
-			docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_DIR_PATH} ${TEX_DIR_PATH}/../
+			docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_FILE_PATH} ${TEX_DIR_PATH}
 		fi
-		if [[ $(docker container exec -i ${CONTAINER_NAME} /bin/bash -c "find ${DOCKER_HOME_DIR}/home -type d | wc -l") -lt 100 ]]; then
-			docker container exec ${CONTAINER_NAME} /bin/bash -c "rm -rf ${DOCKER_HOME_DIR}/home"
-		else
-			echo "想定外の場所をrmしようとしている可能性があります"
-			exit 1
-		fi
+		docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_FILE_PATH/.tex/.pdf} ${TEX_DIR_PATH}
+		docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_FILE_PATH/.tex/.log} ${TEX_DIR_PATH}
+		docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_FILE_PATH/.tex/.aux} ${TEX_DIR_PATH}
+		docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_FILE_PATH/.tex/.dvi} ${TEX_DIR_PATH}
+		# if [[ $(docker container exec -i ${CONTAINER_NAME} /bin/bash -c "find ${DOCKER_HOME_DIR}/home -type d | wc -l") -lt 100 ]]; then
+		# 	docker container exec ${CONTAINER_NAME} /bin/bash -c "rm -rf ${DOCKER_HOME_DIR}/home"
+		# else
+		# 	echo "想定外の場所をrmしようとしている可能性があります"
+		# 	exit 1
+		# fi
 	fi
 }
 

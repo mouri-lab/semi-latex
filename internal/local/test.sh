@@ -13,8 +13,10 @@ cd ../../sample
 readonly NAME="latex-container"
 readonly STYLE_DIR=$(readlink -f "../internal/container/style")
 readonly SCRIPTS_DIR=$(readlink -f "../internal/local")
-readonly ARCH=${1}
 
+if [[ -z $ARCH ]]; then
+	ARCH=$(uname -m)
+fi
 readonly DOCKER_HOME_DIR="/home/$(cat ../Dockerfile | grep "ARG DOCKER_USER_" | cut -d "=" -f 2)"
 
 IS_FAILED=0
@@ -25,21 +27,21 @@ function post_docker(){
 
 function exec_on_container(){
 	local -r command=$1
-	docker container exec -it ${NAME} /bin/bash -c "cd ${DOCKER_HOME_DIR} && ${command}" 2> /dev/null
+	docker container exec -i ${NAME} /bin/bash -c "cd ${DOCKER_HOME_DIR} && ${command}" 2> /dev/null
 }
 
-
 function test(){
-	local -r target_texfile_path=$1
+	local -r target_texdir_path=$1
 	# 								target tex path   	   test mode
-	bash ${SCRIPTS_DIR}/texBuild.sh ${target_texfile_path} true 1>/dev/null 2>/dev/null || true
+	TEST=1 ARCH=${ARCH} bash ${SCRIPTS_DIR}/texBuild.sh ${target_texdir_path} 1>/dev/null 2>/dev/null || true
 
-	local -r target_dir_name=$(dirname ${target_texfile_path} | rev | cut -d "/" -f 1 | rev)
-
+	local -r target_dir_name=$(dirname ${target_texdir_path} | rev | cut -d "/" -f 1 | rev)
+	local -r target_file_path=$(bash ${SCRIPTS_DIR}/search-main.sh ${target_texdir_path})
+	local -r target_pdf_path=${target_file_path/.tex/.pdf}
 
 	# ファイル生成を確認
 	local test_case="Generate PDF"
-	if [[ -z $(exec_on_container "ls ${DOCKER_HOME_DIR}/${target_texfile_path}/*.pdf") ]]; then
+	if [[ -z $(exec_on_container "ls ${DOCKER_HOME_DIR}${target_pdf_path}") ]]; then
 		FAILED "${test_case}"
 	else
 		CORRECT "${test_case}"
@@ -47,7 +49,7 @@ function test(){
 
 	# ファイルサイズ
 	test_case="PDF is not empty"
-	if [[ -z $(exec_on_container "wc -c < ${DOCKER_HOME_DIR}/${target_texfile_path}/*.pdf") ]]; then
+	if [[ -z $(exec_on_container "wc -c < ${DOCKER_HOME_DIR}${target_pdf_path}") ]]; then
 		FAILED "${test_case}"
 	else
 		CORRECT "${test_case}"
@@ -55,7 +57,7 @@ function test(){
 
 	# 文字数
 	test_case="String In The PDF"
-	if [[ $(exec_on_container "pdftotext ${DOCKER_HOME_DIR}/${target_texfile_path}/*.pdf - " | wc -l) -eq 0 ]]; then
+	if [[ $(exec_on_container "pdftotext ${DOCKER_HOME_DIR}${target_pdf_path} - " | wc -l) -eq 0 ]]; then
 		FAILED "${test_case}"
 	else
 		CORRECT "${test_case}"
@@ -63,8 +65,9 @@ function test(){
 
 	# ログ
 	test_case="LaTeX Log"
-	if [[ $(exec_on_container "cat ${DOCKER_HOME_DIR}/${target_texfile_path}/*.log" | grep -c "Output written on" ) -eq 0 ]]; then
+	if [[ $(exec_on_container "cat ${DOCKER_HOME_DIR}${target_file_path/.tex/.log}" | grep -c "Output written on" ) -eq 0 ]]; then
 		FAILED "${test_case}"
+		exec_on_container "cat ${DOCKER_HOME_DIR}${target_file_path/.tex/.log}"
 	else
 		CORRECT "${test_case}"
 	fi

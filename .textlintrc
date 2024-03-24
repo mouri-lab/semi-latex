@@ -1,6 +1,6 @@
 plugins:
   - latex2e
-  # - ./internal/ng-word/textlint-rule-ng-word.js
+
 rules:
   preset-ja-spacing: true
   ja-hiragana-fukushi: false

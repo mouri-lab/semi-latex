@@ -20,7 +20,7 @@ RUN apt-get update \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
 
-COPY ./internal/container/custom-rules/textlint-rule-ja-custom-ng-word /textlint-rule-ja-custom-ng-word
+COPY ./internal/custom-rules/textlint-rule-ja-custom-ng-word /textlint-rule-ja-custom-ng-word
 RUN cd /textlint-rule-ja-custom-ng-word \
     && npm install
 

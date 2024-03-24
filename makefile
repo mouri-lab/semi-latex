@@ -32,14 +32,14 @@ SHELL := /bin/bash
 
 # LaTeXのビルド
 run:
-	@bash ${SCRIPTS_DIR}/texBuild.sh ${TEX_FILE_PATH}
+	ARCH=${ARCH} bash ${SCRIPTS_DIR}/texBuild.sh ${TEX_FILE_PATH}
 
 # TextLint
 lint:
-	@bash ${SCRIPTS_DIR}/lint.sh ${TEX_FILE_PATH}
+	ARCH=${ARCH} bash ${SCRIPTS_DIR}/lint.sh ${TEX_FILE_PATH}
 
 lint-fix:
-	@bash ${SCRIPTS_DIR}/lint.sh ${TEX_FILE_PATH} true
+	ARCH=${ARCH} FIX=1 bash ${SCRIPTS_DIR}/lint.sh ${TEX_FILE_PATH}
 
 
 # 差分を色付けして出力
@@ -158,7 +158,7 @@ get-image:
 
 # サンプルのビルドテスト
 test:
-	@bash ${SCRIPTS_DIR}/test.sh ${ARCH}
+	ARCH=${ARCH} bash ${SCRIPTS_DIR}/test.sh
 
 sandbox:
 	echo ${TEX_FILE_PATH}
