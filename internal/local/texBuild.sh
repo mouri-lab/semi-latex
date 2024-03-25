@@ -46,9 +46,10 @@ fi
 readonly TEX_DIR_PATH=$(dirname ${TEX_FILE_PATH})
 readonly TEX_FILE_NAME=$(basename ${TEX_FILE_PATH})
 
+set -x
 function texBuild {
 	echo "$(tput setaf 2)TEX PATH:$(tput sgr0): ${TEX_FILE_PATH}"
-	docker container exec --user root ${CONTAINER_NAME} /bin/bash -c "cd ${DOCKER_HOME_DIR}${TEX_DIR_PATH} && make all MY-MAIN=${TEX_FILE_NAME/.tex/}"
+	docker container exec --user root ${CONTAINER_NAME} /bin/bash -c "cd ${DOCKER_HOME_DIR}${TEX_DIR_PATH} && make all MY-MAIN=${TEX_FILE_NAME/.tex/} && sed -i 's@${DOCKER_HOME_DIR}@@g' ${TEX_FILE_NAME/.tex/.synctex}"
 }
 
 function fileFormat {
@@ -83,6 +84,7 @@ function postExec {
 		docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_FILE_PATH/.tex/.log} ${TEX_DIR_PATH}
 		docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_FILE_PATH/.tex/.aux} ${TEX_DIR_PATH}
 		docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_FILE_PATH/.tex/.dvi} ${TEX_DIR_PATH}
+		docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_FILE_PATH/.tex/.synctex} ${TEX_DIR_PATH}
 		# if [[ $(docker container exec -i ${CONTAINER_NAME} /bin/bash -c "find ${DOCKER_HOME_DIR}/home -type d | wc -l") -lt 100 ]]; then
 		# 	docker container exec ${CONTAINER_NAME} /bin/bash -c "rm -rf ${DOCKER_HOME_DIR}/home"
 		# else
