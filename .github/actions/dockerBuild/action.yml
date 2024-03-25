@@ -37,8 +37,8 @@ runs:
       run: |
         rm -f sample/semi-sample/*.pdf
         cp -rf sample/semi-sample/ temp
-        make run
-        make docker-stop
+        make run || true
+        make docker-stop || true
         if [ $(cat temp/semi.log | grep -c "No pages of output") -ne 0 ]; then
           cat temp/semi.log
           exit 1

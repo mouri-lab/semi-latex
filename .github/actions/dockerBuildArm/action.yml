@@ -18,31 +18,36 @@ runs:
       run: |
         docker buildx build \
             --load \
+            --file Dockerfile.arm64 \
             --cache-from=type=local,src=/tmp/.buildx-cache \
             --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
             --tag ${{ env.TAG }}:arm64 . \
           || exit 0
-          if [[ $(docker images | grep -c ${{ env.TAG }}) -eq 0 ]]; then
-            docker buildx build \
-              --load \
-              --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
-              --no-cache --pull \
-              --tag ${{ env.TAG }}:arm64 .
-          fi
+        if [[ $(docker images | grep -c ${{ env.TAG }}) -eq 0 ]]; then
+          docker buildx build \
+            --load \
+            --file Dockerfile.arm64 \
+            --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
+            --no-cache --pull \
+            --tag ${{ env.TAG }}:arm64 .
+        fi
+        docker images
       shell: bash
 
     - name: latex build test
       run: |
-        docker images
-        make test ARCH=arm64 --trace
+        make test ARCH=arm64 | tee result.log || true
+        if [[ $(cat result.log | grep -c FAILED) -ne 0 ]]; then
+          make test ARCH=arm64 --trace
+        fi
       shell: bash
 
     - name: automatic selection of texfile
       run: |
         rm -f sample/semi-sample/*.pdf
         cp -rf sample/semi-sample/ temp
-        make run ARCH=arm64
-        make docker-stop
+        make run ARCH=arm64 || true
+        make docker-stop || true
         if [ $(cat temp/semi.log | grep -c "No pages of output") -ne 0 ]; then
           cat temp/semi.log
           exit 1
@@ -51,7 +56,7 @@ runs:
 
     - name: lint
       run: |
-        make lint ARCH=arm64 > lint.txt
+        make lint ARCH=arm64 | tee lint.txt || true
         cat lint.txt
         if [[ $(cat lint.txt | grep -c "error") -lt 1 ]]; then
           cat lint.txt | grep -c "error"

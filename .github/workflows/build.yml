@@ -26,7 +26,7 @@ jobs:
         run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
       - name: docker build
-        uses: ./.github/actions/dockerBuildArm
+        uses: ./.github/actions/dockerBuild
 
   LatexBuildOnArm:
     runs-on: ubuntu-22.04
@@ -34,6 +34,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4.1.2
+      - name: Get current date and time
+        env:
+          TZ: "Asia/Tokyo"
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
       - name: docker build for ARM
         uses: ./.github/actions/dockerBuildArm

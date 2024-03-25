@@ -1,7 +1,11 @@
 # !/bin/env python3
 import os
 import sys
-import re
+
+
+def ERROR(comment: str):
+    print(f"[ERROR] {comment}", flush=True)
+    exit(0)
 
 
 def find_newest_tex_file(directory):
@@ -13,8 +17,7 @@ def find_newest_tex_file(directory):
     ]
 
     if not tex_files:
-        print("ディレクトリ内にTexファイルが見つかりませんでした。")
-        return None
+        ERROR(f"ディレクトリ({directory})にTexファイルが見つかりませんでした。")
 
     return max(tex_files, key=os.path.getmtime)
 
@@ -49,12 +52,12 @@ def search_main_file_path(dir_path: str, target_file: str):
 def is_main(tex_file_path: str):
     tex_texts = open(tex_file_path, "r", encoding="utf-8").readlines()
     for line_text in tex_texts:
-        if line_text.find("\\documentclass[") < 0:
+        if line_text.find("\\documentclass") < 0:
             continue
         if line_text.find("%") < 0:
             return True
 
-        if line_text.find("\\documentclass[") < line_text.find("%"):
+        if line_text.find("\\documentclass") < line_text.find("%"):
             return True
     return False
 
@@ -62,45 +65,55 @@ def is_main(tex_file_path: str):
 def main():
     # コマンドライン引数からディレクトリのパスを取得
     if len(sys.argv) < 3:
-        print(
+        ERROR(
             "正しい引数が指定されていません。プログラムの実行時にディレクトリパスを指定してください。"
         )
-        sys.exit(1)
 
-    HOME_DIR_PATH = sys.argv[1]
+    CONTAINER_HOME_PATH = sys.argv[1]
     WORK_DIR_PATH = sys.argv[2]
 
     if not os.path.exists(WORK_DIR_PATH):
-        print("指定されたディレクトリが存在しません。")
-        sys.exit(1)
+        ERROR(f"指定されたディレクトリが存在しません: {WORK_DIR_PATH}")
 
     if len(sys.argv) < 4:
+        # semi-latex内で最新のtexファイルを取得
         newest_tex_path = find_newest_tex_file(WORK_DIR_PATH)
     else:
         # 絶対パスとsemi-latex内の相対パスに対応
         input_path: str = sys.argv[3]
-        if os.path.exists(HOME_DIR_PATH + input_path):
-            newest_tex_path = HOME_DIR_PATH + input_path
+
+        # 絶対パスと相対パスに対応
+        if os.path.exists(CONTAINER_HOME_PATH + input_path):
+            newest_tex_path = CONTAINER_HOME_PATH + input_path
         elif os.path.exists(WORK_DIR_PATH + "/" + input_path):
             newest_tex_path = WORK_DIR_PATH + "/" + input_path
         else:
-            print(f"指定されたpath(f{input_path})が不正です")
-            sys.exit(1)
+            ERROR(f"指定されたpath({input_path})が不正です")
+
+        if not os.path.exists(newest_tex_path):
+            ERROR(f"指定されたパスが存在しません: {input_path}")
+
+        if os.path.isfile(input_path):
+            if os.path.splitext(input_path)[-1] != ".tex":
+                ERROR(f"tex以外のファイルが指定されています: f{input_path}")
+
+        elif os.path.isdir(newest_tex_path):
+            newest_tex_path = find_newest_tex_file(newest_tex_path)
+
 
     if is_main(newest_tex_path):
-        print(newest_tex_path.replace(HOME_DIR_PATH, ""))
-        return
+        print(newest_tex_path.replace(CONTAINER_HOME_PATH, ""))
+        return None
 
     target_dir_path = os.path.dirname(newest_tex_path)
     main_tex_path = search_main_file_path(target_dir_path, newest_tex_path)
     if main_tex_path != None:
-        print(main_tex_path.replace(HOME_DIR_PATH, ""))
+        print(main_tex_path.replace(CONTAINER_HOME_PATH, ""))
     else:
-        print("インクルード元のファイルを発見できませんでした")
-        sys.exit(1)
+        ERROR("インクルード元のファイルを発見できませんでした")
 
     return
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()

@@ -189,7 +189,7 @@ make lint-fix
 ```
 
 ### 研のlintルール
-   * [配置場所](internal/media/semi-rule.yml)
+   * [配置場所](internal/container/media/semi-rule.yml)
 
 # 画像の貼り方
 ## 対応しているファイル形式
