@@ -33,11 +33,7 @@ fi
 # 	readonly USE_FORMAT=$2
 # fi
 
-if [[ -z $TEST ]]; then
-	TEST=0
-else
-	TEST=1
-fi
+TEST=${TEST:=0}
 
 if [[ -z $ARCH ]]; then
 	ARCH=$(uname -m)
@@ -76,7 +72,7 @@ function preExec {
 
 function postExec {
 	#ビルド中にローカルのtexファイルが更新されている場合，ローカルのtexファイルを上書きしない
-	if [[ ${TEST} != true ]]; then
+	if [[ ${TEST} -ne 1 ]]; then
 		if [[ $(date -r ${TEX_FILE_PATH} +%s) -lt $(docker container exec ${CONTAINER_NAME} /bin/bash -c "date -r ${DOCKER_HOME_DIR}${TEX_FILE_PATH} +%s") ]]; then
 			docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_FILE_PATH} ${TEX_DIR_PATH}
 		fi
