@@ -18,18 +18,18 @@ RUN apt-get update \
 
 COPY ./internal/custom-rules/textlint-rule-ja-custom-ng-word /textlint-rule-ja-custom-ng-word
 RUN cd /textlint-rule-ja-custom-ng-word \
-    && npm install
+	&& npm install
 
 RUN npm install -g \
-    textlint \
-    textlint-rule-preset-ja-technical-writing \
-    textlint-rule-preset-ja-spacing \
-    textlint-rule-preset-jtf-style \
-    textlint-rule-preset-ja-engineering-paper \
-    textlint-plugin-latex2e \
-    textlint-rule-ja-no-weak-phrase \
-    @textlint/ast-node-types \
-    /textlint-rule-ja-custom-ng-word
+	textlint \
+	textlint-rule-preset-ja-technical-writing \
+	textlint-rule-preset-ja-spacing \
+	textlint-rule-preset-jtf-style \
+	textlint-rule-preset-ja-engineering-paper \
+	textlint-plugin-latex2e \
+	textlint-rule-ja-no-weak-phrase \
+	@textlint/ast-node-types \
+	/textlint-rule-ja-custom-ng-word
 
 # RUN rm $(find / -name "*.def" -type f) $(find / -name "*.lz4" -type f )
 
@@ -74,6 +74,7 @@ RUN apt-get install -y --no-install-recommends \
 # 推奨パッケージをインストール
 RUN apt-get install -y \
 	texlive-extra-utils=2019.202000218-1 \
+	latexdiff \
 	&& apt-get clean \
 	&& apt-get autoremove -y \
 	&& rm -rf /var/lib/apt/lists/*
@@ -91,9 +92,9 @@ COPY --from=textlint /usr/local/bin/ /usr/local/bin/
 COPY --from=textlint /usr/local/lib/ /usr/local/lib/
 COPY --from=textlint /textlint-rule-ja-custom-ng-word/ /textlint-rule-ja-custom-ng-word/
 
-COPY ./internal/media/ ${DIRPATH}/internal/media/
-COPY ./internal/scripts/ ${DIRPATH}/internal/scripts/
-COPY ./internal/style/ ${DIRPATH}/internal/style/
+COPY ./internal/container/media/ ${DIRPATH}/internal/container/media/
+COPY ./internal/container/scripts/ ${DIRPATH}/internal/container/scripts/
+COPY ./internal/container/style/ ${DIRPATH}/internal/container/style/
 
 COPY .textlintrc ${DIRPATH}/
 

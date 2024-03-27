@@ -29,5 +29,7 @@
 	"textlint.languages": [
 		"tex",
 		"latex",
-	]
+	],
+	"latex-workshop.synctex.afterBuild.enabled": true,
+	"latex-workshop.view.outline.sync.viewer": true
 }
