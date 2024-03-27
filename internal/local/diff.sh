@@ -87,7 +87,6 @@ function containerAttach {
 function main {
 	preExec
     makeDiff
-    containerAttach
 	postExec
 }
 
