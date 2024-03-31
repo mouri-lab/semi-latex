@@ -3,13 +3,10 @@
   - [動作環境](#動作環境)
 - [INSTALL](#install)
   - [LaTeXビルド環境の構築](#latexビルド環境の構築)
-    - [1. Docker環境の構築](#1-docker環境の構築)
-    - [2. ビルドイメージの取得](#2-ビルドイメージの取得)
-    - [3. インストールの確認](#3-インストールの確認)
   - [ローカル環境へのTextLintのインストール](#ローカル環境へのtextlintのインストール)
-    - [Install方法](#install方法)
 - [使い方](#使い方)
   - [LaTeXのビルド](#latexのビルド)
+  - [latexdiff](#latexdiff)
   - [semi-latexの更新](#semi-latexの更新)
 - [テンプレート](#テンプレート)
   - [全体ゼミ](#全体ゼミ)
@@ -19,18 +16,13 @@
   - [学会](#学会)
 - [textlint](#textlint)
   - [ターミナルから実行](#ターミナルから実行)
-    - [研のlintルール](#研のlintルール)
 - [画像の貼り方](#画像の貼り方)
   - [対応しているファイル形式](#対応しているファイル形式)
   - [自動変換の注意](#自動変換の注意)
-    - [正しいフォルダ階層の例](#正しいフォルダ階層の例)
-    - [NG例](#ng例)
   - [png](#png)
   - [svg](#svg)
 - [ディレクトリ](#ディレクトリ)
-- [コマンド一覧](#コマンド一覧)
-  - [LaTeXのビルド](#latexのビルド-1)
-  - [TextLint](#textlint-1)
+- [その他のコマンド](#その他のコマンド)
   - [コンテナに入りコマンド実行](#コンテナに入りコマンド実行)
   - [コンテナを停止](#コンテナを停止)
   - [dockerのリソースを開放](#dockerのリソースを開放)
@@ -43,19 +35,21 @@
 * LaTeX環境をローカルにインストールしたくないので作りました
 * 研究室や学会で使用するLaTeXフォーマットのビルド環境です
 ## 動作環境
-* 必要環境
-  * Docker
-  * make
-  * bash
-* 推奨環境
-  * VScode
-  * 拡張機能
-    * LaTeX-Workshop
-      * LaTeXの補完
-      * 保存時に自動ビルド
-    * Remote SSH
-      * WindowsからVBox上のUbuntuに接続する際に便利です
-* ホストOSについて
+#### 必要環境
+* Docker
+* make
+* bash
+
+#### 推奨環境
+* VScode
+* 拡張機能
+  * LaTeX-Workshop
+    * LaTeXの補完
+    * 保存時に自動ビルド
+  * Remote SSH
+    * WindowsからVBox上のUbuntuに接続する際に便利です
+
+#### ホストOSについて
   * Linux
     * 推奨環境です
   * Windows
@@ -82,7 +76,6 @@ make get-image
 ```
 
 ### 3. インストールの確認
-"SUCCESS!"と表示されれば，ゼミ，卒論，修論，全国大会，マスター中間発表をビルドできています．
 ```
 make test
 ```
@@ -110,7 +103,7 @@ VSCodeのTextLint拡張機能を利用し，VSCode上にTextLintの結果を表�
 * コマンドから実行
   * ファイルを指定してLaTeXをビルド
   ```
-  make f=texのpath
+  make f=${tex_path}
   ```
   例)
   ```
@@ -124,6 +117,26 @@ VSCodeのTextLint拡張機能を利用し，VSCode上にTextLintの結果を表�
   * texファイル保存時にビルドします
   * **LaTeX-Workshopの拡張機能が必要**
 
+## latexdiff
+- 2つのtexファイルの差分を色付けしてpdfを出力する機能です．
+  - [latexdiff](https://www.ctan.org/pkg/latexdiff)
+- 従来は手動で色を付けていましたが，面倒なので自動化しました
+
+
+#### 使い方
+- 比較対象となる古いtexが必要です．
+- 論文レビューを依頼する際に，前回のバージョンとの差異を色付けして再レビューを依頼する...といった利用を想定しています．
+
+##### 基本
+```
+make diff old=${古いtexのpath} new=${新しいtexのpath}
+```
+
+##### newを指定しない場合は，semi-latex/内で最新のtexが自動で指定されます
+```
+make diff old=${古いtexのpath}
+```
+
 ## semi-latexの更新
 1. 変更を取得
 ```
@@ -133,6 +146,9 @@ git pull
 ```
 make get-image
 ```
+
+
+
 
 # テンプレート
 texファイルのdocumentclassで使用するテンプレートを選択できます
@@ -247,35 +263,14 @@ make lint-fix
 * .vscode
   * VSCodeで保存時にビルドするための設定
 * internal
-  * 触る必要のないファイル
-  * media
-    * 研究室独自のlintルール
-  * scripts
-    * 主にコンテナ内で実行されるスクリプト
-  * style
-    * 全体ゼミなどのスタイルファイル
+  * 触る必要のないファイル群
+  * custom-rules/textlint-rule-ja-custom-ng-word
+    * 論文でのNGワード集
 * sample
   * サンプル
 
 
-# コマンド一覧
-
-## LaTeXのビルド
-ビルドされるのはsemi-latex/内でも最も最近更新されたtexファイルです
-
-makeとmake runは同じ処理
-```
-make
-```
-または
-```
-make run
-```
-
-## TextLint
-```
-make lint
-```
+# その他のコマンド
 
 ## コンテナに入りコマンド実行
 主にデバッグ用なので普段使う必要はないはず
