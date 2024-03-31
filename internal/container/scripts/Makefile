@@ -30,7 +30,8 @@ MAIN := main
 
 ## Configuration for document (overwrite by Makefile.d)
 # The main TeX file name (exclude .tex)
-MY-MAIN		 := main
+MY-MAIN		 := $(shell find . -name "*.tex" -type f)
+MY-MAIN		 := $(basename ${MY-MAIN})
 # Other dependencies to generate
 MY-DEPS          :=
 # Other Makefiles
@@ -41,7 +42,7 @@ MY-VERSION       := 0
 MY-UNIQ-FILENAME := $(MY-MAIN).$(MY-VERSION)
 # Convert pdf to eps (yes|no)
 CONV-PDF-TO-EPS  := no
-# join logs  (yes|no) Ruby is necessary.
+# join logs  (yes|no) Needs Ruby.
 JOIN-LOGS        := no
 
 MAIN := $(MY-MAIN)
@@ -56,7 +57,11 @@ VIEW     := acroread -openInNewWindow /a "zoom=0"
 FINDER   := nautilus
 BIBTEX   := pbibtex	# or jbibtex
 EMACS    := emacs
-PLATEX   := platex
+ifeq ($(shell cat ${MAIN}.tex | head -n3 | grep -v '%\\' | grep '\documentclass\[' | grep -c "uplatex"),0)
+	PLATEX   := platex -halt-on-error -interaction=nonstopmode -file-line-error -synctex=-1
+else
+	PLATEX   := uplatex -halt-on-error -interaction=nonstopmode -file-line-error -shell-escape -synctex=-1
+endif
 INKSCAPE := inkscape
 TGIF     := tgif
 PDFTOPS  := pdftops
@@ -77,18 +82,18 @@ endif
 TIMESTAMP := $(shell date +%Y%m%d)
 
 ## Define dependent files to generate DVI file
-SRC-FIGURE-DIRS := fig
+SRC-FIGURE-DIRS := $(shell find . -name "*.png" -or -name "*.eps" -or -name "*.svg" | cut -d "/" -f 2 | head -n1)
 SRC-OBJ := $(wildcard $(addsuffix /*.obj,$(SRC-FIGURE-DIRS))) # Tgif files
 SRC-SVG := $(wildcard $(addsuffix /*.svg,$(SRC-FIGURE-DIRS))) # Inkscape files
 SRC-PNG := $(wildcard $(addsuffix /*.png,$(SRC-FIGURE-DIRS))) # Some pictures
 SRC-PDF := $(wildcard $(addsuffix /*.pdf,$(SRC-FIGURE-DIRS))) # Power Point, Visio, and so on
 
 # Will generate files (They will be removed by clean-full)
-DST-FIG := $(SRC-SVG:%.svg=%.eps)            # svg -> eps
-DST-FIG += $(SRC-PNG:%.png=%.bb)             # png -> bb
-DST-FIG += $(SRC-PNG:%.png=%.eps)            # png -> eps
+DST-FIG := $(SRC-SVG:%.svg=%.pdf)            # svg -> pdf
+DST-FIG += $(SRC-PNG:%.png=%.xbb)             # png -> xbb
+# DST-FIG += $(SRC-PNG:%.png=%.eps)            # png -> eps
 DST-FIG += $(SRC-OBJ:%.obj=%.eps)            # obj -> eps
-DST-FIG += $(SRC-PDF:%.pdf=%.bb)			 # pdf -> bb
+# DST-FIG += $(SRC-PDF:%.pdf=%.bb)			 # pdf -> bb
 ifeq ("$(CONV-PDF-TO-EPS)","yes")
 	DST-FIG += $(SRC-PDF:%.pdf=%.eps)		 # pdf -> eps
 endif
@@ -166,38 +171,24 @@ $(MAIN).dvi: $(DVISRC)
 	@if [ -f "references.bib" ] ; then   \
 		$(call strong,BIBTEX)           ;\
 		$(BIBTEX) $(MAIN) > jbibtex.log ;\
+		$(PLATEX) $(MAIN).tex			;\
 	fi
 	@if [ -f "$(MAIN).idx" ] ; then   \
 		$(call strong,MANDEX)        ;\
 		mendex $(MAIN).idx           ;\
-	fi
-	@$(call strong,PLATEX)
-	@$(PLATEX) $(MAIN).tex
-	@$(call strong,PLATEX)
-	@$(PLATEX) $(MAIN).tex
-	@if [ "$(JOIN-LOGS)" = "yes" ] ; then    \
-		$(call latex-join-log,$(@:.dvi=.log)) > platex.log ; \
-		if [ -f "references.bib" ] ; then  \
-			if grep Warning jbibtex.log > /dev/null ; then \
-				ruby -e 'puts "\n"+"="*80'; \
-				$(call strong,"WARNING (jbibtex):") ;\
-				nkf -u jbibtex.log | grep Warning | sed -e 's/<NL>/\n  /g' ;\
-			fi ;\
-		fi  ;\
-		if grep Warning platex.log > /dev/null; then \
-			ruby -e 'puts "\n"+"="*80'; \
-			$(call strong,"WARNING (platex):") ;\
-			nkf -u platex.log | grep Warning | sed -e 's/<NL>/\n  /g' ;\
-		fi  ;\
+		$(PLATEX) $(MAIN).tex		 ;\
 	fi
 
+# デフォルトは-z 9で最大圧縮
+# 圧縮率が高いのpdfの生成に時間がかかる
+# -I: 画像のキャッシュオプション, 0: 古い画像をすべて消去し、新しい画像を残す（デフォルトは画像キャッシュを無視）
 $(MAIN).pdf: dvi
-	dvipdfmx $(MAIN).dvi
+	dvipdfmx -z 2 -I 0 -f texfonts.map -q $(MAIN).dvi
 
 
 ## Figure conversion algorithms
-%.bb: %.png
-	cd $(shell dirname "$<") && ebb $(shell basename $<)
+%.xbb: %.png
+	cd $(shell dirname "$<") && extractbb  $(shell basename $<)
 %.bb: %.pdf
 	cd $(shell dirname "$<") && ebb $(shell basename $<)
 %.eps: %.png
@@ -206,6 +197,9 @@ $(MAIN).pdf: dvi
 # Inkscape: svg -> eps
 %.eps: %.svg
 	$(INKSCAPE) $< --export-eps=$@ --export-text-to-path --export-area-drawing
+
+%.pdf: %.svg
+	rsvg-convert -f pdf -o $@ $<
 
 # Tgif: obj -> eps
 %.eps: %.obj
@@ -218,13 +212,13 @@ $(MAIN).pdf: dvi
 %.ps: %.pdf
 	$(PDFTOPS) $<
 
-# nkf: 
+# nkf:
 nkf-utf8:
-	nkf -w8 --overwrite *.tex *.sty Makefile ipsjunsrt.bst references.bib
+	nkf -w8 --overwrite *.tex *.sty Makefile ipsjunsrt.bst references.bib eco.cls
 nkf-euc:
-	nkf -e --overwrite *.tex *.sty Makefile ipsjunsrt.bst references.bib
+	nkf -e --overwrite *.tex *.sty Makefile ipsjunsrt.bst references.bib eco.cls
 nkf-sjis:
-	nkf -s --overwrite *.tex *.sty Makefile ipsjunsrt.bst references.bib
+	nkf -s --overwrite *.tex *.sty Makefile ipsjunsrt.bst references.bib eco.cls
 
 ## Interfaces
 vdvi: dvi
