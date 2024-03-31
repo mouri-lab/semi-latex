@@ -10,20 +10,23 @@ readonly SCRIPTS_DIR=internal/local
 readonly DOCKER_HOME_DIR=/home/guest
 readonly ARCH=$(uname -m)
 
-if [[ ! -f $1 ]]; then
+
+# readonly OLD_PATH=$(bash ${SCRIPTS_DIR}/search-main.sh $1)
+readonly OLD_PATH=${old}
+[[ ! -z $(echo ${OLD_PATH} | grep "[ERROR]") ]] && echo ${OLD_PATH} && exit 1
+if [[ ! -f $OLD_PATH ]]; then
     echo "ファイルパスが不正 old: $1"
     exit 1
 fi
-readonly OLD_PATH=$(bash ${SCRIPTS_DIR}/search-main.sh $1)
-[[ ! -z $(echo ${OLD_PATH} | grep "[ERROR]") ]] && echo ${OLD_PATH} && exit 1
 
 
-if [[ ! -f $2 ]]; then
+# readonly NEW_PATH=$(bash ${SCRIPTS_DIR}/search-main.sh $2)
+# [[ ! -z $(echo ${NEW_PATH} | grep "[ERROR]") ]] && echo ${NEW_PATH} && exit 1
+readonly NEW_PATH=${new:=$(bash ${SCRIPTS_DIR}/search-main.sh)}
+if [[ ! -f $NEW_PATH ]]; then
     echo "ファイルパスが不正 new: $2"
     exit 1
 fi
-readonly NEW_PATH=$(bash ${SCRIPTS_DIR}/search-main.sh $2)
-[[ ! -z $(echo ${NEW_PATH} | grep "[ERROR]") ]] && echo ${NEW_PATH} && exit 1
 
 # TEST_MODE: ビルドした成果物をローカルに保存しない
 if [[ -z $3 ]]; then
@@ -35,7 +38,7 @@ fi
 readonly DIR_PATH=$(readlink -f $(dirname ${0}))
 readonly TEX_DIR_PATH=$(dirname ${NEW_PATH})
 
-set -ux
+set -u
 
 function makeDiff {
 	docker container cp ${OLD_PATH} ${CONTAINER_NAME}:${DOCKER_HOME_DIR}
@@ -48,7 +51,7 @@ function makeDiff {
     # 環境をコンテナにコピー
     docker container exec ${CONTAINER_NAME} /bin/bash -c "mkdir -p ${DOCKER_HOME_DIR}${TEX_DIR_PATH}"
 	docker container cp ${TEX_DIR_PATH} ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_DIR_PATH}/../
-	docker container exec /bin/bash -c \
+	docker container exec ${CONTAINER_NAME} /bin/bash -c \
 		"cp -n ${DOCKER_HOME_DIR}/internal/container/style/* ${DOCKER_HOME_DIR}${TEX_DIR_PATH} \
 		&& cp -n ${DOCKER_HOME_DIR}/internal/container/scripts/* ${DOCKER_HOME_DIR}${TEX_DIR_PATH}"
 

@@ -46,7 +46,7 @@ lint-fix:
 old :=
 new :=
 diff:
-	@bash ${SCRIPTS_DIR}/diff.sh ${old} ${new}
+	old=${old} new=${new} bash ${SCRIPTS_DIR}/diff.sh
 
 # sampleをビルド
 run-sample:
