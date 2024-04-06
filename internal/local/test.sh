@@ -30,10 +30,15 @@ function exec_on_container(){
 	docker container exec -i ${NAME} /bin/bash -c "cd ${DOCKER_HOME_DIR} && ${command}" 2> /dev/null
 }
 
+function containerAttach {
+	docker container exec -it ${NAME} bash
+}
+
 function test(){
 	local -r target_texdir_path=$1
 	# 								target tex path   	   test mode
 	TEST=1 ARCH=${ARCH} bash ${SCRIPTS_DIR}/texBuild.sh ${target_texdir_path} 1>/dev/null 2>/dev/null || true
+	# TEST=1 ARCH=${ARCH} bash ${SCRIPTS_DIR}/texBuild.sh ${target_texdir_path}
 
 	local -r target_dir_name=$(dirname ${target_texdir_path} | rev | cut -d "/" -f 1 | rev)
 	local -r target_file_path=$(bash ${SCRIPTS_DIR}/search-main.sh ${target_texdir_path})
@@ -67,7 +72,7 @@ function test(){
 	test_case="LaTeX Log"
 	if [[ $(exec_on_container "cat ${DOCKER_HOME_DIR}${target_file_path/.tex/.log}" | grep -c "Output written on" ) -eq 0 ]]; then
 		FAILED "${test_case}"
-		exec_on_container "cat ${DOCKER_HOME_DIR}${target_file_path/.tex/.log}"
+		docker cp ${NAME}:${DOCKER_HOME_DIR}${target_file_path/.tex/.log} ${target_file_path/.tex/.log}
 	else
 		CORRECT "${test_case}"
 	fi
