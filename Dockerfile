@@ -10,8 +10,8 @@ COPY --from=node /usr/local/bin/ /usr/local/bin/
 ARG DOCKER_USER=guest
 
 
-ARG APT_LINK=http://www.ftp.ne.jp/Linux/packages/ubuntu/archive/
-RUN sed -i "s-$(grep -v "#" /etc/apt/sources.list | cut -d " " -f 2 | grep -v "security" | sed "/^$/d" | sed -n 1p)-${APT_LINK}-g" /etc/apt/sources.list
+# ARG APT_LINK=http://www.ftp.ne.jp/Linux/packages/ubuntu/archive/
+# RUN sed -i "s-$(grep -v "#" /etc/apt/sources.list | cut -d " " -f 2 | grep -v "security" | sed "/^$/d" | sed -n 1p)-${APT_LINK}-g" /etc/apt/sources.list
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -46,15 +46,15 @@ ENV DEBIAN_FRONTEND noninteractive
 # ユーザーを作成
 ARG DOCKER_USER_=guest
 
-ARG APT_LINK=http://www.ftp.ne.jp/Linux/packages/ubuntu/archive/
-RUN sed -i "s-$(grep -v "#" /etc/apt/sources.list | cut -d " " -f 2 | grep -v "security" | sed "/^$/d" | sed -n 1p)-${APT_LINK}-g" /etc/apt/sources.list
+# ARG APT_LINK=http://www.ftp.ne.jp/Linux/packages/ubuntu/archive/
+# RUN sed -i "s-$(grep -v "#" /etc/apt/sources.list | cut -d " " -f 2 | grep -v "security" | sed "/^$/d" | sed -n 1p)-${APT_LINK}-g" /etc/apt/sources.list
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-    language-pack-ja-base=1:20.04+20220818 \
-    language-pack-ja=1:20.04+20220818 \
-    fonts-noto-cjk=1:20190410+repack1-2 \
-    fcitx-mozc=2.23.2815.102+dfsg-8ubuntu1
+    language-pack-ja-base\
+    language-pack-ja\
+    fonts-noto-cjk \
+    fcitx-mozc
 
 ENV LANG ja_JP.UTF-8
 ENV LANGUAGE ja_JP:jp
@@ -71,17 +71,17 @@ RUN apt-get install -y --no-install-recommends \
     librsvg2-bin \
     # pdfをtextに変換
     poppler-utils \
-    texlive=2019.20200218-1 \
-    texlive-fonts-extra=2019.202000218-1 \
-    texlive-latex-extra=2019.202000218-1 \
-    texlive-fonts-recommended=2019.20200218-1 \
-    texlive-lang-cjk=2019.20200218-1 \
-    texlive-lang-japanese=2019.20200218-1 \
+    texlive \
+    texlive-fonts-extra \
+    texlive-latex-extra \
+    texlive-fonts-recommended \
+    texlive-lang-cjk \
+    texlive-lang-japanese \
     &&  kanji-config-updmap-sys auto
 
 # 推奨パッケージをインストール
 RUN apt-get install -y \
-    texlive-extra-utils=2019.202000218-1 \
+    texlive-extra-utils \
     latexdiff \
     && apt-get clean \
     && apt-get autoremove -y \
