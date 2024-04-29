@@ -98,7 +98,6 @@ docker-stop:
 # コンテナを開きっぱなしにする
 # リモートアクセス用
 bash:
-	make _preExec -s
 	-docker container exec -it ${NAME} bash
 
 # root権限で起動中のコンテナに接続
