@@ -77,15 +77,20 @@ RUN apt-get install -y \
     texlive-fonts-recommended \
     texlive-lang-cjk \
     texlive-lang-japanese \
-    &&  kanji-config-updmap-sys auto
-
-# 推奨パッケージをインストール
-RUN apt-get install -y \
     texlive-extra-utils \
     latexdiff \
+    &&  kanji-config-updmap-sys auto \
     && apt-get clean \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
+
+# 推奨パッケージをインストール
+# RUN apt-get install -y \
+#     texlive-extra-utils \
+#     latexdiff \
+#     && apt-get clean \
+#     && apt-get autoremove -y \
+#     && rm -rf /var/lib/apt/lists/*
 
 
 ENV DIRPATH /home/${DOCKER_USER_}

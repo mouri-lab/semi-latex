@@ -1,5 +1,5 @@
-FROM --platform=linux/arm64/v8 node:20-slim AS node
-FROM arm64v8/ubuntu:20.04 AS textlint
+FROM --platform=linux/arm64/v8 node:22-slim AS node
+FROM arm64v8/ubuntu:22.04 AS textlint
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -33,7 +33,7 @@ RUN npm install -g \
 
 # RUN rm $(find / -name "*.def" -type f) $(find / -name "*.lz4" -type f )
 
-FROM arm64v8/ubuntu:20.04 AS latex
+FROM arm64v8/ubuntu:22.04 AS latex
 
 # SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -63,21 +63,26 @@ RUN apt-get install -y --no-install-recommends \
 	librsvg2-bin \
 	# pdfをtextに変換
 	poppler-utils \
-	texlive=2019.20200218-1 \
-	texlive-fonts-extra=2019.202000218-1 \
-	texlive-latex-extra=2019.202000218-1 \
-	texlive-fonts-recommended=2019.20200218-1 \
-	texlive-lang-cjk=2019.20200218-1 \
-	texlive-lang-japanese=2019.20200218-1 \
-	&&  kanji-config-updmap-sys auto
-
-# 推奨パッケージをインストール
-RUN apt-get install -y \
-	texlive-extra-utils=2019.202000218-1 \
+	texlive \
+	texlive-fonts-extra \
+	texlive-latex-extra \
+	texlive-fonts-recommended \
+	texlive-lang-cjk \
+	texlive-lang-japanese \
+	texlive-extra-utils \
 	latexdiff \
+	&&  kanji-config-updmap-sys auto \
 	&& apt-get clean \
 	&& apt-get autoremove -y \
 	&& rm -rf /var/lib/apt/lists/*
+
+# 推奨パッケージをインストール
+# RUN apt-get install -y \
+# 	texlive-extra-utils \
+# 	latexdiff \
+# 	&& apt-get clean \
+# 	&& apt-get autoremove -y \
+# 	&& rm -rf /var/lib/apt/lists/*
 
 
 ENV DIRPATH /home/${DOCKER_USER_}
