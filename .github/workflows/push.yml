@@ -17,8 +17,8 @@ jobs:
     timeout-minutes: 120
 
     steps:
-      - uses: actions/checkout@v4.1.2
-      - uses: docker/setup-buildx-action@v3.2.0
+      - uses: actions/checkout@v4.1.4
+      - uses: docker/setup-buildx-action@v3.3.0
 
       - name: docker build
         uses: ./.github/actions/dockerBuild
@@ -38,8 +38,8 @@ jobs:
     timeout-minutes: 120
 
     steps:
-      - uses: actions/checkout@v4.1.2
-      - uses: docker/setup-buildx-action@v3.2.0
+      - uses: actions/checkout@v4.1.4
+      - uses: docker/setup-buildx-action@v3.3.0
 
       - name: docker build for ARM
         uses: ./.github/actions/dockerBuildArm
