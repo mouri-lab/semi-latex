@@ -79,12 +79,12 @@ function postExec {
 		if [[ $(date -r ${TEX_FILE_PATH} +%s) -lt $(docker container exec ${CONTAINER_NAME} /bin/bash -c "date -r ${DOCKER_HOME_DIR}${TEX_FILE_PATH} +%s") ]]; then
 			docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_FILE_PATH} ${TEX_DIR_PATH}
 		fi
-		docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_FILE_PATH/.tex/.pdf} ${TEX_DIR_PATH}
-		docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_FILE_PATH/.tex/.log} ${TEX_DIR_PATH}
-		docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_FILE_PATH/.tex/.aux} ${TEX_DIR_PATH}
-		docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_FILE_PATH/.tex/.dvi} ${TEX_DIR_PATH}
-		docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_FILE_PATH/.tex/.synctex} ${TEX_DIR_PATH}
-		docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_FILE_PATH/.tex/.bbl} ${TEX_DIR_PATH}
+		docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_FILE_PATH/.tex/.pdf} ${TEX_DIR_PATH} || true
+		docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_FILE_PATH/.tex/.log} ${TEX_DIR_PATH} || true
+		docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_FILE_PATH/.tex/.aux} ${TEX_DIR_PATH} || true
+		docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_FILE_PATH/.tex/.dvi} ${TEX_DIR_PATH} || true
+		docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_FILE_PATH/.tex/.synctex} ${TEX_DIR_PATH} || true
+		docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_FILE_PATH/.tex/.bbl} ${TEX_DIR_PATH} || true
 		# if [[ $(docker container exec -i ${CONTAINER_NAME} /bin/bash -c "find ${DOCKER_HOME_DIR}/home -type d | wc -l") -lt 100 ]]; then
 		# 	docker container exec ${CONTAINER_NAME} /bin/bash -c "rm -rf ${DOCKER_HOME_DIR}/home"
 		# else

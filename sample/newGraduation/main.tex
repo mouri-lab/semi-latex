@@ -1,0 +1,61 @@
+\documentclass[uplatex,a4paper,dvipdfmx,titlepage]{jsarticle}
+% \usepackage{okumacro, cite, url}
+% \usepackage{ascmac, comment, color, multirow, ifthen, mediabb}
+\usepackage{bachelor_thesis, graduation}
+% \usepackage{listings, jlisting} 		% for source code
+% \usepackage{enumitem}
+% \usepackage{svg}
+\usepackage[dvipdfmx]{graphicx}
+% \usepackage{tocloft}
+
+
+
+\年度{2024}
+\学期{秋}
+\題目{〇〇}
+\指導教員{毛利 公一 教授}
+\クラス{〇〇}
+\コース{〇〇}
+\学籍番号{〇〇}
+\氏名{〇〇}
+
+
+\begin{document}
+\maketitle
+
+% \tableofcontents
+
+\setlength{\baselineskip}{20pt}	% 行間の設定
+\pagestyle{empty}
+
+\include{Abstract}
+
+\pagenumbering{roman}
+\pagestyle{plain}
+
+% % 目次（行間を修正して1ページに納めたいなどはこちら）
+% % {\setlength{\baselineskip}{17.2pt} \tableofcontents}
+
+\tableofcontents
+
+% % \addtocontents{toc}{\protect\contentsline{chapter}}
+\clearpage
+\listoffigures				% 図目次
+\clearpage
+\listoftables				% 表目次
+\clearpage
+
+% % \pagenumbering{arabic}
+
+% % 以下，各章のファイルをincludeする
+\include{Introduction}			% はじめに
+\include{FigureSample}  		% 図挿入の例
+
+
+\include{Acknowledgment}  		% 謝辞
+% % 参考文献はbibtexを使いましょう
+% \AddTableOfContents{参考文献}
+% \bibliography{references}
+% \bibliographystyle{ipsjunsrt}
+
+\end{document}

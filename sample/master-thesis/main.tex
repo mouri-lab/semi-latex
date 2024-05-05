@@ -1,27 +1,12 @@
-﻿\documentclass[10pt]{jreport}
+﻿\documentclass[a4paper,dvipdfmx,titlepage]{jsarticle}
+
 \usepackage[dvipdfmx]{graphicx}
-\usepackage{moreverb, scalefnt, url, master, multirow}
-\usepackage{color, omake, mediabb}
+% \usepackage{moreverb, scalefnt, url, master, multirow}
+% \usepackage{color, omake, mediabb}
 \usepackage{master-cover}
 
 \usepackage[a4paper,textheight=21.7cm,top=3cm,headheight=15pt]{geometry}
 
-% 変更箇所明記
-%   0: not colored
-%   1: colored
-\newcounter{ChangedColor}
-\setcounter{ChangedColor}{1}
-
-\ifthenelse{\equal{\theChangedColor}{0}} %
-  {\newcommand{\Ca}[1]{#1}} %
-  {\newcommand{\Ca}[1]{\textcolor{red}{#1}}} %
-\ifthenelse{\equal{\theChangedColor}{0}} %
-  {\newcommand{\Cb}[1]{#1}} %
-  {\newcommand{\Cb}[1]{\textcolor{blue}{#1}}} %
-
-
-\setcounter{PrintWarn}{1}
-\setcounter{PrintNote}{1}
 
 \setcounter{secnumdepth}{6}
 \makeatletter
@@ -32,7 +17,7 @@
 \makeatother
 
 %\newcommand{\pdforeps}{eps}
-\newcommand{\pdforeps}{pdf}
+% \newcommand{\pdforeps}{pdf}
 
 
 
@@ -59,10 +44,8 @@
 
 \include{acknowledgments}   % 謝辞
 
-\AddTableOfContents{参考文献}
 \bibliography{references}
 \bibliographystyle{ipsjunsrt}
 
-% \include{appendix}
 
 \end{document}
