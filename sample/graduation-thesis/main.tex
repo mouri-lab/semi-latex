@@ -1,24 +1,15 @@
-\documentclass[a4j,12pt]{jarticle}
-\usepackage{okumacro, cite, url}
-\usepackage{ascmac, comment, color, multirow, ifthen, mediabb}
+\documentclass[a4paper,dvipdfmx,titlepage]{jsarticle}
 \usepackage{bachelor_thesis, graduation}
-\usepackage{listings, jlisting} 		% for source code
-\usepackage{enumitem}
-\usepackage{svg}
+\usepackage[dvipdfmx]{graphicx}
 
-\newcounter{ChangedColor}
-% 1: 変更箇所に赤色を付ける
-% 0: 変更箇所に赤色を付けない
-\setcounter{ChangedColor}{1}
+% \usepackage{listings, jlisting} 		% for source code
 
-\ifthenelse{\equal{\theChangedColor}{0}} %
-           {\newcommand{\Ca}[1]{#1}} %
-           {\newcommand{\Ca}[1]{\textcolor{red}{#1}}} %
+
 
 \年度{2024}
 \学期{秋}
 \題目{〇〇}
-\指導教員{〇〇 教授}
+\指導教員{毛利 公一 教授}
 \クラス{〇〇}
 \コース{〇〇}
 \学籍番号{〇〇}
@@ -37,8 +28,7 @@
 \pagenumbering{roman}
 \pagestyle{plain}
 % 目次（行間を修正して1ページに納めたいなどはこちら）
-{\setlength{\baselineskip}{17.2pt} \tableofcontents}
-%\tableofcontents			% 目次
+\tableofcontents			% 目次
 \clearpage
 \listoffigures				% 図目次
 \listoftables				% 表目次
@@ -51,8 +41,8 @@
 
 
 \include{Acknowledgment}  		% 謝辞
-% 参考文献はbibtexを使いましょう
-\AddTableOfContents{参考文献}
+
+
 \bibliography{references}
 \bibliographystyle{ipsjunsrt}
 \end{document}

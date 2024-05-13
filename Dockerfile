@@ -1,5 +1,5 @@
-FROM --platform=amd64 node:20-slim AS node
-FROM amd64/ubuntu:20.04 AS textlint
+FROM --platform=amd64 node:22-slim AS node
+FROM amd64/ubuntu:22.04 AS textlint
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -38,7 +38,7 @@ RUN npm install -g \
 
 # RUN rm $(find / -name "*.def" -type f) $(find / -name "*.lz4" -type f )
 
-FROM amd64/ubuntu:20.04 AS latex
+FROM amd64/ubuntu:22.04 AS latex
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -62,7 +62,7 @@ ENV LC_ALL ja_JP.UTF-8
 RUN locale-gen ja_JP.UTF-8 && \
     update-locale LANG=ja_JP.UTF-8
 
-RUN apt-get install -y --no-install-recommends \
+RUN apt-get install -y \
     make \
     xdvik-ja \
     imagemagick \
@@ -77,15 +77,20 @@ RUN apt-get install -y --no-install-recommends \
     texlive-fonts-recommended \
     texlive-lang-cjk \
     texlive-lang-japanese \
-    &&  kanji-config-updmap-sys auto
-
-# 推奨パッケージをインストール
-RUN apt-get install -y \
     texlive-extra-utils \
     latexdiff \
+    &&  kanji-config-updmap-sys auto \
     && apt-get clean \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
+
+# 推奨パッケージをインストール
+# RUN apt-get install -y \
+#     texlive-extra-utils \
+#     latexdiff \
+#     && apt-get clean \
+#     && apt-get autoremove -y \
+#     && rm -rf /var/lib/apt/lists/*
 
 
 ENV DIRPATH /home/${DOCKER_USER_}
