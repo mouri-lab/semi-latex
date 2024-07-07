@@ -13,7 +13,7 @@ readonly ARCH=$(uname -m)
 
 # readonly OLD_PATH=$(bash ${SCRIPTS_DIR}/search-main.sh $1)
 readonly OLD_PATH=${old}
-[[ ! -z $(echo ${OLD_PATH} | grep "[ERROR]") ]] && echo ${OLD_PATH} && exit 1
+[[ ! -z $(echo ${OLD_PATH} | grep -F "[ERROR]") ]] && echo ${OLD_PATH} && exit 1
 if [[ ! -f $OLD_PATH ]]; then
     echo "ファイルパスが不正 old: $1"
     exit 1

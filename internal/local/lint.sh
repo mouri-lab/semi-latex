@@ -5,7 +5,6 @@
 # 	TEST_MODEに引数を渡すために使用
 # 	絶対パスと相対パスのどちらでもOK
 
-
 readonly DIR_PATH=$(readlink -f $(dirname ${0}))
 
 source ${DIR_PATH}/config.sh
@@ -20,7 +19,7 @@ else
 	readonly TEX_FILE_PATH=$1
 fi
 
-[[ ! -z $(echo ${TEX_FILE_PATH} | grep "[ERROR]") ]] && echo ${TEX_FILE_PATH} && exit 1
+[[ ! -z $(echo ${TEX_FILE_PATH} | grep -F "[ERROR]") ]] && echo ${TEX_FILE_PATH} && exit 1
 
 # if [[ -z $2 ]]; then
 # 	readonly USE_FORMAT=true
