@@ -58,7 +58,7 @@ FINDER   := nautilus
 BIBTEX   := pbibtex	# or jbibtex
 EMACS    := emacs
 ifeq ($(shell cat ${MAIN}.tex | head -n3 | grep -v '%\\' | grep '\documentclass\[' | grep -c "uplatex"),0)
-	PLATEX   := platex -halt-on-error -interaction=nonstopmode -file-line-error -synctex=-1
+	PLATEX   := platex -halt-on-error -interaction=nonstopmode -file-line-error -shell-escape -synctex=-1
 else
 	PLATEX   := uplatex -halt-on-error -interaction=nonstopmode -file-line-error -shell-escape -synctex=-1
 endif
