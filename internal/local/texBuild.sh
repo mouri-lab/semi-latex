@@ -25,7 +25,7 @@ else
 	fi
 fi
 
-[[ ! -z $(echo ${TEX_FILE_PATH} | grep "[ERROR]") ]] && echo ${TEX_FILE_PATH} && exit 1
+[[ ! -z $(echo ${TEX_FILE_PATH} | grep -F '[ERROR]') ]] && echo ${TEX_FILE_PATH} && exit 1
 
 # if [[ -z $2 ]]; then
 # 	readonly USE_FORMAT=true
@@ -42,7 +42,6 @@ fi
 readonly TEX_DIR_PATH=$(dirname ${TEX_FILE_PATH})
 readonly TEX_FILE_NAME=$(basename ${TEX_FILE_PATH})
 
-set -x
 function texBuild {
 	echo "$(tput setaf 2)TEX PATH:$(tput sgr0): ${TEX_FILE_PATH}"
 	docker container exec --user root ${CONTAINER_NAME} /bin/bash -c "cd ${DOCKER_HOME_DIR}${TEX_DIR_PATH} && make all MY-MAIN=${TEX_FILE_NAME/.tex/} && sed -i 's@${DOCKER_HOME_DIR}@@g' ${TEX_FILE_NAME/.tex/.synctex}"
