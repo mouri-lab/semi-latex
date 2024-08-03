@@ -44,7 +44,8 @@ readonly TEX_FILE_NAME=$(basename ${TEX_FILE_PATH})
 
 function texBuild {
 	echo "$(tput setaf 2)TEX PATH:$(tput sgr0): ${TEX_FILE_PATH}"
-	docker container exec --user root ${CONTAINER_NAME} /bin/bash -c "cd ${DOCKER_HOME_DIR}${TEX_DIR_PATH} && make all MY-MAIN=${TEX_FILE_NAME/.tex/} && sed -i 's@${DOCKER_HOME_DIR}@@g' ${TEX_FILE_NAME/.tex/.synctex}"
+	docker container exec --user root ${CONTAINER_NAME} /bin/bash -c "cd ${DOCKER_HOME_DIR}${TEX_DIR_PATH} && make all MY-MAIN=${TEX_FILE_NAME/.tex/} \
+	&& sed -i 's@${DOCKER_HOME_DIR}@@g' ${TEX_FILE_NAME/.tex/.synctex}" # synctexのパスをコンテナ内からホストのパスに修正
 }
 
 function fileFormat {
@@ -78,6 +79,10 @@ function postExec {
 		if [[ $(date -r ${TEX_FILE_PATH} +%s) -lt $(docker container exec ${CONTAINER_NAME} /bin/bash -c "date -r ${DOCKER_HOME_DIR}${TEX_FILE_PATH} +%s") ]]; then
 			docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_FILE_PATH} ${TEX_DIR_PATH}
 		fi
+
+		# 成果物をホストにコピー
+		# || trueはコマンド失敗時に，その行で実行が止まらないようにするため
+		#  実行が止まるとそれ以降の行で成果物が取り出せなくなる
 		docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_FILE_PATH/.tex/.pdf} ${TEX_DIR_PATH} || true
 		docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_FILE_PATH/.tex/.log} ${TEX_DIR_PATH} || true
 		docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_FILE_PATH/.tex/.aux} ${TEX_DIR_PATH} || true
