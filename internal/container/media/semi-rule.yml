@@ -40,6 +40,8 @@ rules:
     pattern: オーバーヘッド
   - expected: "呼出し"
     pattern: 呼び出し
+  - expected: 呼び出す
+    pattern: 呼出す
   - expected: "受付け"
     pattern: 受け付け
   - expected: "組込み"
@@ -79,3 +81,9 @@ rules:
     pattern: windows
   - expected: Linux
     pattern: linux
+  - expected: 前に
+    pattern: 前のに
+  - expected: プロセス
+    pattern: ぷろせす
+  - expected: WSL
+    pattern: WLS
