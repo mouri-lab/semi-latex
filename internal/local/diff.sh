@@ -12,6 +12,8 @@ readonly ARCH=$(uname -m)
 
 
 # readonly OLD_PATH=$(bash ${SCRIPTS_DIR}/search-main.sh $1)
+
+# 比較元のtexファイルのパス
 readonly OLD_PATH=${old}
 [[ ! -z $(echo ${OLD_PATH} | grep -F "[ERROR]") ]] && echo ${OLD_PATH} && exit 1
 if [[ ! -f $OLD_PATH ]]; then
@@ -22,6 +24,9 @@ fi
 
 # readonly NEW_PATH=$(bash ${SCRIPTS_DIR}/search-main.sh $2)
 # [[ ! -z $(echo ${NEW_PATH} | grep "[ERROR]") ]] && echo ${NEW_PATH} && exit 1
+
+# 更新したtexファイルのパス
+# 空の場合は最新のtexファイルを探索
 readonly NEW_PATH=${new:=$(bash ${SCRIPTS_DIR}/search-main.sh)}
 if [[ ! -f $NEW_PATH ]]; then
     echo "ファイルパスが不正 new: $2"
@@ -61,6 +66,8 @@ function makeDiff {
         "cp ${DOCKER_HOME_DIR}/diff.tex ${DOCKER_HOME_DIR}${TEX_DIR_PATH}"
 	docker container exec --user root ${CONTAINER_NAME} /bin/bash -c \
         "cd ${DOCKER_HOME_DIR}${TEX_DIR_PATH} && make all && make all && make all"
+	docker container exec --user root ${CONTAINER_NAME} /bin/bash -c \
+        "cd ${DOCKER_HOME_DIR}${TEX_DIR_PATH} && make all"
 }
 
 function preExec {
@@ -78,6 +85,7 @@ function postExec {
 	#ビルド中にローカルのtexファイルが更新されている場合，ローカルのtexファイルを上書きしない
 	if [[ ${TEST_MODE} != true ]]; then
         docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}/${TEX_DIR_PATH}/diff.pdf ${TEX_DIR_PATH}/diff.pdf
+        docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}/${TEX_DIR_PATH}/diff.tex ${TEX_DIR_PATH}/diff.tex
         docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}/${TEX_DIR_PATH}/diff.log ${TEX_DIR_PATH}/diff.log
 	fi
 	docker container exec --user root ${CONTAINER_NAME} /bin/bash -c "rm -rf ${DOCKER_HOME_DIR}/home *.tex"
