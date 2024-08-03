@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1
+
 FROM --platform=amd64 node:22-slim AS node
 FROM amd64/ubuntu:22.04 AS textlint
 
@@ -10,21 +12,19 @@ COPY --from=node /usr/local/bin/ /usr/local/bin/
 ARG DOCKER_USER=guest
 
 
-# ARG APT_LINK=http://www.ftp.ne.jp/Linux/packages/ubuntu/archive/
-# RUN sed -i "s-$(grep -v "#" /etc/apt/sources.list | cut -d " " -f 2 | grep -v "security" | sed "/^$/d" | sed -n 1p)-${APT_LINK}-g" /etc/apt/sources.list
-
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-    npm \
-    && apt-get -y clean \
-    && apt-get autoremove -y \
-    && rm -rf /var/lib/apt/lists/*
+RUN --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends npm
 
 COPY ./internal/custom-rules/textlint-rule-ja-custom-ng-word /textlint-rule-ja-custom-ng-word
-RUN cd /textlint-rule-ja-custom-ng-word \
-    && npm install
+RUN --mount=type=cache,target=/root/.npm,sharing=locked \
+	--mount=type=cache,target=/workspace/node_modules,sharing=locked \
+	cd /textlint-rule-ja-custom-ng-word \
+	&& npm install
 
-RUN npm install -g \
+RUN --mount=type=cache,target=/root/.npm,sharing=locked \
+    --mount=type=cache,target=/workspace/node_modules,sharing=locked \
+    npm install -g \
     textlint \
     textlint-rule-preset-ja-technical-writing \
     textlint-rule-preset-ja-spacing \
@@ -49,7 +49,9 @@ ARG DOCKER_USER_=guest
 # ARG APT_LINK=http://www.ftp.ne.jp/Linux/packages/ubuntu/archive/
 # RUN sed -i "s-$(grep -v "#" /etc/apt/sources.list | cut -d " " -f 2 | grep -v "security" | sed "/^$/d" | sed -n 1p)-${APT_LINK}-g" /etc/apt/sources.list
 
-RUN apt-get update \
+RUN --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    apt-get update \
     && apt-get install -y --no-install-recommends \
     language-pack-ja-base\
     language-pack-ja\
@@ -62,7 +64,10 @@ ENV LC_ALL ja_JP.UTF-8
 RUN locale-gen ja_JP.UTF-8 && \
     update-locale LANG=ja_JP.UTF-8
 
-RUN apt-get install -y \
+RUN --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    apt-get update \
+    && apt-get install -y \
     make \
     xdvik-ja \
     imagemagick \
@@ -79,11 +84,8 @@ RUN apt-get install -y \
     texlive-lang-japanese \
     texlive-extra-utils \
     latexdiff \
-    &&  kanji-config-updmap-sys auto \
-    && apt-get clean \
-    && apt-get autoremove -y \
-    && rm -rf /var/lib/apt/lists/*
-
+    &&  kanji-config-updmap-sys auto 
+    
 # 推奨パッケージをインストール
 # RUN apt-get install -y \
 #     texlive-extra-utils \
