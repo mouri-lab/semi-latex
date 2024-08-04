@@ -875,11 +875,6 @@ rules:
     expected: 引き換$1
   - pattern: /目が会([わいうえおっ])|目が遭([わいうえおっ])|目が逢([わいうえおっ])|目があ([わいうえおっ])/
     expected: 目が合$1
-  - pattern:
-      - よびだ
-      - 呼びだ
-      - 呼出
-    expected: 呼び出
   - pattern: 作りだ
     expected: 作り出
   - pattern: 読みだ
@@ -1735,8 +1730,6 @@ rules:
     pattern: /\bIntent\b/
   - expected: ウィジェット
     pattern: /\bWidget\b|\bwidget\b/
-  - expected: ウィルス
-    pattern: /ウイルス/
   - expected: ウィンドウ
     pattern: /ウインドウ/
   - expected: ウェア
@@ -2069,8 +2062,6 @@ rules:
     pattern: /プロバイダー/
   - expected: ペアプログラミング$1
     pattern: /ペアプロ([^グ])/
-  - expected: ベンダー
-    pattern: /ベンダ(?!ー)/
   - expected: ヘッダ
     pattern: /ヘッダー|ヘッタ|ヘッター/
   - expected: ベクタ
@@ -2192,12 +2183,6 @@ rules:
     pattern: /\bBackup\b([^.])/
   - expected: スレーブ$1
     pattern: /スレイブ([^.])|\bSlave\b([^.])/
-  - expected: 記述子
-    pattern: /ディスクリプタ/
-  - expected: 属性
-    pattern: /アトリビュート/
-  - expected: 要素
-    pattern: /エレメント/
   - expected: アニメーター
     pattern: /アニメータ(?!ー)/
   - expected: キャラクタ$1

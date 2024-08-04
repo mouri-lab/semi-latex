@@ -26,10 +26,14 @@
 			]
 		},
 	],
-	"textlint.languages": [
-		"tex",
-		"latex",
-	],
+	// "textlint.languages": [
+	// 	"tex",
+	// 	"latex",
+	// ],
 	"latex-workshop.synctex.afterBuild.enabled": true,
-	"latex-workshop.view.outline.sync.viewer": true
+	"latex-workshop.view.outline.sync.viewer": true,
+	"[latex]": {
+		"editor.formatOnPaste": false,
+		"editor.formatOnSave": false
+	}
 }
