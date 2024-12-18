@@ -1,9 +1,9 @@
 # syntax=docker/dockerfile:1
 
-FROM --platform=amd64 node:22-slim AS node
+FROM amd64/node:22-slim AS node
 FROM amd64/ubuntu:22.04 AS textlint
 
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 
 COPY --from=node /usr/local/include/ /usr/local/include/
 COPY --from=node /usr/local/lib/ /usr/local/lib/
@@ -18,9 +18,9 @@ RUN --mount=type=cache,target=/var/lib/apt,sharing=locked \
 
 COPY ./internal/custom-rules/textlint-rule-ja-custom-ng-word /textlint-rule-ja-custom-ng-word
 RUN --mount=type=cache,target=/root/.npm,sharing=locked \
-	--mount=type=cache,target=/workspace/node_modules,sharing=locked \
-	cd /textlint-rule-ja-custom-ng-word \
-	&& npm install
+    --mount=type=cache,target=/workspace/node_modules,sharing=locked \
+    cd /textlint-rule-ja-custom-ng-word \
+    && npm install
 
 RUN --mount=type=cache,target=/root/.npm,sharing=locked \
     --mount=type=cache,target=/workspace/node_modules,sharing=locked \
@@ -42,7 +42,7 @@ FROM amd64/ubuntu:22.04 AS latex
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 # ユーザーを作成
 ARG DOCKER_USER_=guest
 
@@ -58,9 +58,9 @@ RUN --mount=type=cache,target=/var/lib/apt,sharing=locked \
     fonts-noto-cjk \
     fcitx-mozc
 
-ENV LANG ja_JP.UTF-8
-ENV LANGUAGE ja_JP:jp
-ENV LC_ALL ja_JP.UTF-8
+ENV LANG=ja_JP.UTF-8
+ENV LANGUAGE=ja_JP:jp
+ENV LC_ALL=ja_JP.UTF-8
 RUN locale-gen ja_JP.UTF-8 && \
     update-locale LANG=ja_JP.UTF-8
 
@@ -75,7 +75,12 @@ RUN --mount=type=cache,target=/var/lib/apt,sharing=locked \
     inkscape \
     librsvg2-bin \
     # pdfをtextに変換
-    poppler-utils \
+    poppler-utils
+
+RUN --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    apt-get update \
+    && apt-get install -y \
     texlive \
     texlive-fonts-extra \
     texlive-latex-extra \
@@ -85,7 +90,7 @@ RUN --mount=type=cache,target=/var/lib/apt,sharing=locked \
     texlive-extra-utils \
     latexdiff \
     &&  kanji-config-updmap-sys auto 
-    
+
 # 推奨パッケージをインストール
 # RUN apt-get install -y \
 #     texlive-extra-utils \
@@ -95,7 +100,7 @@ RUN --mount=type=cache,target=/var/lib/apt,sharing=locked \
 #     && rm -rf /var/lib/apt/lists/*
 
 
-ENV DIRPATH /home/${DOCKER_USER_}
+ENV DIRPATH=/home/${DOCKER_USER_}
 WORKDIR $DIRPATH
 
 RUN useradd ${DOCKER_USER_} \
