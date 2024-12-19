@@ -18,6 +18,7 @@ runs:
       run: |
         docker buildx build \
             --load \
+            --platform linux/arm64/v8 \
             --file Dockerfile.arm64 \
             --cache-from=type=local,src=/tmp/.buildx-cache \
             --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
@@ -26,6 +27,7 @@ runs:
         if [[ $(docker images | grep -c ${{ env.TAG }}) -eq 0 ]]; then
           docker buildx build \
             --load \
+            --platform linux/arm64/v8 \
             --file Dockerfile.arm64 \
             --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
             --no-cache --pull \

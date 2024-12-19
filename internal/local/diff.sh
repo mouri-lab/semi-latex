@@ -54,20 +54,18 @@ function makeDiff {
         "latexdiff --graphics-markup=none -e utf8 -t CFONT $(basename ${OLD_PATH}) $(basename ${NEW_PATH}) > diff.tex"
 
     # 環境をコンテナにコピー
-    docker container exec ${CONTAINER_NAME} /bin/bash -c "mkdir -p ${DOCKER_HOME_DIR}${TEX_DIR_PATH}"
-	docker container cp ${TEX_DIR_PATH} ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_DIR_PATH}/../
+    docker container exec ${CONTAINER_NAME} /bin/bash -c "mkdir -p ${DOCKER_HOME_DIR}/${TEX_DIR_PATH}"
+	docker container cp ${TEX_DIR_PATH} ${CONTAINER_NAME}:${DOCKER_HOME_DIR}/${TEX_DIR_PATH}/../
 	docker container exec ${CONTAINER_NAME} /bin/bash -c \
-		"cp -n ${DOCKER_HOME_DIR}/internal/container/style/* ${DOCKER_HOME_DIR}${TEX_DIR_PATH} \
-		&& cp -n ${DOCKER_HOME_DIR}/internal/container/scripts/* ${DOCKER_HOME_DIR}${TEX_DIR_PATH}"
+		"cp -n ${DOCKER_HOME_DIR}/internal/container/style/* ${DOCKER_HOME_DIR}/${TEX_DIR_PATH} \
+		&& cp -n ${DOCKER_HOME_DIR}/internal/container/scripts/* ${DOCKER_HOME_DIR}/${TEX_DIR_PATH}"
 
 	docker container exec --user root ${CONTAINER_NAME} /bin/bash -c \
-        "rm ${DOCKER_HOME_DIR}${TEX_DIR_PATH}/*.tex"
+        "rm ${DOCKER_HOME_DIR}/${TEX_DIR_PATH}/*.tex"
 	docker container exec --user root ${CONTAINER_NAME} /bin/bash -c \
-        "cp ${DOCKER_HOME_DIR}/diff.tex ${DOCKER_HOME_DIR}${TEX_DIR_PATH}"
+        "cp ${DOCKER_HOME_DIR}/diff.tex ${DOCKER_HOME_DIR}/${TEX_DIR_PATH}"
 	docker container exec --user root ${CONTAINER_NAME} /bin/bash -c \
-        "cd ${DOCKER_HOME_DIR}${TEX_DIR_PATH} && make all && make all && make all"
-	docker container exec --user root ${CONTAINER_NAME} /bin/bash -c \
-        "cd ${DOCKER_HOME_DIR}${TEX_DIR_PATH} && make all"
+        "cd ${DOCKER_HOME_DIR}/${TEX_DIR_PATH} && make all && make all && make all"
 }
 
 function preExec {
