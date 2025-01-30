@@ -160,4 +160,4 @@ test:
 	ARCH=${ARCH} bash ${SCRIPTS_DIR}/test.sh
 
 sandbox:
-	echo ${TEX_FILE_PATH}
+	docker exec -it  --user root ${NAME} /bin/bash -c -x "echo "hoge hoge ""
