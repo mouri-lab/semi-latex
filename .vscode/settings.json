@@ -22,7 +22,6 @@
 				"-C",
 				"%WORKSPACE_FOLDER%",
 				"-s",
-				"f=%DOC_EXT%",
 			]
 		},
 	],
