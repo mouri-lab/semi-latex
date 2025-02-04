@@ -1,12 +1,22 @@
 
 - [概要](#概要)
   - [動作環境](#動作環境)
+      - [必要環境](#必要環境)
+      - [推奨環境](#推奨環境)
+      - [ホストOSについて](#ホストosについて)
 - [INSTALL](#install)
   - [LaTeXビルド環境の構築](#latexビルド環境の構築)
+    - [1. Docker環境の構築](#1-docker環境の構築)
+    - [2. ビルドイメージの取得](#2-ビルドイメージの取得)
+    - [3. インストールの確認](#3-インストールの確認)
   - [ローカル環境へのTextLintのインストール](#ローカル環境へのtextlintのインストール)
+    - [Install方法](#install方法)
 - [使い方](#使い方)
   - [LaTeXのビルド](#latexのビルド)
   - [latexdiff](#latexdiff)
+      - [使い方](#使い方-1)
+        - [基本](#基本)
+        - [newを指定しない場合は，semi-latex/内で最新のtexが自動で指定されます](#newを指定しない場合はsemi-latex内で最新のtexが自動で指定されます)
   - [semi-latexの更新](#semi-latexの更新)
 - [テンプレート](#テンプレート)
   - [全体ゼミ](#全体ゼミ)
@@ -16,9 +26,12 @@
   - [学会](#学会)
 - [textlint](#textlint)
   - [ターミナルから実行](#ターミナルから実行)
+    - [研のlintルール](#研のlintルール)
 - [画像の貼り方](#画像の貼り方)
   - [対応しているファイル形式](#対応しているファイル形式)
   - [自動変換の注意](#自動変換の注意)
+    - [正しいフォルダ階層の例](#正しいフォルダ階層の例)
+    - [NG例](#ng例)
   - [png](#png)
   - [svg](#svg)
 - [ディレクトリ](#ディレクトリ)
@@ -41,8 +54,8 @@
 * bash
 
 #### 推奨環境
-* VScode
-* 拡張機能
+* VSCode
+* VSCode拡張機能
   * LaTeX-Workshop
     * LaTeXの補完
     * 保存時に自動ビルド
@@ -121,6 +134,7 @@ VSCodeのTextLint拡張機能を利用し，VSCode上にTextLintの結果を表�
 - 2つのtexファイルの差分を色付けしてpdfを出力する機能です．
   - [latexdiff](https://www.ctan.org/pkg/latexdiff)
 - 従来は手動で色を付けていましたが，面倒なので自動化しました
+- 卒修論などのmain.texからinclude{}で複数ファイルを使った場合にも対応してます
 
 
 #### 使い方
@@ -130,6 +144,11 @@ VSCodeのTextLint拡張機能を利用し，VSCode上にTextLintの結果を表�
 ##### 基本
 ```
 make diff old=${古いtexのpath} new=${新しいtexのpath}
+```
+
+例)
+```
+make diff old=latex/oldDir/main.tex new=latex/newDir/main.tex
 ```
 
 ##### newを指定しない場合は，semi-latex/内で最新のtexが自動で指定されます
@@ -171,7 +190,8 @@ texファイルのdocumentclassで使用するテンプレートを選択でき�
   \documentclass[submit,techreq,noauthor,dvipdfmx]{mid-eco}
   ```
 * 卒論
-  * [サンプルコード](sample/graduation-thesis/main.tex)
+  * 基本的には[newGraduation](sample/newGraduation/main.tex)の方のはず(表紙のテンプレートが変わっていたら随時変更してほしい)
+    * [graduation-thesis](sample/graduation-thesis/main.tex)は古い表紙
   * 他のサンプルと違い，複数のtexファイルに分かれています
 
 ## 院生向け
