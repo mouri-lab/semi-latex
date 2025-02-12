@@ -15,7 +15,7 @@ runs:
             --platform linux/amd64 \
             --cache-from=type=local,src=/tmp/.buildx-cache \
             --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
-            --tag ${{ env.TAG }}:x86_64 . \
+            --tag ${{ env.TAG }}:latest . \
           || exit 0
           if [[ $(docker images | grep -c ${{ env.TAG }}) -eq 0 ]]; then
             docker buildx build \
@@ -23,7 +23,7 @@ runs:
               --platform linux/amd64 \
               --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
               --no-cache --pull \
-              --tag ${{ env.TAG }}:x86_64 .
+              --tag ${{ env.TAG }}:latest .
           fi
       shell: bash
 

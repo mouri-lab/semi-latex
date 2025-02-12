@@ -8,7 +8,7 @@ readonly CONTAINER_NAME=latex-container
 readonly STYLE_DIR=internal/container/style
 readonly SCRIPTS_DIR=internal/local
 readonly DOCKER_HOME_DIR=/home/guest
-readonly ARCH=$(uname -m)
+readonly DOCKER_TAG="latest"
 
 
 # readonly OLD_PATH=$(bash ${SCRIPTS_DIR}/search-main.sh $1)
@@ -80,7 +80,7 @@ function preExec {
 			--rm\
 			-d\
 			--name ${CONTAINER_NAME}\
-			${CONTAINER_NAME}:${ARCH}
+			${CONTAINER_NAME}:${DOCKER_TAG}
 	fi
 }
 

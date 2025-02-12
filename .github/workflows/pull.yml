@@ -1,5 +1,7 @@
 name: Scheduled workflow
 
+# 定期的にLaTeXがビルドできるかテストするAction
+
 on:
   workflow_dispatch:
   schedule:
@@ -27,30 +29,6 @@ jobs:
       - name: build test
         run: make test
 
-  image-test-arm64:
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 30
-    strategy:
-      matrix:
-        os: [ubuntu-20.04 , ubuntu-22.04, ubuntu-24.04]
-    steps:
-      - name: checkout code
-        uses: actions/checkout@v4.1.7
-      - name: setup docker
-        uses: docker/setup-buildx-action@v3.8.0
-
-      - name: install qemu
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y qemu-user-static
-        shell: bash
-
-      - name: docker pull
-        run: ARCH=arm64 make get-image
-
-      - name: build test
-        run: ARCH=arm64 make test
-
   latest-ubuntu-test:
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -64,23 +42,3 @@ jobs:
       - name: build test
         run: make test
 
-  latest-ubuntu-test-arm64:
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    steps:
-      - name: checkout code
-        uses: actions/checkout@v4.1.7
-      - name: setup docker
-        uses: docker/setup-buildx-action@v3.8.0
-
-      - name: install qemu
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y qemu-user-static
-        shell: bash
-
-      - name: docker rebuild
-        run: ARCH=arm64 make docker-rebuild
-
-      - name: build test
-        run: ARCH=arm64 make test
