@@ -1,36 +1,44 @@
 name: Scheduled workflow
 
+# 定期的にLaTeXがビルドできるかテストするAction
+
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 0 * * 1"
+    - cron: "0 0 * * 1" # every Monday at 00:00
 
 permissions:
-  contents: read
+  contents: read 
 
 jobs:
   image-test:
-    runs-on: ubuntu-22.04
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 30
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
     steps:
       - name: checkout code
         uses: actions/checkout@v4.1.7
       - name: setup docker
-        uses: docker/setup-buildx-action@v3.7.1
+        uses: docker/setup-buildx-action@v3.9.0
+
       - name: docker pull
         run: make get-image
+
       - name: build test
         run: make test
 
-  latest-ubuntu:
+  latest-ubuntu-test:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
       - name: checkout code
         uses: actions/checkout@v4.1.7
       - name: setup docker
-        uses: docker/setup-buildx-action@v3.7.1
+        uses: docker/setup-buildx-action@v3.9.0
       - name: docker rebuild
         run: make docker-rebuild
       - name: build test
         run: make test
+

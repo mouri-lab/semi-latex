@@ -14,8 +14,8 @@ readonly NAME="latex-container"
 readonly STYLE_DIR=$(readlink -f "../internal/container/style")
 readonly SCRIPTS_DIR=$(readlink -f "../internal/local")
 
-if [[ -z $ARCH ]]; then
-	ARCH=$(uname -m)
+if [[ -z $DOCKER_TAG ]]; then
+	DOCKER_TAG="latest"
 fi
 readonly DOCKER_HOME_DIR="/home/$(cat ../Dockerfile | grep "ARG DOCKER_USER_" | cut -d "=" -f 2)"
 
@@ -36,9 +36,10 @@ function containerAttach {
 
 function test(){
 	local -r target_texdir_path=$1
-	# 								target tex path   	   test mode
-	TEST=1 ARCH=${ARCH} bash ${SCRIPTS_DIR}/texBuild.sh ${target_texdir_path} 1>/dev/null 2>/dev/null || true
-	# TEST=1 ARCH=${ARCH} bash ${SCRIPTS_DIR}/texBuild.sh ${target_texdir_path}
+	# テスト実行
+	# 標準出力と標準エラー出力はCLIが崩れるので出力しない
+	# テスト結果は後ろで確認するので，このコマンドは常に成功させる（そうしないと他のテストが実行されない)）
+	TEST=1 DOCKER_TAG=${DOCKER_TAG} bash ${SCRIPTS_DIR}/texBuild.sh ${target_texdir_path} 1>/dev/null 2>/dev/null || true
 
 	local -r target_dir_name=$(dirname ${target_texdir_path} | rev | cut -d "/" -f 1 | rev)
 	local -r target_file_path=$(bash ${SCRIPTS_DIR}/search-main.sh ${target_texdir_path})
@@ -78,14 +79,6 @@ function test(){
 	fi
 
 	post_docker
-}
-
-function ERROR(){
-	local -r line=$1
-	local -r comment=$2
-	echo -e "[error] line: ${line}\n\t ${comment}"
-	post_docker
-	exit
 }
 
 function FAILED(){

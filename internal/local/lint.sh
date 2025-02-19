@@ -35,8 +35,8 @@ else
 fi
 
 # TEST_MODE: ビルドした成果物をローカルに保存しない
-if [[ -z $ARCH ]]; then
-	ARCH=$(uname -m)
+if [[ -z $DOCKER_TAG ]]; then
+	DOCKER_TAG="latest"
 fi
 
 readonly TEX_DIR_PATH=$(dirname ${TEX_FILE_PATH})
@@ -62,7 +62,7 @@ function preExec {
 			--rm\
 			-d\
 			--name ${CONTAINER_NAME}\
-			${CONTAINER_NAME}:${ARCH}
+			${CONTAINER_NAME}:${DOCKER_TAG}
 	fi
 	docker container exec ${CONTAINER_NAME} /bin/bash -c "mkdir -p ${DOCKER_HOME_DIR}${TEX_DIR_PATH}"
 	docker container cp ${TEX_FILE_PATH} ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_DIR_PATH}/

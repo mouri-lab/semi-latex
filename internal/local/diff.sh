@@ -8,7 +8,7 @@ readonly CONTAINER_NAME=latex-container
 readonly STYLE_DIR=internal/container/style
 readonly SCRIPTS_DIR=internal/local
 readonly DOCKER_HOME_DIR=/home/guest
-readonly ARCH=$(uname -m)
+readonly DOCKER_TAG="latest"
 
 
 # readonly OLD_PATH=$(bash ${SCRIPTS_DIR}/search-main.sh $1)
@@ -46,12 +46,14 @@ readonly TEX_DIR_PATH=$(dirname ${NEW_PATH})
 set -u
 
 function makeDiff {
-	docker container cp ${OLD_PATH} ${CONTAINER_NAME}:${DOCKER_HOME_DIR}
-	docker container cp ${NEW_PATH} ${CONTAINER_NAME}:${DOCKER_HOME_DIR}
+	# docker container cp ${OLD_PATH} ${CONTAINER_NAME}:${DOCKER_HOME_DIR}
+	docker container cp $(dirname ${OLD_PATH}) ${CONTAINER_NAME}:${DOCKER_HOME_DIR}/old/
+	# docker container cp ${NEW_PATH} ${CONTAINER_NAME}:${DOCKER_HOME_DIR}
+	docker container cp $(dirname ${NEW_PATH}) ${CONTAINER_NAME}:${DOCKER_HOME_DIR}/new/
 
     # diff.texを生成
     docker container exec --user root ${CONTAINER_NAME} /bin/bash -c \
-        "latexdiff --graphics-markup=none -e utf8 -t CFONT $(basename ${OLD_PATH}) $(basename ${NEW_PATH}) > diff.tex"
+        "latexdiff --graphics-markup=none -e utf8 -t CFONT --flatten old/$(basename ${OLD_PATH}) new/$(basename ${NEW_PATH}) > diff.tex"
 
     # 環境をコンテナにコピー
     docker container exec ${CONTAINER_NAME} /bin/bash -c "mkdir -p ${DOCKER_HOME_DIR}/${TEX_DIR_PATH}"
@@ -62,6 +64,9 @@ function makeDiff {
 
 	docker container exec --user root ${CONTAINER_NAME} /bin/bash -c \
         "rm ${DOCKER_HOME_DIR}/${TEX_DIR_PATH}/*.tex"
+
+	docker container exec --user root ${CONTAINER_NAME} /bin/bash -c "bash ${DOCKER_HOME_DIR}/internal/container/scripts/latexdiff-replace.sh ${DOCKER_HOME_DIR}"
+	
 	docker container exec --user root ${CONTAINER_NAME} /bin/bash -c \
         "cp ${DOCKER_HOME_DIR}/diff.tex ${DOCKER_HOME_DIR}/${TEX_DIR_PATH}"
 	docker container exec --user root ${CONTAINER_NAME} /bin/bash -c \
@@ -75,7 +80,7 @@ function preExec {
 			--rm\
 			-d\
 			--name ${CONTAINER_NAME}\
-			${CONTAINER_NAME}:${ARCH}
+			${CONTAINER_NAME}:${DOCKER_TAG}
 	fi
 }
 
@@ -87,6 +92,7 @@ function postExec {
         docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}/${TEX_DIR_PATH}/diff.log ${TEX_DIR_PATH}/diff.log
 	fi
 	docker container exec --user root ${CONTAINER_NAME} /bin/bash -c "rm -rf ${DOCKER_HOME_DIR}/home *.tex"
+	docker container stop ${CONTAINER_NAME}
 }
 
 function containerAttach {

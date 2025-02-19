@@ -3,11 +3,10 @@ NAME := latex-container
 
 # DockerHubのリポジトリ名
 # make get-imageの取得先
-DOCKER_REPOSITORY := taka0628/semi-latex
+DOCKER_REPOSITORY := sakuramourilab/semi-latex
+DOCKER_TAG := latest
 
 SCRIPTS_DIR := internal/local
-
-ARCH := $$(uname -m)
 
 # ビルドするtexファイルのディレクトリ
 # fはTEX_FILE_PATHのエイリアス
@@ -32,14 +31,14 @@ SHELL := /bin/bash
 
 # LaTeXのビルド
 run:
-	ARCH=${ARCH} bash ${SCRIPTS_DIR}/texBuild.sh ${TEX_FILE_PATH}
+	bash ${SCRIPTS_DIR}/texBuild.sh ${TEX_FILE_PATH}
 
 # TextLint
 lint:
-	ARCH=${ARCH} bash ${SCRIPTS_DIR}/lint.sh ${TEX_FILE_PATH}
+	bash ${SCRIPTS_DIR}/lint.sh ${TEX_FILE_PATH}
 
 lint-fix:
-	ARCH=${ARCH} FIX=1 bash ${SCRIPTS_DIR}/lint.sh ${TEX_FILE_PATH}
+	FIX=1 bash ${SCRIPTS_DIR}/lint.sh ${TEX_FILE_PATH}
 
 
 # 差分を色付けして出力
@@ -55,28 +54,13 @@ run-sample:
 # コンテナのビルド
 docker-build:
 	make docker-stop -s
-	docker buildx build --platform linux/amd64 -t ${NAME}:x86_64 .
+	docker buildx build --platform linux/amd64 -t ${NAME}:${DOCKER_TAG} .
 	make _postBuild -s
-
-docker-buildforArm:
-	make docker-stop -s
-	docker buildx build --platform linux/arm64/v8 -t ${NAME}:arm64 -f Dockerfile.arm64 .
-	make _postBuild -s
-
 
 # キャッシュを使わずにビルド
 docker-rebuild:
 	make docker-stop -s
-	docker buildx build --platform linux/amd64 -t ${NAME}:x86_64 \
-	--pull \
-	--force-rm=true \
-	--no-cache=true .
-	make _postBuild -s
-
-docker-rebuildforArm:
-	make docker-stop -s
-	docker buildx build --platform linux/arm64/v8 -t ${NAME}:arm64 \
-	-f Dockerfile.arm64 \
+	docker buildx build --platform linux/amd64 -t ${NAME}:${DOCKER_TAG} \
 	--pull \
 	--force-rm=true \
 	--no-cache=true .
@@ -145,19 +129,19 @@ install-textlint:
 	npm install
 
 push-image:
-	docker tag ${NAME}:${ARCH} ${DOCKER_REPOSITORY}:${ARCH}
-	docker push ${DOCKER_REPOSITORY}:${ARCH}
-	docker image rm ${DOCKER_REPOSITORY}:${ARCH}
+	docker tag ${NAME}:${DOCKER_TAG} ${DOCKER_REPOSITORY}:${DOCKER_TAG}
+	docker push ${DOCKER_REPOSITORY}:${DOCKER_TAG}
+	docker image rm ${DOCKER_REPOSITORY}:${DOCKER_TAG}
 
 get-image:
-	docker pull ${DOCKER_REPOSITORY}:${ARCH}
-	docker tag ${DOCKER_REPOSITORY}:${ARCH} ${NAME}:${ARCH}
-	docker image rm ${DOCKER_REPOSITORY}:${ARCH}
+	docker pull ${DOCKER_REPOSITORY}:${DOCKER_TAG}
+	docker tag ${DOCKER_REPOSITORY}:${DOCKER_TAG} ${NAME}:${DOCKER_TAG}
+	docker image rm ${DOCKER_REPOSITORY}:${DOCKER_TAG}
 
 
 # サンプルのビルドテスト
 test:
-	ARCH=${ARCH} bash ${SCRIPTS_DIR}/test.sh
+	DOCKER_TAG=${DOCKER_TAG} bash ${SCRIPTS_DIR}/test.sh
 
 sandbox:
-	echo ${TEX_FILE_PATH}
+	docker exec -it  --user root ${NAME} /bin/bash -c -x "echo "hoge hoge ""

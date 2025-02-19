@@ -1,5 +1,7 @@
 name: LaTeX Build Test
 
+# PushやPR時にテストを実行するAction
+
 on:
   push:
   pull_request:
@@ -14,8 +16,11 @@ env:
 
 jobs:
   LatexBuild:
-    runs-on: ubuntu-22.04
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 60
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
 
     steps:
       - uses: actions/checkout@v4.1.7
@@ -27,18 +32,3 @@ jobs:
 
       - name: docker build
         uses: ./.github/actions/dockerBuild
-
-  LatexBuildOnArm:
-    runs-on: ubuntu-22.04
-    timeout-minutes: 60
-
-    steps:
-      - uses: actions/checkout@v4.1.7
-      - name: Get current date and time
-        env:
-          TZ: "Asia/Tokyo"
-        id: date
-        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
-
-      - name: docker build for ARM
-        uses: ./.github/actions/dockerBuildArm
