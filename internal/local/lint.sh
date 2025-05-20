@@ -45,8 +45,14 @@ set -u
 
 function lint {
 	echo "$(tput setaf 2)TEX PATH:$(tput sgr0) ${TEX_FILE_PATH}"
+
+	local FIX_OPT=""
+	if [[ ${FIX} -eq 1 ]]; then
+		FIX_OPT="--fix"
+	fi
+
 	docker container exec -i ${CONTAINER_NAME} /bin/bash -c \
-        "textlint ${DOCKER_HOME_DIR}${TEX_FILE_PATH} \
+        "textlint ${FIX_OPT} ${DOCKER_HOME_DIR}${TEX_FILE_PATH} \
 		| sed -e 's^\([0-9]\)\+:\([0-9]\)\+^\n${TEX_FILE_PATH}:&\n\t^g' \
 		| sed 's/errors/$(tput setaf 1)&$(tput sgr0)/g' \
 		| sed 's/error/$(tput setaf 1)&$(tput sgr0)/g' \
@@ -69,6 +75,11 @@ function preExec {
 }
 
 function postExec {
+
+	if [[ ${FIX} -eq 1 ]]; then
+    docker container cp ${CONTAINER_NAME}:${DOCKER_HOME_DIR}${TEX_FILE_PATH} ${TEX_FILE_PATH}
+	fi
+
     docker container exec --user root ${CONTAINER_NAME} /bin/bash -c "rm -rf ${DOCKER_HOME_DIR}/home"
 }
 
