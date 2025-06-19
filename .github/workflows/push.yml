@@ -18,7 +18,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4.1.7
-      - uses: docker/setup-buildx-action@v3.9.0
+      - uses: docker/setup-buildx-action@v3.11.1
 
       - name: docker build
         uses: ./.github/actions/dockerBuild
