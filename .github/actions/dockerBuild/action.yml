@@ -3,7 +3,7 @@ runs:
   steps:
     - uses: docker/setup-buildx-action@v3.0.0
     - name: Cache Docker layers
-      uses: actions/cache@v4.0.0
+      uses: actions/cache@v4
       with:
         path: /tmp/.buildx-cache
         key: ${{ runner.os }}-buildx-${{ env.date }}

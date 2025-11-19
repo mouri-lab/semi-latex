@@ -58,6 +58,9 @@ RUN --mount=type=cache,target=/var/lib/apt,sharing=locked \
     fonts-noto-cjk \
     fcitx-mozc
 
+RUN cp /etc/fonts/conf.d/70-fonts-noto-cjk.conf etc/fonts/local.conf \
+    && fc-cache -f -v
+
 ENV LANG=ja_JP.UTF-8
 ENV LANGUAGE=ja_JP:jp
 ENV LC_ALL=ja_JP.UTF-8
