@@ -99,6 +99,7 @@ function main(){
 		local target_tex_path=$(readlink -f $target)
 		test ${target_tex_path}
 		echo
+    sleep 1
 	done
 
 	if [[ ${IS_FAILED} -eq 1 ]]; then
